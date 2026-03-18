@@ -217,7 +217,74 @@
 
         </section>
         <hr>
-        
+
+        <!-- Contact Section -->
+        <!-- used form and table elements to create a contact form with various input types and a submit button. -->
+        <section id="contact">
+
+            <h2>Contact</h2>
+
+            <form>
+
+                <table>
+
+                    <tr>
+                        <td><label for="name">Name:</label></td>
+                        <td><input type="text" id="name" name="name"></td>
+                    </tr>
+
+                    <tr>
+                        <td><label for="email">Email:</label></td>
+                        <td><input type="email" id="email" name="email"></td>
+                    </tr>
+
+                    <tr>
+                        <td>Reason:</td>
+                        <td>
+                            <input type="radio" id="project" name="reason">
+                            <label for="project">Project</label>
+
+                            <input type="radio" id="job" name="reason">
+                            <label for="job">Job</label>
+
+                            <input type="radio" id="other" name="reason">
+                            <label for="other">Other</label>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><label for="source">Found via:</label></td>
+                        <td>
+                            <select id="source" name="source">
+                                <option>GitHub</option>
+                                <option>LinkedIn</option>
+                                <option>Search</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><label for="message">Message:</label></td>
+                        <td>
+                            <textarea id="message" name="message" rows="3" cols="30"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input type="submit" value="Send">
+                        </td>
+                    </tr>
+
+                </table>
+
+            </form>
+
+        </section>
+        <hr>
+
+
 
     </main>
 </body>
