@@ -243,3 +243,55 @@ section h2::before {
   font-style: normal;
   font-weight: 600;
 }
+
+/* 
+   SKILLS SECTION
+   Using CSS Grid to show skill categories in
+   2 columns. Inner skills are pill-shaped tags
+   using flexbox wrap — much cleaner than raw lists.
+   Also removed the br tags which were used for spacing during HTML design,
+    since the CSS grid and gap properties handle spacing now.
+ */
+
+#skills > ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+#skills > ul > li {
+    background: var(--clr-primary-light);
+    border: 1px solid var(--clr-border);
+    border-radius: 8px;
+    padding: 16px 18px;
+}
+
+#skills > ul > li > strong {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--clr-primary-dark);
+    margin-bottom: 10px;
+}
+
+#skills ul ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0;
+}
+
+#skills ul ul li {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    color: var(--clr-text);
+    font-size: 0.8rem;
+    padding: 3px 11px;
+    border-radius: 20px;
+    font-family: 'Courier New', monospace;
+}
+
