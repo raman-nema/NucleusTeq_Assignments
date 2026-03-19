@@ -79,3 +79,56 @@ h3 {
   line-height: 1.3;
 }
 
+/* 
+   HEADER
+   Using a diagonal gradient from dark green to
+   teal to give the header a premium feel without
+   needing an image. Profile photo is made circular
+   using border-radius: 50%.
+ */
+header {
+  background: linear-gradient(135deg, #0d2b22 0%, #0d9e72 100%);
+  color: #ffffff;
+  text-align: center;
+  padding: 48px 32px 40px;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+header h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+
+header p {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+}
+
+header strong {
+  color: #a8f0d8;
+  font-weight: 500;
+}
+
+/* Circular profile image with soft border */
+header img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  margin: 16px auto;
+  display: block;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+header a {
+  color: #a8f0d8;
+}
+
+header a:hover {
+  color: #ffffff;
+}
