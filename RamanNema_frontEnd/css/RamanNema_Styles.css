@@ -352,7 +352,7 @@ section h2::before {
    gives a nice interactive feel without JS.
    transition is set so the animation is smooth.
  */
- 
+
 #projects ol {
     list-style: none;
     display: flex;
@@ -400,4 +400,83 @@ section h2::before {
 
 #projects article p strong {
     color: var(--clr-text);
+}
+
+
+/* 
+   CONTACT FORM
+   Aligning labels and inputs using the table
+   layout already in the HTML. Input fields all
+   share the same styling for visual consistency.
+   The submit button uses the primary color with
+   cursor:pointer to signal it's clickable.
+ */
+#contact form table {
+    width: 100%;
+    border-spacing: 0 10px;
+}
+
+#contact form td {
+    padding: 4px 0;
+    vertical-align: middle;
+}
+
+#contact form td:first-child {
+    width: 110px;
+}
+
+#contact label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--clr-text-muted);
+}
+
+#contact input[type="text"],
+#contact input[type="email"],
+#contact select,
+#contact textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--clr-border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--clr-text);
+    background: var(--clr-bg);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Green glow ring on focus — shows the user
+   which field is currently active */
+#contact input[type="text"]:focus,
+#contact input[type="email"]:focus,
+#contact select:focus,
+#contact textarea:focus {
+    border-color: var(--clr-primary);
+    box-shadow: 0 0 0 3px rgba(13, 158, 114, 0.12);
+}
+
+#contact input[type="radio"] {
+    accent-color: var(--clr-primary);
+    margin-right: 4px;
+}
+
+#contact input[type="submit"] {
+    background-color: var(--clr-primary);
+    color: #ffffff;
+    border: none;
+    padding: 11px 28px;
+    font-size: 0.93rem;
+    font-weight: 600;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 6px;
+}
+
+#contact input[type="submit"]:hover {
+    background-color: var(--clr-primary-dark);
+    transform: translateY(-1px);
 }
