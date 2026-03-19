@@ -1,0 +1,81 @@
+/* 
+   GLOBAL RESET
+   Resetting margin, padding and box-sizing so
+   every element behaves predictably across browsers.
+   Without this, browsers add their own default
+   spacing which breaks our layout.
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 
+   CSS VARIABLES (COLOR THEME)
+   Defined once here so I can reuse them everywhere.
+   Changing one value updates the whole site —
+   much better than hunting for hardcoded hex values.
+ */
+:root {
+  --clr-primary: #0d9e72;
+  --clr-primary-dark: #087a57;
+  --clr-primary-light: #e6f7f2;
+  --clr-accent: #06b88a;
+  --clr-bg: #f5f7f6;
+  --clr-surface: #ffffff;
+  --clr-border: #d4ede6;
+  --clr-text: #1a2e27;
+  --clr-text-muted: #5a7a6f;
+  --clr-heading: #0d2b22;
+  --clr-table-alt: #f0faf6;
+  --radius: 10px;
+  --shadow: 0 2px 12px rgba(13, 158, 114, 0.08);
+  --shadow-hover: 0 6px 24px rgba(13, 158, 114, 0.16);
+}
+
+/* 
+   BODY
+   Setting the base font, background color,
+   and max-width with auto margin to keep content
+   centered on wide screens.
+ */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--clr-bg);
+  color: var(--clr-text);
+  font-size: 16px;
+  line-height: 1.7;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
+}
+
+/* 
+   HR, LINKS, HEADINGS
+ */
+hr {
+  border: none;
+  border-top: 1px solid var(--clr-border);
+  margin: 0;
+}
+
+a {
+  color: var(--clr-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--clr-primary-dark);
+  text-decoration: underline;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--clr-heading);
+  line-height: 1.3;
+}
+
