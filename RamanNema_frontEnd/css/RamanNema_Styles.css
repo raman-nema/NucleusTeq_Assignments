@@ -132,3 +132,52 @@ header a {
 header a:hover {
   color: #ffffff;
 }
+
+/* 
+   NAVIGATION
+   Using flexbox to display nav links horizontally.
+   Sticky positioning keeps it visible while scrolling.
+   Removed default list bullets and underlines —
+   replaced with a bottom border hover effect instead.
+ */
+nav {
+    background-color: var(--clr-surface);
+    border-bottom: 1px solid var(--clr-border);
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(13, 158, 114, 0.06);
+}
+
+/* Hiding the "Navigation" h2 heading — it's not
+   needed visually since the links speak for themselves */
+nav h2 {
+    display: none;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center; /* Centering nav links horizontally. */ 
+    gap: 4px;
+}
+
+nav ul li a {
+    display: block;
+    padding: 16px 14px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--clr-text-muted);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+/* Hover effect: color shifts to primary green
+   and an underline border slides in */
+nav ul li a:hover {
+    color: var(--clr-primary);
+    border-bottom-color: var(--clr-primary);
+    text-decoration: none;
+}
