@@ -254,45 +254,45 @@ section h2::before {
  */
 
 #skills > ul {
-    list-style: none;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
 #skills > ul > li {
-    background: var(--clr-primary-light);
-    border: 1px solid var(--clr-border);
-    border-radius: 8px;
-    padding: 16px 18px;
+  background: var(--clr-primary-light);
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  padding: 16px 18px;
 }
 
 #skills > ul > li > strong {
-    display: block;
-    font-size: 0.82rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--clr-primary-dark);
-    margin-bottom: 10px;
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--clr-primary-dark);
+  margin-bottom: 10px;
 }
 
 #skills ul ul {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
 }
 
 #skills ul ul li {
-    background: var(--clr-surface);
-    border: 1px solid var(--clr-border);
-    color: var(--clr-text);
-    font-size: 0.8rem;
-    padding: 3px 11px;
-    border-radius: 20px;
-    font-family: 'Courier New', monospace;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-text);
+  font-size: 0.8rem;
+  padding: 3px 11px;
+  border-radius: 20px;
+  font-family: "Courier New", monospace;
 }
 
 /* 
@@ -304,46 +304,45 @@ section h2::before {
  */
 
 #education table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.93rem;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.93rem;
 }
 
 #education th {
-    background-color: var(--clr-primary);
-    color: #ffffff;
-    padding: 12px 16px;
-    text-align: left;
-    font-weight: 600;
+  background-color: var(--clr-primary);
+  color: #ffffff;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
 }
 
 /* The colspan header (title row) is centered */
 #education th[colspan] {
-    text-align: center;
-    font-size: 1rem;
+  text-align: center;
+  font-size: 1rem;
 }
 
 #education td {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--clr-border);
-    color: var(--clr-text);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--clr-border);
+  color: var(--clr-text);
 }
 
 /* Alternating row color to improve readability */
 #education tr:nth-child(even) td {
-    background-color: var(--clr-table-alt);
+  background-color: var(--clr-table-alt);
 }
 
 #education tr:last-child td {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 /* Subtle hover highlight on each row */
 #education tr:hover td {
-    background-color: #d8f5ec;
-    transition: background 0.15s;
+  background-color: #d8f5ec;
+  transition: background 0.15s;
 }
-
 
 /* 
    PROJECTS SECTION
@@ -354,54 +353,55 @@ section h2::before {
  */
 
 #projects ol {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0;
 }
 
 #projects article {
-    background: var(--clr-primary-light);
-    border: 1px solid var(--clr-border);
-    border-left: 4px solid var(--clr-primary);
-    border-radius: 8px;
-    padding: 18px 20px;
-    transition: box-shadow 0.2s, transform 0.2s;
+  background: var(--clr-primary-light);
+  border: 1px solid var(--clr-border);
+  border-left: 4px solid var(--clr-primary);
+  border-radius: 8px;
+  padding: 18px 20px;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
 }
 
 #projects article:hover {
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
 }
 
 #projects article h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 6px;
 }
 
 /* Project link color — transitions smoothly on hover */
 #projects article h3 a {
-    color: var(--clr-primary-dark);
-    transition: color 0.2s;
+  color: var(--clr-primary-dark);
+  transition: color 0.2s;
 }
 
 #projects article h3 a:hover {
-    color: var(--clr-accent);
-    text-decoration: underline;
+  color: var(--clr-accent);
+  text-decoration: underline;
 }
 
 #projects article p {
-    font-size: 0.88rem;
-    color: var(--clr-text-muted);
-    margin-top: 4px;
+  font-size: 0.88rem;
+  color: var(--clr-text-muted);
+  margin-top: 4px;
 }
 
 #projects article p strong {
-    color: var(--clr-text);
+  color: var(--clr-text);
 }
-
 
 /* 
    CONTACT FORM
@@ -412,39 +412,41 @@ section h2::before {
    cursor:pointer to signal it's clickable.
  */
 #contact form table {
-    width: 100%;
-    border-spacing: 0 10px;
+  width: 100%;
+  border-spacing: 0 10px;
 }
 
 #contact form td {
-    padding: 4px 0;
-    vertical-align: middle;
+  padding: 4px 0;
+  vertical-align: middle;
 }
 
 #contact form td:first-child {
-    width: 110px;
+  width: 110px;
 }
 
 #contact label {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--clr-text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--clr-text-muted);
 }
 
 #contact input[type="text"],
 #contact input[type="email"],
 #contact select,
 #contact textarea {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid var(--clr-border);
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--clr-text);
-    background: var(--clr-bg);
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--clr-border);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--clr-text);
+  background: var(--clr-bg);
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 /* Green glow ring on focus — shows the user
@@ -453,30 +455,64 @@ section h2::before {
 #contact input[type="email"]:focus,
 #contact select:focus,
 #contact textarea:focus {
-    border-color: var(--clr-primary);
-    box-shadow: 0 0 0 3px rgba(13, 158, 114, 0.12);
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 3px rgba(13, 158, 114, 0.12);
 }
 
 #contact input[type="radio"] {
-    accent-color: var(--clr-primary);
-    margin-right: 4px;
+  accent-color: var(--clr-primary);
+  margin-right: 4px;
 }
 
 #contact input[type="submit"] {
-    background-color: var(--clr-primary);
-    color: #ffffff;
-    border: none;
-    padding: 11px 28px;
-    font-size: 0.93rem;
-    font-weight: 600;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    margin-top: 6px;
+  background-color: var(--clr-primary);
+  color: #ffffff;
+  border: none;
+  padding: 11px 28px;
+  font-size: 0.93rem;
+  font-weight: 600;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.1s;
+  margin-top: 6px;
 }
 
 #contact input[type="submit"]:hover {
-    background-color: var(--clr-primary-dark);
-    transform: translateY(-1px);
+  background-color: var(--clr-primary-dark);
+  transform: translateY(-1px);
+}
+
+/* 
+   FOOTER
+   Mirrors the dark header color for a bookend
+   effect. Smaller font size since it's secondary
+   info. Links in the same mint green as the header.
+ */
+footer {
+  background-color: var(--clr-heading);
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  padding: 28px 20px;
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  margin-top: 20px;
+}
+
+footer p {
+  margin-bottom: 6px;
+}
+
+footer a {
+  color: #a8f0d8;
+  font-weight: 500;
+}
+footer a:hover {
+  color: #ffffff;
+}
+
+footer + hr {
+  display: none;
 }
