@@ -141,43 +141,105 @@ header a:hover {
    replaced with a bottom border hover effect instead.
  */
 nav {
-    background-color: var(--clr-surface);
-    border-bottom: 1px solid var(--clr-border);
-    padding: 0 24px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgba(13, 158, 114, 0.06);
+  background-color: var(--clr-surface);
+  border-bottom: 1px solid var(--clr-border);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(13, 158, 114, 0.06);
 }
 
 /* Hiding the "Navigation" h2 heading — it's not
    needed visually since the links speak for themselves */
 nav h2 {
-    display: none;
+  display: none;
 }
 
 nav ul {
-    list-style: none;
-    display: flex;
-    justify-content: center; /* Centering nav links horizontally. */ 
-    gap: 4px;
+  list-style: none;
+  display: flex;
+  justify-content: center; /* Centering nav links horizontally. */
+  gap: 4px;
 }
 
 nav ul li a {
-    display: block;
-    padding: 16px 14px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--clr-text-muted);
-    text-decoration: none;
-    border-bottom: 2px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
+  display: block;
+  padding: 16px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--clr-text-muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
 }
 
 /* Hover effect: color shifts to primary green
    and an underline border slides in */
 nav ul li a:hover {
-    color: var(--clr-primary);
-    border-bottom-color: var(--clr-primary);
-    text-decoration: none;
+  color: var(--clr-primary);
+  border-bottom-color: var(--clr-primary);
+  text-decoration: none;
+}
+
+/* 
+   SECTIONS — GENERAL
+   Every section gets a white card look with
+   a subtle shadow and border. The green bar
+   before each h2 is created using ::before
+   pseudo-element — no extra HTML needed.
+ */
+
+main {
+  margin-top: 0;
+}
+
+section {
+  background-color: var(--clr-surface);
+  padding: 36px 32px;
+  margin: 20px 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--clr-border);
+  box-shadow: var(--shadow);
+}
+
+/* Hiding the <hr> tags which are used during HTML designing. */
+section + hr {
+  display: none;
+}
+
+section h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--clr-primary-dark);
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--clr-primary-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Small vertical accent bar before every section title */
+section h2::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 20px;
+  background: var(--clr-primary);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ABOUT SECTION */
+#about p {
+  color: var(--clr-text);
+}
+
+#about em {
+  color: var(--clr-primary-dark);
+  font-style: normal;
+  font-weight: 600;
 }
