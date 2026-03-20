@@ -1,10 +1,17 @@
 /* 
+  Note :
+  Found the aesthetically pleasing color palette for the resume styled portfolio
+  used vaious fonts for different secttions to create visually appealing and readable layout.
+  Also used prettier css formatting to make it easier to read and debug.
+
+  */
+
+/* 
    GLOBAL RESET
    Resetting margin, padding and box-sizing so
    every element behaves predictably across browsers.
-   Without this, browsers add their own default
-   spacing which breaks our layout.
  */
+
 *,
 *::before,
 *::after {
@@ -14,10 +21,10 @@
 }
 
 /* 
-   CSS VARIABLES (COLOR THEME)
-   Defined once here so I can reuse them everywhere.
+   CSS VARIABLES.
+   Defined once here so that I can reuse them everywhere.
    Changing one value updates the whole site —
-   much better than hunting for hardcoded hex values.
+   much better than searching for hardcoded hex values.
  */
 :root {
   --clr-primary: #0d9e72;
@@ -81,11 +88,10 @@ h3 {
 
 /* 
    HEADER
-   Using a diagonal gradient from dark green to
-   teal to give the header a premium feel without
-   needing an image. Profile photo is made circular
-   using border-radius: 50%.
+   Using a diagonal gradient from dark green to teal.
+   Profile photo is made circular using border-radius: 50%.
  */
+
 header {
   background: linear-gradient(135deg, #0d2b22 0%, #0d9e72 100%);
   color: #ffffff;
@@ -140,6 +146,7 @@ header a:hover {
    Removed default list bullets and underlines —
    replaced with a bottom border hover effect instead.
  */
+
 nav {
   background-color: var(--clr-surface);
   border-bottom: 1px solid var(--clr-border);
@@ -178,6 +185,7 @@ nav ul li a {
 
 /* Hover effect: color shifts to primary green
    and an underline border slides in */
+
 nav ul li a:hover {
   color: var(--clr-primary);
   border-bottom-color: var(--clr-primary);
@@ -407,9 +415,7 @@ section h2::before {
    CONTACT FORM
    Aligning labels and inputs using the table
    layout already in the HTML. Input fields all
-   share the same styling for visual consistency.
-   The submit button uses the primary color with
-   cursor:pointer to signal it's clickable.
+   share the same styling.
  */
 #contact form table {
   width: 100%;
