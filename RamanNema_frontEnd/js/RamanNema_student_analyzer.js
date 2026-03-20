@@ -143,5 +143,31 @@ function printSubjectAverages(students) {
     console.log(`Average ${subject} Score: ${avg.toFixed(1)}`);
   }
 }
-printSubjectAverages(students);
+// printSubjectAverages(students);
+
+// function to find overall class topper
+function findClassTopper(students) {
+  let topper = null;
+  let highestMarks = 0;
+
+  students.forEach(student => {
+    let total = 0;
+
+    // calculate total marks
+    student.marks.forEach(mark => {
+      total += mark.score;
+    });
+
+    // check if current student has highest marks
+    if (total > highestMarks) {
+      highestMarks = total;
+      topper = student.name;
+    }
+  });
+
+  console.log(`Class Topper: ${topper} with ${highestMarks} marks`);
+}
+findClassTopper(students);
+
+
 
