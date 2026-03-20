@@ -69,6 +69,23 @@ function printTotalMarks(students) {
     console.log(`${student.name} Total Marks: ${total}`);
   });
 }
+// printTotalMarks(students);
 
 
-printTotalMarks(students);
+// function to print average marks of each student
+function printAverages(students) {
+  students.forEach(student => {
+    let total = 0;
+
+    // calculate total marks
+    student.marks.forEach(m => {
+      total += m.score;
+    });
+
+    // calculate average
+    const avg = (total / student.marks.length).toFixed(1);
+
+    console.log(`${student.name} Average: ${avg}`);
+  });
+}
+printAverages(students);
