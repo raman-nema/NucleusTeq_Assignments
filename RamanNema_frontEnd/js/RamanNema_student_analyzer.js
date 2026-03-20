@@ -88,4 +88,30 @@ function printAverages(students) {
     console.log(`${student.name} Average: ${avg}`);
   });
 }
-printAverages(students);
+// printAverages(students);
+
+
+// function to print highest marks in each subject
+function printHighestBySubject(students) {
+  const highest = {};
+
+  students.forEach(student => {
+    student.marks.forEach(mark => {
+
+      if (!highest[mark.subject] || mark.score > highest[mark.subject].score) {
+        highest[mark.subject] = {
+          name: student.name,
+          score: mark.score
+        };
+      }
+
+    });
+  });
+
+  console.log("Subject-wise Highest Score in the Class");
+
+  for (let subject in highest) {
+    console.log(`Highest in ${subject}: ${highest[subject].name} (${highest[subject].score})`);
+  }
+}
+printHighestBySubject(students);
