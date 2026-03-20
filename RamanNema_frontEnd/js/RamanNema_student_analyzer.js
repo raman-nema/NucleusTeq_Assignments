@@ -55,3 +55,20 @@ const students = [
     attendance: 88,
   },
 ];
+
+// function to print total marks of each student
+function printTotalMarks(students) {
+  students.forEach(student => {
+    let total = 0;
+
+    // calculate total inside same function
+    student.marks.forEach(m => {
+      total += m.score;
+    });
+
+    console.log(`${student.name} Total Marks: ${total}`);
+  });
+}
+
+
+printTotalMarks(students);
