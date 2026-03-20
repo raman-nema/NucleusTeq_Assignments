@@ -2,9 +2,9 @@ const students = [
   {
     name: "Lalit",
     marks: [
-      { subject: "Math", score: 78 },
+      { subject: "Math", score: 100 },
       { subject: "English", score: 82 },
-      { subject: "Science", score: 74 },
+      { subject: "Science", score: 95 },
       { subject: "History", score: 69 },
       { subject: "Computer", score: 88 },
     ],
@@ -167,7 +167,56 @@ function findClassTopper(students) {
 
   console.log(`Class Topper: ${topper} with ${highestMarks} marks`);
 }
-findClassTopper(students);
+// findClassTopper(students);
 
+
+// function to print grade of each student
+function printGrades(students) {
+  students.forEach(student => {
+    let total = 0;
+
+    // calculate total
+    student.marks.forEach(m => {
+      total += m.score;
+    });
+
+    // calculate average
+    let avg = total / student.marks.length;
+
+    // check fail (subject)
+    let isFailed = false;
+    let failedSubject = "";
+
+    student.marks.forEach(m => {
+      if (m.score <= 40) {
+        isFailed = true;
+        failedSubject = m.subject;
+      }
+    });
+
+    // check attendance
+    if (student.attendance < 75) {
+      console.log(student.name + " Grade: Fail (Low Attendance)");
+    }
+    // check subject fail
+    else if (isFailed) {
+      console.log(student.name + " Grade: Fail (Failed in " + failedSubject + ")");
+    }
+    // grade logic
+    else {
+      if (avg >= 85) {
+        console.log(student.name + " Grade: A");
+      } else if (avg >= 70) {
+        console.log(student.name + " Grade: B");
+      } else if (avg >= 50) {
+        console.log(student.name + " Grade: C");
+      } else {
+        console.log(student.name + " Grade: Fail");
+      }
+    }
+  });
+}
+
+ printGrades(students);
 
 
