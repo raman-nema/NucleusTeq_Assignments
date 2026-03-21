@@ -163,3 +163,17 @@ function getFilteredProducts() {
 
   return filtered;
 }
+
+
+// handles delete button clicks using event delegation
+document.getElementById("productList").addEventListener("click", function(e) {
+  if (e.target.classList.contains("deleteBtn")) {
+    var productId = parseInt(e.target.getAttribute("data-id"));
+    productData = productData.filter(function(p) { return p.id !== productId; });
+    saveProducts();
+    currentPage = 1;
+    updateCategoryDropdown();
+    renderProducts();
+    updateSummaryCards();
+  }
+});
