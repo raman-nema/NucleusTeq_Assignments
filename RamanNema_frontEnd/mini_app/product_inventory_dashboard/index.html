@@ -61,9 +61,47 @@
                 Low Stock Only
             </label>
         </div>
+        <!-- products show up here -->
+        <div id="productList"></div>
+        <p id="noProductsMsg" style="display:none;">No products found.</p>
+        <div id="paginationBar"></div>
+
+        <!-- form to add new product -->
+        <div class="addProductForm">
+            <h2>Add New Product</h2>
+            <div class="inputGrid">
+                <div class="inputField">
+                    <label>Product Name</label>
+                    <input type="text" id="newName" placeholder="e.g. Keyboard" />
+                    <span class="errorMsg" id="nameError"></span>
+                </div>
+                <div class="inputField">
+                    <label>Price</label>
+                    <input type="number" id="newPrice" placeholder="e.g. 999" />
+                    <span class="errorMsg" id="priceError"></span>
+                </div>
+                <div class="inputField">
+                    <label>Stock</label>
+                    <input type="number" id="newStock" placeholder="e.g. 20" />
+                    <span class="errorMsg" id="stockError"></span>
+                </div>
+                <div class="inputField">
+                    <label>Category</label>
+                    <select id="newCategory">
+                        <option value="">Select</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="clothing">Clothing</option>
+                        <option value="books">Books</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                    <span class="errorMsg" id="categoryError"></span>
+                </div>
+            </div>
+            <button id="addProductBtn">Add Product</button>
+        </div>
 
     </div>
-
+    <script src="script.js"></script>
 </body>
 
 </html>
