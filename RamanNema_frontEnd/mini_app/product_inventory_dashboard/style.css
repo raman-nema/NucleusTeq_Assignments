@@ -1,0 +1,14 @@
+/* basic reset for consistent layout */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* main page styling */
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #f7f5f0;
+  color: #2c2c2c;
+  font-size: 15px;
+}
