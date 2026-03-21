@@ -1,17 +1,40 @@
 // default product list used when nothing is saved yet
 var defaultProducts = [
-  { id: 1,  name: "Laptop",           price: 55000, stock: 5,  category: "electronics" },
-  { id: 2,  name: "Wireless Earbuds", price: 3499,  stock: 0,  category: "electronics" },
-  { id: 3,  name: "Smartwatch",       price: 14999, stock: 8,  category: "electronics" },
-  { id: 4,  name: "Linen Shirt",      price: 999,   stock: 30, category: "clothing"    },
-  { id: 5,  name: "Denim Jacket",     price: 2999,  stock: 2,  category: "clothing"    },
-  { id: 6,  name: "Atomic Habits",    price: 499,   stock: 0,  category: "books"       },
-  { id: 7,  name: "JS: Good Parts",   price: 699,   stock: 12, category: "books"       },
-  { id: 8,  name: "Leather Wallet",   price: 899,   stock: 3,  category: "accessories" },
-  { id: 9,  name: "Running Shoes",    price: 4299,  stock: 0,  category: "accessories" },
-  { id: 10, name: "Desk Lamp",        price: 1299,  stock: 9,  category: "accessories" }
+  { id: 1, name: "Laptop", price: 55000, stock: 5, category: "electronics" },
+  {
+    id: 2,
+    name: "Wireless Earbuds",
+    price: 3499,
+    stock: 0,
+    category: "electronics",
+  },
+  {
+    id: 3,
+    name: "Smartwatch",
+    price: 14999,
+    stock: 8,
+    category: "electronics",
+  },
+  { id: 4, name: "Linen Shirt", price: 999, stock: 30, category: "clothing" },
+  { id: 5, name: "Denim Jacket", price: 2999, stock: 2, category: "clothing" },
+  { id: 6, name: "Atomic Habits", price: 499, stock: 0, category: "books" },
+  { id: 7, name: "JS: Good Parts", price: 699, stock: 12, category: "books" },
+  {
+    id: 8,
+    name: "Leather Wallet",
+    price: 899,
+    stock: 3,
+    category: "accessories",
+  },
+  {
+    id: 9,
+    name: "Running Shoes",
+    price: 4299,
+    stock: 0,
+    category: "accessories",
+  },
+  { id: 10, name: "Desk Lamp", price: 1299, stock: 9, category: "accessories" },
 ];
-
 
 var productData = [];
 var currentPage = 1;
@@ -30,14 +53,13 @@ function getSavedProducts() {
 
 // simulates loading data from a server (uses Promise + setTimeout)
 function loadProductsFromServer() {
-  return new Promise(function(resolve) {
-    setTimeout(function() {
+  return new Promise(function (resolve) {
+    setTimeout(function () {
       var saved = getSavedProducts();
       resolve(saved || defaultProducts);
     }, 1500);
   });
 }
-
 
 // save current product list to localStorage
 function saveProducts() {
@@ -52,10 +74,28 @@ function getSavedProducts() {
 
 // simulates loading data from a server (uses Promise + setTimeout)
 function loadProductsFromServer() {
-  return new Promise(function(resolve) {
-    setTimeout(function() {
+  return new Promise(function (resolve) {
+    setTimeout(function () {
       var saved = getSavedProducts();
       resolve(saved || defaultProducts);
     }, 1500);
   });
+}
+
+// updates the 3 numbers at the top of the page
+function updateSummaryCards() {
+  document.getElementById("totalProducts").textContent = productData.length;
+
+  var totalVal = 0;
+  for (var i = 0; i < productData.length; i++) {
+    totalVal += productData[i].price * productData[i].stock;
+  }
+  document.getElementById("totalValue").textContent =
+    "Rs. " + totalVal.toLocaleString("en-IN");
+
+  var outOfStockCount = 0;
+  for (var j = 0; j < productData.length; j++) {
+    if (productData[j].stock === 0) outOfStockCount++;
+  }
+  document.getElementById("outOfStock").textContent = outOfStockCount;
 }
