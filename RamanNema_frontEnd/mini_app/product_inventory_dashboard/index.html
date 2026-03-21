@@ -15,16 +15,54 @@
 <body>
 
     <div id="loadingScreen">
-    <div class="spinner"></div>
-    <p>Loading products...</p>
-  </div>
+        <div class="spinner"></div>
+        <p>Loading products...</p>
+    </div>
 
-  <header>
-    <h1>Product Inventory Dashboard</h1>
-  </header>
-  <div class="container">
-    
-  </div>
+    <header>
+        <h1>Product Inventory Dashboard</h1>
+    </header>
+    <div class="container">
+
+        <!-- summary section -->
+        <div class="summarySection">
+            <div class="summaryBox">
+                <p class="boxLabel">Total Products</p>
+                <p class="boxNumber" id="totalProducts">0</p>
+            </div>
+            <div class="summaryBox">
+                <p class="boxLabel">Total Value</p>
+                <p class="boxNumber" id="totalValue">Rs. 0</p>
+            </div>
+            <div class="summaryBox">
+                <p class="boxLabel">Out of Stock</p>
+                <p class="boxNumber" id="outOfStock">0</p>
+            </div>
+        </div>
+
+        <!-- filter and search bar -->
+        <div class="filterBar">
+            <input type="text" id="searchBox" placeholder="Search by name..." />
+
+            <select id="categoryDropdown">
+                <option value="all">All Categories</option>
+            </select>
+
+            <select id="sortDropdown">
+                <option value="">Default</option>
+                <option value="low">Price: Low to High</option>
+                <option value="high">Price: High to Low</option>
+                <option value="az">Name: A to Z</option>
+                <option value="za">Name: Z to A</option>
+            </select>
+
+            <label class="checkboxLabel">
+                <input type="checkbox" id="lowStockOnly" />
+                Low Stock Only
+            </label>
+        </div>
+
+    </div>
 
 </body>
 
