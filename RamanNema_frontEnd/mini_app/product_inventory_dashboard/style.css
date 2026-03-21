@@ -201,3 +201,40 @@ header h1 {
   border-color: #c0614e;
   color: #c0614e;
 }
+/* pagination */
+#paginationBar {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+#paginationBar button {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #e8e4de;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.82rem;
+  color: #8a8580;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+
+#paginationBar button:hover:not(:disabled) {
+  border-color: #5c7c6e;
+  color: #5c7c6e;
+}
+
+#paginationBar button.activePage {
+  background: #5c7c6e;
+  border-color: #5c7c6e;
+  color: #fff;
+}
+
+#paginationBar button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
