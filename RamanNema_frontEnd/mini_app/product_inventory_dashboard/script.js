@@ -128,3 +128,38 @@ function updateCategoryDropdown() {
 
   dropdown.value = selectedValue || "all";
 }
+
+// reads the filters and returns matching products
+function getFilteredProducts() {
+  var searchText     = document.getElementById("searchBox").value.toLowerCase().trim();
+  var selectedCat    = document.getElementById("categoryDropdown").value;
+  var selectedSort   = document.getElementById("sortDropdown").value;
+  var showLowOnly    = document.getElementById("lowStockOnly").checked;
+
+  var filtered = productData.slice();
+
+  if (searchText) {
+    filtered = filtered.filter(function(p) {
+      return p.name.toLowerCase().indexOf(searchText) !== -1;
+    });
+  }
+
+  if (selectedCat !== "all") {
+    filtered = filtered.filter(function(p) {
+      return p.category === selectedCat;
+    });
+  }
+
+  if (showLowOnly) {
+    filtered = filtered.filter(function(p) {
+      return p.stock < 5;
+    });
+  }
+
+  if (selectedSort === "low")  filtered.sort(function(a, b) { return a.price - b.price; });
+  if (selectedSort === "high") filtered.sort(function(a, b) { return b.price - a.price; });
+  if (selectedSort === "az")   filtered.sort(function(a, b) { return a.name.localeCompare(b.name); });
+  if (selectedSort === "za")   filtered.sort(function(a, b) { return b.name.localeCompare(a.name); });
+
+  return filtered;
+}
