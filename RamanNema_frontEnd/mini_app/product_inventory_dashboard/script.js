@@ -99,3 +99,32 @@ function updateSummaryCards() {
   }
   document.getElementById("outOfStock").textContent = outOfStockCount;
 }
+
+// fills the category dropdown based on what categories exist
+function updateCategoryDropdown() {
+  var dropdown = document.getElementById("categoryDropdown");
+  var selectedValue = dropdown.value;
+
+  var alreadyAdded = {};
+  var categoryList = [];
+  for (var i = 0; i < productData.length; i++) {
+    var cat = productData[i].category;
+    if (!alreadyAdded[cat]) {
+      alreadyAdded[cat] = true;
+      categoryList.push(cat);
+    }
+  }
+  categoryList.sort();
+
+  while (dropdown.options.length > 1) dropdown.remove(1);
+
+  for (var k = 0; k < categoryList.length; k++) {
+    var option = document.createElement("option");
+    option.value = categoryList[k];
+    option.textContent =
+      categoryList[k].charAt(0).toUpperCase() + categoryList[k].slice(1);
+    dropdown.appendChild(option);
+  }
+
+  dropdown.value = selectedValue || "all";
+}
