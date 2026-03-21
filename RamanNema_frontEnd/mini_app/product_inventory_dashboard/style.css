@@ -61,7 +61,143 @@ header h1 {
 }
 
 .boxNumber {
-  font-family: 'Lora', serif;
+  font-family: "Lora", serif;
   font-size: 1.6rem;
   font-weight: 600;
+}
+
+
+/* filter bar */
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.filterBar input[type="text"],
+.filterBar select {
+  padding: 8px 11px;
+  border: 1px solid #e8e4de;
+  border-radius: 8px;
+  background: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  color: #2c2c2c;
+  outline: none;
+}
+
+.filterBar input[type="text"] {
+  flex: 1;
+  min-width: 160px;
+}
+
+.filterBar input[type="text"]:focus,
+.filterBar select:focus {
+  border-color: #5c7c6e;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #8a8580;
+  cursor: pointer;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  accent-color: #5c7c6e;
+  width: 14px;
+  height: 14px;
+}
+
+/* product list grid */
+#productList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+#noProductsMsg {
+  text-align: center;
+  color: #8a8580;
+  padding: 40px 0;
+}
+
+/* each product card */
+.productCard {
+  background: #fff;
+  border: 1px solid #e8e4de;
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: slideUp 0.3s ease both;
+  transition: box-shadow 0.2s;
+}
+
+.productCard:hover {
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.categoryTag {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #5c7c6e;
+  background: #eef3f1;
+  padding: 2px 8px;
+  border-radius: 999px;
+  align-self: flex-start;
+}
+
+.productName {
+  font-family: 'Lora', serif;
+  font-size: 0.97rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.productPrice {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #5c7c6e;
+}
+
+.stockStatus {
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding-top: 8px;
+  border-top: 1px solid #e8e4de;
+  margin-top: auto;
+}
+
+.inStock   { color: #4e7c61; }
+.lowStock  { color: #b08a3e; }
+.noStock   { color: #c0614e; }
+
+.deleteBtn {
+  margin-top: 8px;
+  padding: 6px;
+  width: 100%;
+  background: none;
+  border: 1px solid #e8e4de;
+  border-radius: 8px;
+  color: #8a8580;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.deleteBtn:hover {
+  border-color: #c0614e;
+  color: #c0614e;
 }
