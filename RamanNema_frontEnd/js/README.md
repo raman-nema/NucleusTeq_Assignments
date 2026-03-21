@@ -127,7 +127,7 @@ The application uses an array of objects to represent student data.
 •For  every  student,  it  loops  through  their  subject  mark  and  accumulates  total
 score.
 
-
+![image alt] (https://github.com/raman-nema/NucleusTeq_Assignments/blob/3940887d256bf1a0a36b67953c17953ee8a796a0/RamanNema_frontEnd/js/ScreenShots/JS%201.png)
 
 ## Task 2: Average Marks for Each Student
 
@@ -145,7 +145,8 @@ score.
     • The  average  is  computed  by  dividing  the  total  marks  by  the  number  of
 subjects.
     • The result is formatted to one decimal place using .toFixed(1).
-
+  
+![image alt] (https://github.com/raman-nema/NucleusTeq_Assignments/blob/3940887d256bf1a0a36b67953c17953ee8a796a0/RamanNema_frontEnd/js/ScreenShots/JS%202.png)
 
 ## Task 3: Subject-wise Highest Score in the Class
 
@@ -169,6 +170,7 @@ than the stored score.
     • Updates the subject with the new highest score and student name
     • Finally, the results are printed subject-wise.
 
+![image alt] (https://github.com/raman-nema/NucleusTeq_Assignments/blob/3940887d256bf1a0a36b67953c17953ee8a796a0/RamanNema_frontEnd/js/ScreenShots/JS%203.png)
 
 ## Task 4: Subject-wise Average Score
 
@@ -194,6 +196,7 @@ than the stored score.
     • The average for each subject is calculated
     • Results are formatted and displayed
 
+![image alt] (https://github.com/raman-nema/NucleusTeq_Assignments/blob/3940887d256bf1a0a36b67953c17953ee8a796a0/RamanNema_frontEnd/js/ScreenShots/JS%204.png)
 
 ## Task 5: Determine Overall Class Topper
 
@@ -214,6 +217,7 @@ than the stored score.
 
 - After processing all students, the topper is displayed
 
+![image alt] (https://github.com/raman-nema/NucleusTeq_Assignments/blob/3940887d256bf1a0a36b67953c17953ee8a796a0/RamanNema_frontEnd/js/ScreenShots/JS%205.png)
 
 ## Task 6. Assign Grades to Students
 
@@ -247,3 +251,6 @@ respective subject.
         D.Below 50 → Fail
 
 - The final grade for each student is displayed in the console.
+
+![image alt] (https://github.com/raman-nema/NucleusTeq_Assignments/blob/3940887d256bf1a0a36b67953c17953ee8a796a0/RamanNema_frontEnd/js/ScreenShots/JS%206.png)
+
