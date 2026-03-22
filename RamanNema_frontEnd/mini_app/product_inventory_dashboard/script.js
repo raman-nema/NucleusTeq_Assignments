@@ -210,3 +210,86 @@ document.getElementById("productList").addEventListener("click", function(e) {
     updateSummaryCards();
   }
 });
+
+
+// handles the add product button click
+document.getElementById("addProductBtn").addEventListener("click", function() {
+
+  // clear any previous error messages
+  var fieldIds  = ["newName", "newPrice", "newStock", "newCategory"];
+  var errorIds  = ["nameError", "priceError", "stockError", "categoryError"];
+  for (var i = 0; i < fieldIds.length; i++) {
+    document.getElementById(fieldIds[i]).classList.remove("invalid");
+    document.getElementById(errorIds[i]).textContent = "";
+  }
+
+  var productName     = document.getElementById("newName").value.trim();
+  var productPrice    = parseFloat(document.getElementById("newPrice").value);
+  var productStock    = parseInt(document.getElementById("newStock").value);
+  var productCategory = document.getElementById("newCategory").value;
+  var isValid         = true;
+
+  if (!productName) {
+    document.getElementById("newName").classList.add("invalid");
+    document.getElementById("nameError").textContent = "Please enter a name.";
+    isValid = false;
+  }
+  if (isNaN(productPrice) || productPrice <= 0) {
+    document.getElementById("newPrice").classList.add("invalid");
+    document.getElementById("priceError").textContent = "Price must be more than 0.";
+    isValid = false;
+  }
+  if (isNaN(productStock) || productStock < 0) {
+    document.getElementById("newStock").classList.add("invalid");
+    document.getElementById("stockError").textContent = "Stock cannot be negative.";
+    isValid = false;
+  }
+  if (!productCategory) {
+    document.getElementById("newCategory").classList.add("invalid");
+    document.getElementById("categoryError").textContent = "Please pick a category.";
+    isValid = false;
+  }
+
+  if (!isValid) return;
+
+  productData.push({
+    id:       Date.now(),
+    name:     productName,
+    price:    productPrice,
+    stock:    productStock,
+    category: productCategory
+  });
+
+  saveProducts();
+
+  // clear the form after adding
+  document.getElementById("newName").value     = "";
+  document.getElementById("newPrice").value    = "";
+  document.getElementById("newStock").value    = "";
+  document.getElementById("newCategory").value = "";
+
+  currentPage = 1;
+  updateCategoryDropdown();
+  renderProducts();
+  updateSummaryCards();
+});
+
+// attach events to all the filter controls
+document.getElementById("searchBox").addEventListener("input", function() { currentPage = 1; renderProducts(); });
+document.getElementById("categoryDropdown").addEventListener("change", function() { currentPage = 1; renderProducts(); });
+document.getElementById("sortDropdown").addEventListener("change", function() { currentPage = 1; renderProducts(); });
+document.getElementById("lowStockOnly").addEventListener("change", function() { currentPage = 1; renderProducts(); });
+
+// this runs when the page first loads
+async function startApp() {
+  var loadingScreen = document.getElementById("loadingScreen");
+  var data = await loadProductsFromServer();
+  productData = data;
+  if (!getSavedProducts()) saveProducts();
+  loadingScreen.classList.add("hide");
+  updateCategoryDropdown();
+  renderProducts();
+  updateSummaryCards();
+}
+
+document.addEventListener("DOMContentLoaded", startApp);
