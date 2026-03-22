@@ -45,13 +45,13 @@ Simple and clean design for smooth and intuitive interaction
 
 ## Project Structure:
 
+```
 product-inventory-dashboard/
-│
-├── index.html # Main HTML file (structure of the application)
-├── style.css # Styling and layout of the dashboard
-├── script.js # Core JavaScript logic (search, filter, sort, render)
-│
-└── README.md # Project documentation
+├── index.html
+├── style.css
+├── script.js
+└── README.md
+```
 
 ## How to run:
 
