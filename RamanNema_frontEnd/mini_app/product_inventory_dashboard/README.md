@@ -117,11 +117,16 @@ Below the summary section, users can interact with features like search, categor
 
 The lower section provides a form to add new products, allowing users to dynamically update the inventory. The overall layout is clean and user-friendly, enabling efficient inventory management.
 
+![Dashboard Screenshot](https://github.com/raman-nema/NucleusTeq_Assignments/blob/719010cbb637e6df4af80b960fa550c2bd92afe9/RamanNema_frontEnd/mini_app/assets/mp%201.png)
+
+
 ## Search Functionality
 
 This screenshot demonstrates the real-time search feature of the application. As the user types a keyword (e.g., “rd”) in the search bar, the product list dynamically filters to display only the matching results.
 
 The filtering is case-insensitive and updates instantly without reloading the page, providing a smooth and efficient user experience.
+
+![searchFunc Screenshot](https://github.com/raman-nema/NucleusTeq_Assignments/blob/719010cbb637e6df4af80b960fa550c2bd92afe9/RamanNema_frontEnd/mini_app/assets/mp%202.png)
 
 ## Category Filtering
 
@@ -129,17 +134,23 @@ This screenshot demonstrates the category filtering feature of the dashboard. Wh
 
 This functionality helps users easily organize and view relevant products without distraction, improving overall usability and data navigation.
 
+![categoryFiltering Screenshot](https://github.com/raman-nema/NucleusTeq_Assignments/blob/719010cbb637e6df4af80b960fa550c2bd92afe9/RamanNema_frontEnd/mini_app/assets/mp%203.png)
+
 ## Sorting Functionality
 
 This screenshot demonstrates the sorting feature of the dashboard. Users can organize products based on different criteria such as price (low to high or high to low) and name (A to Z or Z to A) using the dropdown menu.
 
 The product list updates instantly based on the selected option, allowing users to analyze and arrange inventory data efficiently.
 
+![sortingFunc Screenshot](https://github.com/raman-nema/NucleusTeq_Assignments/blob/719010cbb637e6df4af80b960fa550c2bd92afe9/RamanNema_frontEnd/mini_app/assets/mp%204.png)
+
 ## Low Stock Indicator
 
 This screenshot highlights the low stock filtering feature of the dashboard. When the “Low Stock Only” option is enabled, only products with limited stock are displayed.
 
 Products with low inventory are clearly marked (e.g., “Only 4 left”), helping users quickly identify items that require restocking and take necessary action.
+
+![lowStockInd Screenshot](https://github.com/raman-nema/NucleusTeq_Assignments/blob/719010cbb637e6df4af80b960fa550c2bd92afe9/RamanNema_frontEnd/mini_app/assets/mp%205.png)
 
 ## Local Storage Persistence
 
@@ -148,6 +159,8 @@ This screenshot shows the browser’s Local Storage where product data is stored
 The presence of this data confirms that the application stores and retrieves product information using the browser’s Local Storage API. This ensures that all inventory data persists even after refreshing or reopening the application.
 
 This demonstrates successful implementation of client-side data persistence.
+
+![localStorage Screenshot](https://github.com/raman-nema/NucleusTeq_Assignments/blob/719010cbb637e6df4af80b960fa550c2bd92afe9/RamanNema_frontEnd/mini_app/assets/mp%206.png)
 
 ## Conclusion
 
