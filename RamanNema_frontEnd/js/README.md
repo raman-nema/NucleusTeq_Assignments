@@ -42,11 +42,12 @@ summary of overall performance through terminal output.
 
 
 ## Project Structure:
+```
 RamanNema_frontEnd/
-|-- js/
-    |-- RamanNema_student_analyzer.js   (Main application logic)
-    |--README.md
-
+├── js/
+│   ├── RamanNema_student_analyzer.js   # Main application logic
+│   └── README.md
+```
 
 
 ## How to run:
