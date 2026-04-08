@@ -1,0 +1,2 @@
+HELLO JAVA.
+This is my java test record for I/O operations.
