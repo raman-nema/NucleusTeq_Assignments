@@ -1,6 +1,7 @@
 package com.example.spring_core_assignment.service;
 
 import com.example.spring_core_assignment.component.NotificationComponent;
+import com.example.spring_core_assignment.exception.UserNotFoundException;
 import com.example.spring_core_assignment.model.User;
 import com.example.spring_core_assignment.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,10 @@ public class UserService {
 
     // Get user by ID
     public User getUserById(Long id) {
-        return userRepository.findById(id);
+        User user = userRepository.findById(id); // fetch user
+        if (user == null) {
+            throw new UserNotFoundException("User not found with id: " + id);
+        }
+        return user;
     }
 }
