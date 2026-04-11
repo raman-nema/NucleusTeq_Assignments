@@ -36,4 +36,11 @@ public class UserController {
     public User getUser(@PathVariable Long id) {
         return userService.getUserById(id);
     }
+
+    // Trigger notification endpoint
+    @GetMapping("/notify")
+    public String notifyUser() {
+        return userService.triggerNotification();
+    }
+
 }
