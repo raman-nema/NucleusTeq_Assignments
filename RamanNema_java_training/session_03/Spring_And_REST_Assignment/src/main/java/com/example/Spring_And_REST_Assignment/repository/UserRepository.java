@@ -28,7 +28,7 @@ public class UserRepository {
         return users;
     }
 
-    // Find user by ID using stream filtering
+    // Find user by ID using stream filtering and returning find the first occurence in the data.
     public Optional<User> findById(Long id) {
         return users.stream()
                 .filter(u -> u.getId().equals(id))
