@@ -13,8 +13,9 @@ public class IO_operations {
 
         // Reading from a file
         try {
-            BufferedReader br = new BufferedReader(new FileReader("test.txt"));
-
+           BufferedReader br = new BufferedReader(
+    new FileReader("/Users/ramannema/Documents/NT/NucleusTeq_Assignments/RamanNema_java_training/session_01/advancedTopics/test.txt")
+);
             // Read a line from the file
             String line = br.readLine();
             System.out.println(line);

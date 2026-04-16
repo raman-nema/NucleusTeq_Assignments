@@ -46,10 +46,24 @@ Simple and clean design for smooth and intuitive interaction
 ## Project Structure:
 
 ```
-product-inventory-dashboard/
-├── index.html
-├── style.css
-├── script.js
+spring-boot-user-management/
+├── src/
+│   ├── main/
+│   │   ├── java/spring_core_assignment/
+│   │   │   ├── controller/
+│   │   │   ├── service/
+│   │   │   ├── repository/
+│   │   │   ├── model/
+│   │   │   ├── exception/
+│   │   │   ├── component/
+│   │   │   └── SpringCoreAssignmentApplication.java
+│   │   │
+│   │   └── resources/
+│   │       └── application.properties
+│   │
+│   └── test/
+│
+├── pom.xml
 └── README.md
 ```
 
