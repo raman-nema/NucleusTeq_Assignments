@@ -26,5 +26,22 @@ public class UserController {
         return service.search(name, age, role);
     }
 
+    // POST API
+    @PostMapping("/submit")
+    public ResponseEntity<?> saveUser(@RequestBody User user) {
+
+        // if the input is invalid
+        if (user.getName() == null || user.getName().isEmpty()
+                || user.getRole() == null
+                || user.getAge() == 0) {
+
+            return ResponseEntity.badRequest().body("Invalid input, please enter valid information.");
+        }
+        // if the input is valid
+        return ResponseEntity.status(201).body(service.saveUser(user));
+    }
+
+
+
 
 }
