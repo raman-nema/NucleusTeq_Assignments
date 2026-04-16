@@ -41,6 +41,14 @@ public class UserController {
         return ResponseEntity.status(201).body(service.saveUser(user));
     }
 
+    // DELETE API
+    @DeleteMapping("/users/{id}")
+    public String deleteUser(
+            @PathVariable Long id,
+            @RequestParam(required = false, defaultValue = "false") boolean confirm
+    ) {
+        return service.deleteUser(id, confirm);
+    }
 
 
 
