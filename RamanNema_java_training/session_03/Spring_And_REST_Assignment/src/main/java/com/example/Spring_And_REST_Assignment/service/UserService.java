@@ -29,28 +29,27 @@ public class UserService {
         // various filters for filtering the user while searching across data
         return repository.findAll().stream()
                 .filter(user -> {
-                    boolean matches = true;
+                    boolean result = true;
 
-                    // Case-insensitive name match
-                    if (name != null) {
-                        matches &= user.getName().equalsIgnoreCase(name);
+                    // Name match (ignore if null or empty)
+                    if (name != null && !name.trim().isEmpty()) {
+                        result &= user.getName().equalsIgnoreCase(name.trim());
                     }
 
-                    // Exact age match
+                    // Age match
                     if (age != null) {
-                        matches &= user.getAge() == age;
+                        result &= user.getAge() == age;
                     }
 
-                    // Case-insensitive role match
-                    if (role != null) {
-                        matches &= user.getRole().equalsIgnoreCase(role);
+                    // Role match (ignore if null or empty)
+                    if (role != null && !role.trim().isEmpty()) {
+                        result &= user.getRole().equalsIgnoreCase(role.trim());
                     }
 
-                    return matches;
+                    return result;
                 })
-                .collect(Collectors.toList()); // after filtering convert to list from stream
+                .toList();
     }
-
     // Delete user only if confirmation is true
     public String deleteUser(Long id, boolean confirm) {
 
@@ -63,7 +62,7 @@ public class UserService {
         return repository.findById(id)
                 .map(user -> {
                     repository.delete(user);
-                    return "User deleted from the data.";
+                    return "User with ID " + id + " deleted successfully.";
                 })
                 .orElse("User not found in the data.");
     }
