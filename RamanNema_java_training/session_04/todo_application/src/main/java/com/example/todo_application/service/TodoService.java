@@ -90,7 +90,13 @@ public class TodoService {
      * Deletes a Todo by its ID.
      */
     public void delete(Long id) {
-        repository.deleteById(id);
+
+        // Check if Todo exists
+        Todo todo = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Todo not found, cannot delete"));
+
+        //  Delete only if found
+        repository.delete(todo);
     }
 
     /**
