@@ -6,6 +6,8 @@ import com.example.todo_application.exception.ResourceNotFoundException;
 import com.example.todo_application.mapper.TodoMapper;
 import com.example.todo_application.repository.TodoRepository;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +18,12 @@ import java.util.stream.Collectors;
  */
 @Service
 public class TodoService {
+
+    /**
+     * Logger instance used to trace service layer operations
+     * and monitor important events during execution.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(TodoService.class);
 
     private final TodoRepository repository;
 
@@ -31,8 +39,23 @@ public class TodoService {
      * Converts DTO to Entity, saves it, and returns response DTO.
      */
     public TodoResponseDTO create(TodoDTO dto) {
+
+        /**
+         * Logs the initiation of Todo creation in the service layer.
+         * Helps in tracking the flow of data from controller to persistence.
+         */
+        logger.info("Processing request to create Todo");
+
         Todo todo = TodoMapper.toEntity(dto);
-        return TodoMapper.toDTO(repository.save(todo));
+        Todo saved = repository.save(todo);
+
+        /**
+         * Logs successful persistence of Todo along with generated identifier.
+         * Useful for auditing and debugging database operations.
+         */
+        logger.info("Todo successfully saved with ID: {}", saved.getId());
+
+        return TodoMapper.toDTO(saved);
     }
 
     /**
@@ -63,26 +86,20 @@ public class TodoService {
      */
     public TodoResponseDTO update(Long id, TodoDTO dto) {
 
-        // Fetch existing Todo or throw exception if not found
         Todo todo = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Todo not found in the data."));
 
-        // Update basic fields
         todo.setTitle(dto.getTitle());
         todo.setDescription(dto.getDescription());
 
-        // Convert incoming status string to enum
         Status newStatus = Status.valueOf(dto.getStatus());
 
-        // Validate allowed status transitions
         if (!isValid(todo.getStatus(), newStatus)) {
             throw new RuntimeException("Invalid status transition");
         }
 
-        // Apply status update
         todo.setStatus(newStatus);
 
-        // Save updated entity and return response DTO
         return TodoMapper.toDTO(repository.save(todo));
     }
 
@@ -91,11 +108,9 @@ public class TodoService {
      */
     public void delete(Long id) {
 
-        // Check if Todo exists
         Todo todo = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Todo not found, cannot delete"));
 
-        //  Delete only if found
         repository.delete(todo);
     }
 
