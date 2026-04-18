@@ -52,7 +52,6 @@ public class TodoController {
          * Helps in tracking successful operations and auditing.
          */
         logger.info("TODO created successfully with ID: {}", response.getId());
-
         return response;
     }
 

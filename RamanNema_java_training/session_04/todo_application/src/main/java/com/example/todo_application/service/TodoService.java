@@ -1,5 +1,6 @@
 package com.example.todo_application.service;
 
+import com.example.todo_application.client.NotificationServiceClient;
 import com.example.todo_application.dto.*;
 import com.example.todo_application.entity.*;
 import com.example.todo_application.exception.ResourceNotFoundException;
@@ -26,12 +27,14 @@ public class TodoService {
     private static final Logger logger = LoggerFactory.getLogger(TodoService.class);
 
     private final TodoRepository repository;
+    private final NotificationServiceClient notificationClient;
 
     /**
      * Constructor-based dependency injection for TodoRepository.
      */
-    public TodoService(TodoRepository repository) {
+    public TodoService(TodoRepository repository, NotificationServiceClient notificationClient) {
         this.repository = repository;
+        this.notificationClient = notificationClient;
     }
 
     /**
@@ -54,7 +57,8 @@ public class TodoService {
          * Useful for auditing and debugging database operations.
          */
         logger.info("Todo successfully saved with ID: {}", saved.getId());
-
+        // 
+        notificationClient.sendNotification("New Todo created with ID: " + saved.getId());
         return TodoMapper.toDTO(saved);
     }
 
