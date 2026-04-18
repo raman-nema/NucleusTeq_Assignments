@@ -1,6 +1,5 @@
 package com.example.todo_application.entity;
 
-import ch.qos.logback.core.status.Status;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
