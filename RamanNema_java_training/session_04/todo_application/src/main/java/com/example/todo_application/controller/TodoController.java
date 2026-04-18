@@ -1,8 +1,10 @@
 package com.example.todo_application.controller;
 
 import com.example.todo_application.dto.*;
+import com.example.todo_application.exception.ResourceNotFoundException;
 import com.example.todo_application.service.TodoService;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,83 +12,85 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * REST Controller for managing Todo operations.
- * Exposes endpoints for CRUD functionalities.
+ * REST Controller for Todo operations.
+ * Handles CRUD APIs.
  */
 @RestController
 @RequestMapping("/todos")
 public class TodoController {
 
-    /**
-     * Logger instance used for tracking application flow and important events.
-     * Helps in monitoring request processing and debugging issues in production.
-     */
+    // Logger for tracking API calls
     private static final Logger logger = LoggerFactory.getLogger(TodoController.class);
 
     private final TodoService service;
 
-    /**
-     * Constructor-based dependency injection for TodoService.
-     */
+    // Constructor injection
     public TodoController(TodoService service) {
         this.service = service;
     }
 
-    /**
-     * Creates a new Todo.
-     * Validates request body before passing it to the service layer.
-     */
+     // Create a new Todo.
     @PostMapping
     public TodoResponseDTO create(@RequestBody @Valid TodoDTO dto) {
 
-        /**
-         * Logs the incoming request with the title of the Todo.
-         * Useful for tracing user actions and verifying input data.
-         */
         logger.info("Creating TODO with title: {}", dto.getTitle());
 
         TodoResponseDTO response = service.create(dto);
 
-        /**
-         * Logs successful creation along with generated Todo ID.
-         * Helps in tracking successful operations and auditing.
-         */
-        logger.info("TODO created successfully with ID: {}", response.getId());
+        logger.info("TODO created with ID: {}", response.getId());
+
         return response;
     }
 
-    /**
-     * Retrieves all Todos.
-     */
+     // Get all Todos.
     @GetMapping
     public List<TodoResponseDTO> getAll() {
-        return service.getAll();
+
+        logger.info("Fetching all TODOs");
+
+        List<TodoResponseDTO> todos = service.getAll();
+
+        logger.info("Total TODOs: {}", todos.size());
+
+        return todos;
     }
 
-    /**
-     * Retrieves a specific Todo by its ID.
-     */
+
+     //  Get Todo by ID.
     @GetMapping("/{id}")
     public TodoResponseDTO getById(@PathVariable Long id) {
-        return service.getById(id);
+
+        logger.info("Fetching TODO with ID: {}", id);
+
+        TodoResponseDTO todo = service.getById(id);
+
+        return todo;
     }
 
-    /**
-     * Updates an existing Todo by ID.
-     * Accepts updated data in request body.
-     */
+     // Update Todo.
     @PutMapping("/{id}")
     public TodoResponseDTO update(@PathVariable Long id,
                                   @RequestBody TodoDTO dto) {
-        return service.update(id, dto);
+
+        logger.info("Updating TODO with ID: {}", id);
+
+        TodoResponseDTO updated = service.update(id, dto);
+
+        return updated;
     }
 
-    /**
-     * Deletes a Todo by its ID.
-     */
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id) {
-        service.delete(id);
-        return "Deleted successfully.";
-    }
+     // Delete Todo by ID.
+     @DeleteMapping("/{id}")
+
+     public ResponseEntity<String> delete(@PathVariable Long id) {
+
+         logger.info("DELETE /todos/{} - Request received", id);
+
+         service.delete(id);
+
+         logger.info("DELETE /todos/{} - Successfully deleted", id);
+
+         return ResponseEntity.ok("Todo deleted successfully.");
+
+     }
 }
