@@ -7,32 +7,33 @@ import com.example.todo_application.entity.Status;
 import com.example.todo_application.entity.Todo;
 import com.example.todo_application.exception.ResourceNotFoundException;
 import com.example.todo_application.repository.TodoRepository;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TodoServiceTest {
 
-    // mock dependencies (simulate DB and external service)
     @Mock
     private TodoRepository repository;
 
     @Mock
     private NotificationServiceClient notificationClient;
 
-    // actual service to test
     @InjectMocks
     private TodoService service;
 
@@ -41,14 +42,11 @@ class TodoServiceTest {
 
     @BeforeEach
     void setup() {
-
-        // sample input DTO
         dto = new TodoDTO();
         dto.setTitle("Test Todo");
         dto.setDescription("Test Desc");
         dto.setStatus("PENDING");
 
-        // sample entity object
         todo = new Todo();
         todo.setId(1L);
         todo.setTitle("Test Todo");
@@ -56,95 +54,68 @@ class TodoServiceTest {
         todo.setStatus(Status.PENDING);
     }
 
-    // test create method
     @Test
     void testCreate() {
+        when(repository.save(any(Todo.class))).thenReturn(todo);
 
-        // mock save behavior
-        when(repository.save(any())).thenReturn(todo);
-
-        // call service method
         TodoResponseDTO result = service.create(dto);
 
-        // verify response
         assertNotNull(result);
         assertEquals("Test Todo", result.getTitle());
-
-        // verify interactions
-        verify(repository).save(any());
-        verify(notificationClient).sendNotification(anyString());
+        verify(repository).save(any(Todo.class));
+        verify(notificationClient).sendNotification(any(String.class));
     }
 
-    // test getAll method
     @Test
     void testGetAll() {
+        when(repository.findAll()).thenReturn(List.of(todo));
 
-        // mock findAll
-        when(repository.findAll()).thenReturn(Arrays.asList(todo));
+        List<TodoResponseDTO> list = service.getAll();
 
-        // call method
-        var list = service.getAll();
-
-        // verify result
         assertEquals(1, list.size());
     }
 
-    // test getById method
     @Test
     void testGetById() {
-
-        // mock findById
         when(repository.findById(1L)).thenReturn(Optional.of(todo));
 
-        // call method
         TodoResponseDTO result = service.getById(1L);
 
-        // verify result
         assertEquals(1L, result.getId());
     }
 
-    // test when todo is not found
     @Test
-    void testGetById_NotFound() {
-
-        // return empty
+    void testGetByIdNotFound() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
-        // expect exception
-        assertThrows(ResourceNotFoundException.class,
-                () -> service.getById(1L));
+        assertThrows(ResourceNotFoundException.class, () -> service.getById(1L));
     }
 
-    // test update method
     @Test
     void testUpdate() {
-
-        // mock existing todo and save
         when(repository.findById(1L)).thenReturn(Optional.of(todo));
-        when(repository.save(any())).thenReturn(todo);
+        when(repository.save(any(Todo.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        // update status in DTO
         dto.setStatus("COMPLETED");
-
-        // call update
         TodoResponseDTO result = service.update(1L, dto);
 
-        // verify updated status
         assertEquals(Status.COMPLETED, result.getStatus());
     }
 
-    // test delete method
     @Test
     void testDelete() {
-
-        // mock existing todo
         when(repository.findById(1L)).thenReturn(Optional.of(todo));
 
-        // call delete
         service.delete(1L);
 
-        // verify delete operation
         verify(repository).delete(todo);
     }
 
+    @Test
+    void testDeleteNotFound() {
+        when(repository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.delete(1L));
+        verify(repository, never()).delete(any(Todo.class));
+    }
 }
