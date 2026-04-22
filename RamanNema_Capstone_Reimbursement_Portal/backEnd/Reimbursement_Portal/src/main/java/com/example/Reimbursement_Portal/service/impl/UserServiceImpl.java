@@ -8,6 +8,7 @@ import com.example.Reimbursement_Portal.exception.BadRequestException;
 import com.example.Reimbursement_Portal.repository.UserRepository;
 import com.example.Reimbursement_Portal.service.UserService;
 import com.example.Reimbursement_Portal.util.ValidationUtil;
+import com.example.Reimbursement_Portal.mapper.UserMapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -63,17 +64,53 @@ public class UserServiceImpl implements UserService {
         // Save user
         User savedUser = userRepository.save(user);
 
-        return mapToResponse(savedUser);
+        return UserMapper.toResponse(savedUser);
     }
 
+    // GET ALL USERS
+    @Override
+    public List<UserResponse> getAllUsers() {
+        List<User> users = userRepository.findAll();
 
-    // COMMON DTO MAPPING METHOD
-    private UserResponse mapToResponse(User user) {
-        return UserResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
+        return users.stream()
+                .map(UserMapper::toResponse)
+                .toList();
+    }
+
+    // GET USER BY ID
+    @Override
+    public UserResponse getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("User not found with ID: " + id));
+
+        return UserMapper.toResponse(user);
+    }
+
+    // GET EMPLOYEES UNDER MANAGER
+    @Override
+    public List<UserResponse> getEmployeesByManager(Long managerId) {
+
+        // Validate manager exists
+        if (!userRepository.existsById(managerId)) {
+            throw new BadRequestException("Manager not found with ID: " + managerId);
+        }
+
+        return userRepository.findByManagerId(managerId)
+                .stream()
+                .map(UserMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("User not found with ID: " + id));
+
+        if (userRepository.existsByManagerId(id)) {
+            throw new BadRequestException("Cannot delete manager with assigned employees");
+        }
+
+        userRepository.delete(user);
     }
 }

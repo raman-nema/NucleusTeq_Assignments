@@ -19,6 +19,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Fetch all employees reporting to a manager
     List<User> findByManagerId(Long managerId);
 
+    // for deletion purpose
+    boolean existsByManagerId(Long managerId);
+
     // Fetch users by role
     List<User> findByRole(Role role);
 }
