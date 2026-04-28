@@ -1,15 +1,17 @@
 package com.example.Reimbursement_Portal.dto.Response;
 
-import com.example.Reimbursement_Portal.entity.ClaimStatus;
+import com.example.Reimbursement_Portal.enums.ClaimStatus;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 
-// DTO for sending claim response
+/**
+ * Response DTO for claim details.
+ */
 @Data
 @Builder
-public class ClaimResponse {
+public class ClaimResponseDTO {
 
     private Long id;
     private Double amount;

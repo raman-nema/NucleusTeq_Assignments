@@ -1,34 +1,52 @@
 package com.example.Reimbursement_Portal.entity;
 
+import com.example.Reimbursement_Portal.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
-// Lombok annotations reduce boilerplate code
+/**
+ * Entity representing a user.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity // Marks this class as a database table
+@Entity
 @Table(name = "users")
 public class User {
 
+    /**
+     * User ID.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // User basic details
+    /**
+     * User name.
+     */
     private String name;
 
+    /**
+     * User email.
+     */
     @Column(unique = true)
     private String email;
 
+    /**
+     * User password.
+     */
     private String password;
 
-    // Role stored as String in DB
+    /**
+     * User role.
+     */
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    // Many employees can have one manager
+    /**
+     * Manager of the user.
+     */
     @ManyToOne
     @JoinColumn(name = "manager_id")
     private User manager;

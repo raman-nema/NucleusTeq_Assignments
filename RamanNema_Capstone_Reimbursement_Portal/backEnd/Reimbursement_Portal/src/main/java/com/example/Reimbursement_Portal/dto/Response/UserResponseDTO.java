@@ -1,0 +1,23 @@
+package com.example.Reimbursement_Portal.dto.Response;
+
+import com.example.Reimbursement_Portal.enums.Role;
+import lombok.Builder;
+import lombok.Data;
+
+
+/**
+ * Response DTO for user details.
+ */
+@Data
+@Builder
+public class UserResponseDTO {
+
+    private Long id;
+    private String name;
+    private String email;
+    private Role role;
+
+    // Include manager info so the frontend can show "Reports to X"
+    private Long managerId;
+    private String managerName;
+}

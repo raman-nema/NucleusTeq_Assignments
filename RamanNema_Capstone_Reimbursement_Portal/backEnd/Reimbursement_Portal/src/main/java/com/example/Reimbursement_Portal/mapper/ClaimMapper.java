@@ -1,32 +1,58 @@
 package com.example.Reimbursement_Portal.mapper;
 
-import com.example.Reimbursement_Portal.dto.Response.ClaimResponse;
+import com.example.Reimbursement_Portal.dto.Request.ClaimRequestDTO;
+import com.example.Reimbursement_Portal.dto.Response.ClaimResponseDTO;
 import com.example.Reimbursement_Portal.entity.Claim;
+import com.example.Reimbursement_Portal.entity.User;
+import com.example.Reimbursement_Portal.enums.ClaimStatus;
 
-// Mapper class to convert Claim entity to ClaimResponse DTO
+import java.time.LocalDate;
+
+/**
+ * Mapper for Claim entity.
+ */
 public class ClaimMapper {
 
-    // Convert Claim entity to response DTO
-    public static ClaimResponse toResponse(Claim claim) {
+    /**
+     * Converts Claim entity to ClaimResponseDTO.
+     *
+     * @param claim the claim entity
+     * @return the claim response DTO
+     */
+    public static ClaimResponseDTO toResponse(Claim claim) {
 
-        // Build response object from entity fields
-        return ClaimResponse.builder()
-                .id(claim.getId()) // Set claim ID
-                .amount(claim.getAmount()) // Set claim amount
-                .description(claim.getDescription()) // Set description
-                .date(claim.getDate()) // Set claim date
-                .status(claim.getStatus()) // Set claim status
-
-                // Map employee details safely
+        return ClaimResponseDTO.builder()
+                .id(claim.getId())
+                .amount(claim.getAmount())
+                .description(claim.getDescription())
+                .date(claim.getDate())
+                .status(claim.getStatus())
                 .employeeId(claim.getEmployee() != null ? claim.getEmployee().getId() : null)
                 .employeeName(claim.getEmployee() != null ? claim.getEmployee().getName() : null)
-
-                // Map reviewer details safely
                 .reviewerId(claim.getReviewer() != null ? claim.getReviewer().getId() : null)
                 .reviewerName(claim.getReviewer() != null ? claim.getReviewer().getName() : null)
+                .comment(claim.getComment())
+                .build();
+    }
 
-                .comment(claim.getComment()) // Set reviewer comment
+    /**
+     * Converts ClaimRequestDTO to Claim entity.
+     *
+     * @param request the claim request
+     * @param employee the employee
+     * @param reviewer the reviewer
+     * @return the claim entity
+     */
+    public static Claim toEntity(ClaimRequestDTO request, User employee, User reviewer) {
 
-                .build(); // Build and return response
+        Claim claim = new Claim();
+        claim.setAmount(request.getAmount());
+        claim.setDescription(request.getDescription());
+        claim.setDate(LocalDate.now());
+        claim.setStatus(ClaimStatus.SUBMITTED);
+        claim.setEmployee(employee);
+        claim.setReviewer(reviewer);
+
+        return claim;
     }
 }

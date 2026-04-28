@@ -1,9 +1,9 @@
 package com.example.Reimbursement_Portal.controller;
 
-import com.example.Reimbursement_Portal.dto.Request.ClaimActionRequest;
-import com.example.Reimbursement_Portal.dto.Request.ClaimRequest;
-import com.example.Reimbursement_Portal.dto.Response.ClaimResponse;
-import com.example.Reimbursement_Portal.entity.ClaimStatus;
+import com.example.Reimbursement_Portal.dto.Request.ClaimActionRequestDTO;
+import com.example.Reimbursement_Portal.dto.Request.ClaimRequestDTO;
+import com.example.Reimbursement_Portal.dto.Response.ClaimResponseDTO;
+import com.example.Reimbursement_Portal.enums.ClaimStatus;
 import com.example.Reimbursement_Portal.service.ClaimService;
 
 import jakarta.validation.Valid;
@@ -12,51 +12,83 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// REST controller for claim operations
+/**
+ * Controller for managing reimbursement claims.
+ */
 @RestController
 @RequestMapping("/api/claims")
 @RequiredArgsConstructor
 public class ClaimController {
 
-    // Service layer dependency
     private final ClaimService claimService;
 
-    // Submit a new claim
+    /**
+     * Submits a new claim.
+     *
+     * @param request the claim request data
+     * @return the created claim response
+     */
     @PostMapping
-    public ClaimResponse submitClaim(@Valid @RequestBody ClaimRequest request) {
+    public ClaimResponseDTO submitClaim(@Valid @RequestBody ClaimRequestDTO request) {
         return claimService.submitClaim(request);
     }
 
-    // Fetch all claims
+    /**
+     * Retrieves all claims.
+     *
+     * @return list of all claims
+     */
     @GetMapping
-    public List<ClaimResponse> getAllClaims() {
+    public List<ClaimResponseDTO> getAllClaims() {
         return claimService.getAllClaims();
     }
 
-    // Fetch claims by employee ID
+    /**
+     * Retrieves claims by employee ID.
+     *
+     * @param id the employee ID
+     * @return list of claims for the employee
+     */
     @GetMapping("/employee/{id}")
-    public List<ClaimResponse> getClaimsByEmployee(@PathVariable Long id) {
+    public List<ClaimResponseDTO> getClaimsByEmployee(@PathVariable Long id) {
         return claimService.getClaimsByEmployee(id);
     }
 
-    // Fetch claims by reviewer ID
+    /**
+     * Retrieves claims by reviewer ID.
+     *
+     * @param id the reviewer ID
+     * @return list of claims assigned to the reviewer
+     */
     @GetMapping("/reviewer/{id}")
-    public List<ClaimResponse> getClaimsByReviewer(@PathVariable Long id) {
+    public List<ClaimResponseDTO> getClaimsByReviewer(@PathVariable Long id) {
         return claimService.getClaimsByReviewer(id);
     }
 
-    // Fetch claims by status
+    /**
+     * Retrieves claims by status.
+     *
+     * @param status the claim status
+     * @return list of claims with the given status
+     */
     @GetMapping("/status/{status}")
-    public List<ClaimResponse> getClaimsByStatus(@PathVariable ClaimStatus status) {
+    public List<ClaimResponseDTO> getClaimsByStatus(@PathVariable ClaimStatus status) {
         return claimService.getClaimsByStatus(status);
     }
 
-    // Approve or reject a claim
+    /**
+     * Approves or rejects a claim.
+     *
+     * @param claimId the claim ID
+     * @param reviewerId the reviewer ID
+     * @param request the action request data
+     * @return the updated claim response
+     */
     @PutMapping("/{claimId}/action")
-    public ClaimResponse takeAction(
+    public ClaimResponseDTO takeAction(
             @PathVariable Long claimId,
             @RequestParam Long reviewerId,
-            @Valid @RequestBody ClaimActionRequest request) {
+            @Valid @RequestBody ClaimActionRequestDTO request) {
 
         return claimService.takeAction(claimId, reviewerId, request);
     }

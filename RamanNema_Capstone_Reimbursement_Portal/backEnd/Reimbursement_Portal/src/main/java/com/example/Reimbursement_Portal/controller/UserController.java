@@ -1,7 +1,7 @@
 package com.example.Reimbursement_Portal.controller;
 
-import com.example.Reimbursement_Portal.dto.Request.UserRequest;
-import com.example.Reimbursement_Portal.dto.Response.UserResponse;
+import com.example.Reimbursement_Portal.dto.Request.UserRequestDTO;
+import com.example.Reimbursement_Portal.dto.Response.UserResponseDTO;
 import com.example.Reimbursement_Portal.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// REST Controller
+/**
+ * Controller for managing user operations.
+ */
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -17,37 +19,58 @@ public class UserController {
 
     private final UserService userService;
 
-    // CREATE USER
+    /**
+     * Creates a new user.
+     *
+     * @param request the user request data
+     * @return the created user response
+     */
     @PostMapping
-    public UserResponse createUser(@RequestBody UserRequest request) {
+    public UserResponseDTO createUser(@RequestBody UserRequestDTO request) {
         return userService.createUser(request);
     }
 
-    // GET ALL USERS - retrieves all users
+    /**
+     * Retrieves all users.
+     *
+     * @return list of users
+     */
     @GetMapping
-    public List<UserResponse> getAllUsers() {
+    public List<UserResponseDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    // GET USER BY ID - retrieves a specific user by ID
+    /**
+     * Retrieves a user by ID.
+     *
+     * @param id the user ID
+     * @return the user response
+     */
     @GetMapping("/{id}")
-    public UserResponse getUserById(@PathVariable Long id) {
+    public UserResponseDTO getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
-    // GET EMPLOYEES UNDER MANAGER - fetches users reporting to a manager
+    /**
+     * Retrieves employees under a manager.
+     *
+     * @param managerId the manager ID
+     * @return list of employees
+     */
     @GetMapping("/manager/{managerId}")
-    public List<UserResponse> getEmployeesByManager(@PathVariable Long managerId) {
+    public List<UserResponseDTO> getEmployeesByManager(@PathVariable Long managerId) {
         return userService.getEmployeesByManager(managerId);
     }
 
-    // DELETE USER - deletes user by ID
+    /**
+     * Deletes a user by ID.
+     *
+     * @param id the user ID
+     * @return confirmation message
+     */
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return "User deleted successfully with id.";
     }
-
-
-
 }

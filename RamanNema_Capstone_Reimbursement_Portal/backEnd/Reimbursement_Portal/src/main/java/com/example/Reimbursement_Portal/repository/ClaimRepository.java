@@ -1,23 +1,46 @@
 package com.example.Reimbursement_Portal.repository;
 
 import com.example.Reimbursement_Portal.entity.Claim;
-import com.example.Reimbursement_Portal.entity.ClaimStatus;
+import com.example.Reimbursement_Portal.enums.ClaimStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-// Repository for Claim entity
+/**
+ * Repository for Claim entity.
+ */
 public interface ClaimRepository extends JpaRepository<Claim, Long> {
 
-    // Get all claims submitted by a specific employee
+    /**
+     * Finds claims by employee ID.
+     *
+     * @param employeeId the employee ID
+     * @return list of claims
+     */
     List<Claim> findByEmployeeId(Long employeeId);
 
-    // Get all claims assigned to a reviewer (manager/admin)
+    /**
+     * Finds claims by reviewer ID.
+     *
+     * @param reviewerId the reviewer ID
+     * @return list of claims
+     */
     List<Claim> findByReviewerId(Long reviewerId);
 
-    // Get claims by status (SUBMITTED, APPROVED, REJECTED)
+    /**
+     * Finds claims by status.
+     *
+     * @param status the claim status
+     * @return list of claims
+     */
     List<Claim> findByStatus(ClaimStatus status);
 
-    // Get claims for a reviewer filtered by status
+    /**
+     * Finds claims by reviewer ID and status.
+     *
+     * @param reviewerId the reviewer ID
+     * @param status the claim status
+     * @return list of claims
+     */
     List<Claim> findByReviewerIdAndStatus(Long reviewerId, ClaimStatus status);
 }

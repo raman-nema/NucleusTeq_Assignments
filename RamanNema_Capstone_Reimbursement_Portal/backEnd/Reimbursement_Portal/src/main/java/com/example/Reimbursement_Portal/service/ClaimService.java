@@ -1,30 +1,63 @@
 package com.example.Reimbursement_Portal.service;
 
-import com.example.Reimbursement_Portal.dto.Request.ClaimActionRequest;
-import com.example.Reimbursement_Portal.dto.Request.ClaimRequest;
-import com.example.Reimbursement_Portal.dto.Response.ClaimResponse;
-import com.example.Reimbursement_Portal.entity.ClaimStatus;
+import com.example.Reimbursement_Portal.dto.Request.ClaimActionRequestDTO;
+import com.example.Reimbursement_Portal.dto.Request.ClaimRequestDTO;
+import com.example.Reimbursement_Portal.dto.Response.ClaimResponseDTO;
+import com.example.Reimbursement_Portal.enums.ClaimStatus;
 
 import java.util.List;
 
-// Claim service operations
+/**
+ * Service interface for claim operations.
+ */
 public interface ClaimService {
 
-    // Submit claim //
-    ClaimResponse submitClaim(ClaimRequest request);
+    /**
+     * Submits a new claim.
+     *
+     * @param request the claim request
+     * @return the created claim
+     */
+    ClaimResponseDTO submitClaim(ClaimRequestDTO request);
 
-    //  Get all claims //
-    List<ClaimResponse> getAllClaims();
+    /**
+     * Retrieves all claims.
+     *
+     * @return list of claims
+     */
+    List<ClaimResponseDTO> getAllClaims();
 
-    //  Get claims by employee //
-    List<ClaimResponse> getClaimsByEmployee(Long employeeId);
+    /**
+     * Retrieves claims by employee ID.
+     *
+     * @param employeeId the employee ID
+     * @return list of claims
+     */
+    List<ClaimResponseDTO> getClaimsByEmployee(Long employeeId);
 
-    // Get claims by reviewer //
-    List<ClaimResponse> getClaimsByReviewer(Long reviewerId);
+    /**
+     * Retrieves claims by reviewer ID.
+     *
+     * @param reviewerId the reviewer ID
+     * @return list of claims
+     */
+    List<ClaimResponseDTO> getClaimsByReviewer(Long reviewerId);
 
-    //  Get claims by status //
-    List<ClaimResponse> getClaimsByStatus(ClaimStatus status);
+    /**
+     * Retrieves claims by status.
+     *
+     * @param status the claim status
+     * @return list of claims
+     */
+    List<ClaimResponseDTO> getClaimsByStatus(ClaimStatus status);
 
-    // Take action on claim //
-    ClaimResponse takeAction(Long claimId, Long reviewerId, ClaimActionRequest request);
+    /**
+     * Takes action on a claim.
+     *
+     * @param claimId the claim ID
+     * @param reviewerId the reviewer ID
+     * @param request the action request
+     * @return the updated claim
+     */
+    ClaimResponseDTO takeAction(Long claimId, Long reviewerId, ClaimActionRequestDTO request);
 }
