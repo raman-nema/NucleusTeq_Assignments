@@ -57,6 +57,14 @@
         <div class="form-card">
           <h3 class="form-card-title">New Reimbursement Request</h3>
 
+          <!-- Manager info banner — shown if employee has a manager -->
+          <div id="managerInfoBanner" style="display:none;margin-bottom:14px;padding:10px 14px;background:var(--surface2);border-radius:var(--radius-sm);border-left:2px solid var(--green);font-size:12.5px;color:var(--text-mid)">
+            Your claims will be reviewed by <strong id="managerInfoName"></strong>
+          </div>
+          <div id="noManagerBanner" style="display:none;margin-bottom:14px;padding:10px 14px;background:var(--amber-light);border-radius:var(--radius-sm);border-left:2px solid var(--amber);font-size:12.5px;color:var(--amber)">
+            No manager assigned — your claims will be reviewed by an Admin.
+          </div>
+
           <div class="alert alert-error"   id="submitError"   style="display:none"></div>
           <div class="alert alert-success" id="submitSuccess" style="display:none"></div>
 
@@ -118,11 +126,44 @@
   <script src="js/api.js"></script>
   <script src="js/claims.js"></script>
   <script>
-    window.addEventListener('DOMContentLoaded', function () {
+    window.addEventListener('DOMContentLoaded', async function () {
       guardPage('EMPLOYEE');
       populateSidebar();
       setupEmployeeTabs();
+      // Always re-fetch the current user so manager assignment changes
+      // made after login are immediately visible without re-logging in
+      await refreshCurrentUser();
+      showManagerBanner();
     });
+
+    /* Re-fetch logged-in user from API and update localStorage */
+    async function refreshCurrentUser() {
+      const user = getSession();
+      if (!user) return;
+      try {
+        const fresh = await getUserById(user.id);
+        // Merge fresh data back into session (keeps token/email/password intact)
+        const updated = Object.assign({}, user, fresh);
+        localStorage.setItem('rh_user', JSON.stringify(updated));
+        // Also refresh sidebar name in case it changed
+        populateSidebar();
+      } catch (e) {
+        // Non-critical — if it fails just use stale session data
+        console.warn('Could not refresh user:', e.message);
+      }
+    }
+
+    /* Show the correct manager info banner based on fresh session */
+    function showManagerBanner() {
+      const user = getSession();
+      if (!user) return;
+      const hasMgr = user.managerName || user.managerId;
+      document.getElementById('managerInfoBanner').style.display = hasMgr ? 'block' : 'none';
+      document.getElementById('noManagerBanner').style.display   = hasMgr ? 'none'  : 'block';
+      if (hasMgr && user.managerName) {
+        document.getElementById('managerInfoName').textContent = user.managerName;
+      }
+    }
 
     /* ── Tab switching for employee sidebar ── */
     function setupEmployeeTabs() {
