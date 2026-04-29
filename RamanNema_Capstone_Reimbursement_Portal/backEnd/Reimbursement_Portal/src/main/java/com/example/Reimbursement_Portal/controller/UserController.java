@@ -2,9 +2,11 @@ package com.example.Reimbursement_Portal.controller;
 
 import com.example.Reimbursement_Portal.dto.Request.UserRequestDTO;
 import com.example.Reimbursement_Portal.dto.Response.UserResponseDTO;
+import com.example.Reimbursement_Portal.dto.StandardAPIResponse;
 import com.example.Reimbursement_Portal.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,56 +23,94 @@ public class UserController {
 
     /**
      * Creates a new user.
-     *
-     * @param request the user request data
-     * @return the created user response
      */
     @PostMapping
-    public UserResponseDTO createUser(@RequestBody UserRequestDTO request) {
-        return userService.createUser(request);
+    public ResponseEntity<StandardAPIResponse<UserResponseDTO>> createUser(
+            @RequestBody UserRequestDTO request) {
+
+        UserResponseDTO response = userService.createUser(request);
+
+        StandardAPIResponse<UserResponseDTO> apiResponse =
+                StandardAPIResponse.<UserResponseDTO>builder()
+                        .success(true)
+                        .message("User created successfully")
+                        .data(response)
+                        .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 
     /**
      * Retrieves all users.
-     *
-     * @return list of users
      */
     @GetMapping
-    public List<UserResponseDTO> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<StandardAPIResponse<List<UserResponseDTO>>> getAllUsers() {
+
+        List<UserResponseDTO> response = userService.getAllUsers();
+
+        StandardAPIResponse<List<UserResponseDTO>> apiResponse =
+                StandardAPIResponse.<List<UserResponseDTO>>builder()
+                        .success(true)
+                        .message("Users fetched successfully")
+                        .data(response)
+                        .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 
     /**
      * Retrieves a user by ID.
-     *
-     * @param id the user ID
-     * @return the user response
      */
     @GetMapping("/{id}")
-    public UserResponseDTO getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    public ResponseEntity<StandardAPIResponse<UserResponseDTO>> getUserById(
+            @PathVariable Long id) {
+
+        UserResponseDTO response = userService.getUserById(id);
+
+        StandardAPIResponse<UserResponseDTO> apiResponse =
+                StandardAPIResponse.<UserResponseDTO>builder()
+                        .success(true)
+                        .message("User fetched successfully")
+                        .data(response)
+                        .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 
     /**
      * Retrieves employees under a manager.
-     *
-     * @param managerId the manager ID
-     * @return list of employees
      */
     @GetMapping("/manager/{managerId}")
-    public List<UserResponseDTO> getEmployeesByManager(@PathVariable Long managerId) {
-        return userService.getEmployeesByManager(managerId);
+    public ResponseEntity<StandardAPIResponse<List<UserResponseDTO>>> getEmployeesByManager(
+            @PathVariable Long managerId) {
+
+        List<UserResponseDTO> response = userService.getEmployeesByManager(managerId);
+
+        StandardAPIResponse<List<UserResponseDTO>> apiResponse =
+                StandardAPIResponse.<List<UserResponseDTO>>builder()
+                        .success(true)
+                        .message("Employees fetched successfully")
+                        .data(response)
+                        .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 
     /**
      * Deletes a user by ID.
-     *
-     * @param id the user ID
-     * @return confirmation message
      */
     @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable Long id) {
+    public ResponseEntity<StandardAPIResponse<String>> deleteUser(@PathVariable Long id) {
+
         userService.deleteUser(id);
-        return "User deleted successfully with id.";
+
+        StandardAPIResponse<String> apiResponse =
+                StandardAPIResponse.<String>builder()
+                        .success(true)
+                        .message("User deleted successfully")
+                        .data("User deleted with id: " + id)
+                        .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 }

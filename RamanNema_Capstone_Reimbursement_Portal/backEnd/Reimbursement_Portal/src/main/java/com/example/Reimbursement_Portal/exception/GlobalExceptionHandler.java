@@ -1,54 +1,54 @@
 package com.example.Reimbursement_Portal.exception;
 
-import org.springframework.http.HttpStatus;
+import com.example.Reimbursement_Portal.dto.StandardAPIResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
-/**
- * Global exception handler for REST APIs.
- */
-@RestControllerAdvice
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Handles bad request exceptions.
-     *
-     * @param ex the exception
-     * @return error response
-     */
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<String> handleBadRequest(BadRequestException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<StandardAPIResponse<Object>> handleBadRequest(BadRequestException ex) {
+        return ResponseEntity.badRequest().body(
+                StandardAPIResponse.builder()
+                        .success(false)
+                        .message(ex.getMessage())
+                        .data(null)
+                        .build()
+        );
     }
 
-    /**
-     * Handles resource not found exceptions.
-     *
-     * @param ex the exception
-     * @return error response
-     */
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleNotFound(ResourceNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<StandardAPIResponse<Object>> handleNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(404).body(
+                StandardAPIResponse.builder()
+                        .success(false)
+                        .message(ex.getMessage())
+                        .data(null)
+                        .build()
+        );
     }
 
-    /**
-     * Handles validation exceptions.
-     *
-     * @param ex the exception
-     * @return error response
-     */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<StandardAPIResponse<Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
+        return ResponseEntity.badRequest().body(
+                StandardAPIResponse.builder()
+                        .success(false)
+                        .message("Cannot delete this user because they have existing claims in the system. Please delete their claims first.")
+                        .data(null)
+                        .build()
+        );
+    }
 
-        String errorMessage = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .findFirst()
-                .map(error -> error.getDefaultMessage())
-                .orElse("Validation error");
-
-        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<StandardAPIResponse<Object>> handleGeneric(Exception ex) {
+        return ResponseEntity.internalServerError().body(
+                StandardAPIResponse.builder()
+                        .success(false)
+                        .message("Something went wrong: " + ex.getMessage())
+                        .data(null)
+                        .build()
+        );
     }
 }
