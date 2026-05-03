@@ -1,8 +1,8 @@
 /* =====================================================
    dashboard.js — Admin Dashboard Logic
    Handles: user listing, stat cards, add/delete user,
-            tab switching, filtering, pagination
-   ===================================================== */
+        tab switching, filtering, pagination
+  ===================================================== */
 
 const USERS_PER_PAGE = 12; // Show 12 users per page in the grid
 
@@ -215,7 +215,7 @@ function toggleManagerField() {
 function buildManagerDropdown() {
   const sel = document.getElementById('newManager');
   if (!sel) return;
-  sel.innerHTML = '<option value="">No manager assigned</option>';
+  sel.innerHTML = '<option value="">Admin Access</option>';
   managers.forEach(m => {
     const opt = document.createElement('option');
     opt.value = m.id;
@@ -512,3 +512,5 @@ document.querySelectorAll('.overlay').forEach(ov => {
 function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
 function hide(id)         { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
 function toggleError(id, show) { const el = document.getElementById(id); if (el) el.classList.toggle('show', show); }
+
+
