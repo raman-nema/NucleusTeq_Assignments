@@ -13,6 +13,9 @@ import com.example.Reimbursement_Portal.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -22,6 +25,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     // ========================= CREATE USER =========================
     @Override
@@ -59,6 +63,7 @@ public class UserServiceImpl implements UserService {
         // 6. Save user
         User savedUser = userRepository.save(user);
 
+        log.info("User created: {}", request.getEmail());
         return UserMapper.toResponse(savedUser);
     }
 
@@ -105,6 +110,7 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("Cannot delete manager with assigned employees");
         }
 
+        log.warn("User deleted with id: {}", id);
         userRepository.delete(user);
     }
 }

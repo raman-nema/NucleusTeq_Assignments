@@ -3,6 +3,8 @@ package com.example.Reimbursement_Portal.dto.Response;
 import com.example.Reimbursement_Portal.enums.ClaimStatus;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 
@@ -10,6 +12,8 @@ import java.time.LocalDate;
  * Response DTO for claim details.
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class ClaimResponseDTO {
 

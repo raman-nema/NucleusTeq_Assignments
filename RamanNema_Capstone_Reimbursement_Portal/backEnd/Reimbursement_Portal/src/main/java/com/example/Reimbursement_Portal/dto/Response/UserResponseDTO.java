@@ -1,8 +1,7 @@
 package com.example.Reimbursement_Portal.dto.Response;
 
 import com.example.Reimbursement_Portal.enums.Role;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 
 /**
@@ -10,6 +9,10 @@ import lombok.Data;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class UserResponseDTO {
 
     private Long id;

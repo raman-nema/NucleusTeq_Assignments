@@ -13,6 +13,8 @@ import com.example.Reimbursement_Portal.mapper.ClaimMapper;
 import com.example.Reimbursement_Portal.repository.ClaimRepository;
 import com.example.Reimbursement_Portal.repository.UserRepository;
 import com.example.Reimbursement_Portal.service.ClaimService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class ClaimServiceImpl implements ClaimService {
 
     private final ClaimRepository claimRepository;
     private final UserRepository userRepository;
+    private static final Logger log = LoggerFactory.getLogger(ClaimServiceImpl.class);
 
     // ========================= SUBMIT CLAIM =========================
     @Override
@@ -54,7 +57,9 @@ public class ClaimServiceImpl implements ClaimService {
         claim.setEmployee(employee);
         claim.setReviewer(reviewer);
 
+        log.info("Claim submitted for employeeId: {}", request.getEmployeeId());
         return ClaimMapper.toResponse(claimRepository.save(claim));
+
     }
 
     // ========================= GET ALL CLAIMS =========================
@@ -107,6 +112,8 @@ public class ClaimServiceImpl implements ClaimService {
     @Override
     public ClaimResponseDTO takeAction(Long claimId, Long reviewerId, ClaimActionRequestDTO request) {
 
+        log.info("Processing claim: claimId={}, reviewerId={}, status={}",
+                claimId, reviewerId, request.getStatus());
         Claim claim = claimRepository.findById(claimId)
                 .orElseThrow(() -> new ResourceNotFoundException("Claim not found"));
 
@@ -142,11 +149,19 @@ public class ClaimServiceImpl implements ClaimService {
         }
 
         claim.setStatus(request.getStatus());
+        if (request.getStatus() == ClaimStatus.APPROVED) {
+            log.info("Claim APPROVED: {}", claimId);
+        }
+
+        if (request.getStatus() == ClaimStatus.REJECTED) {
+            log.warn("Claim REJECTED: {} reason={}", claimId, request.getComment());
+        }
         claim.setComment(request.getComment());
 
         // Update reviewer to the person who actually took the action
         // This correctly records that an Admin actioned it, not the original assigned reviewer
         claim.setReviewer(reviewer);
+
 
         return ClaimMapper.toResponse(claimRepository.save(claim));
     }
