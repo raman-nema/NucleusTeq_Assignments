@@ -419,7 +419,7 @@ async function loadAllClaims() {
         <td><strong>${formatCurrency(c.amount)}</strong></td>
         <td>${esc(c.description)}</td>
         <td><span class="status-badge status-${c.status}">${esc(c.status)}</span></td>
-        <td>${c.comment ? esc(c.comment) : '<span style="color:var(--text-muted)">–</span>'}</td>
+        <td>${c.comment ? esc(c.comment) : '<span style="color:var(--text-muted)">NA</span>'}</td>
         <td>
           ${c.status === 'SUBMITTED'
             ? `<div style="display:flex;gap:6px">
@@ -428,7 +428,7 @@ async function loadAllClaims() {
                 <button class="btn btn-danger btn-sm"
                   onclick="openAdminRejectModal(${c.id})">Reject</button>
                </div>`
-            : '<span style="color:var(--text-muted);font-size:12px">–</span>'}
+            : '<span style="color:var(--text-muted);font-size:12px">NA</span>'}
         </td>
       </tr>`).join('');
   } catch (err) {
