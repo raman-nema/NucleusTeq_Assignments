@@ -1,0 +1,10 @@
+Employee Information
+
+Name: Shubham Nema
+Department: Software Development
+Role: Software Developer Trainee
+
+Profile:
+A motivated professional with a strong interest in Python programming and software development. Focused on building technical skills through practical projects and continuous learning.
+
+This document is a sample text file created to demonstrate Python file handling operations.
