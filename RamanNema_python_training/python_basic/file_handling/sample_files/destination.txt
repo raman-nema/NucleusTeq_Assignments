@@ -1,0 +1,3 @@
+This is the content of source.txt file.
+This file is used to test the copy_file_content code.
+The content of this file will be pasted in the destination.txt file.

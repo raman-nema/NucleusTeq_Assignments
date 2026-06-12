@@ -1,0 +1,5 @@
+Welcome to my notes.
+This is a sample notes file used for testing the append_data_to_file code.
+New data will be appended below...
+
+Appended text in notes file from Python.
