@@ -1,4 +1,4 @@
-"""Execute a function in parallel using ThreadPoolExecutor.
+"""Convert a normal function into parallel execution using ThreadPoolExecutor.
 
  The main benefit of ThreadPoolExecutor is that it manages threads for you automatically.
  Without ThreadPoolExecutor, we have to create, start, and join each thread manually.

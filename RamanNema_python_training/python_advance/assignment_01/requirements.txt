@@ -1,0 +1,14 @@
+## Dependencies
+
+### External Packages
+- pytest
+
+### Python Standard Library Modules
+- re
+- functools
+- threading
+- multiprocessing
+- concurrent.futures
+- pdb
+- time
+- os

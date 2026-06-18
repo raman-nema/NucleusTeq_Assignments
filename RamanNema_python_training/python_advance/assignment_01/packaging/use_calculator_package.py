@@ -1,4 +1,4 @@
-"""Use calculator package."""
+""" Create a package for mathematical operations (add, subtract, multiply, divide) and use it. """
 
 # importing various functions from calculator package
 from calculator_package.add import add
