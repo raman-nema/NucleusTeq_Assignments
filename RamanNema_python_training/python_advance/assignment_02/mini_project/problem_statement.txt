@@ -1,0 +1,21 @@
+
+Assignment 7: Mini Project 
+End-to-End Practice
+
+Create a dataset of Students:
+
+Name   Marks   Hours_Studied
+Rahul   70        2
+Priya   80        3
+Siri    90        5
+Anuj    60        1
+
+Tasks:
+1. Load into Pandas
+2. Add:
+    Performance = Pass if Marks > 65 else Fail
+3. Visualize:
+    Line Chart → Hours vs Marks
+    Scatter Plot → Study vs Marks
+4. Use Seaborn:
+    Barplot → Performance vs Marks
