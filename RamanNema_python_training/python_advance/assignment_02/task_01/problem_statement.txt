@@ -1,0 +1,21 @@
+
+Assignment 1: NumPy Basics
+Understand arrays and numerical operations
+
+Tasks:
+1. Create a NumPy array: [10, 20, 30, 40, 50]
+    Perform:
+        - Mean
+        - Max
+        - Min
+        - Sum 
+
+2. Create two arrays:
+    arr_1 = [1,2,3]
+    arr_2 = [4,5,6]
+
+    Perform:
+        - Addition
+        - Multiplication
+
+3. Create a 3×3 matrix using NumPy
