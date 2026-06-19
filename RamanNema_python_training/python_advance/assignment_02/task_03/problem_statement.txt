@@ -1,0 +1,15 @@
+
+Assignment 3: Data Cleaning
+Handle missing values
+
+Create this dataset:
+
+Name   Age   Salary
+Rahul  25    30000
+Priya  NaN   40000
+Anuj   29    NaN
+
+Tasks:
+    1. Detect missing values
+    2. Replace missing Age with mean
+    3. Replace missing Salary with 0
