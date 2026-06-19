@@ -1,0 +1,19 @@
+
+Assignment 2: Pandas DataFrame Creation
+Learn DataFrame structure
+
+Tasks:
+Create a DataFrame for employees:
+Name   Age   Department   Salary
+Rahul  25       HR        30000
+Priya  30       IT        50000
+Amit   28     Finance     45000
+Anuj   35       IT        60000
+
+Then:
+    1. Show first 2 rows
+    2. Show summary statistics
+    3. Display only IT employees
+    4. Add new column:
+        Bonus = Salary * 0.10
+
