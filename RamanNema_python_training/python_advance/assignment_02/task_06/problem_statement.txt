@@ -1,7 +1,6 @@
 
-Assignment 4: Data Analysis (Use GroupBy)
-
-Using employee dataset:
+Assignment 6: Seaborn Visualizations
+Create advanced charts using employee dataset:
 
 Name   Age   Department   Salary
 Rahul  25       HR        30000
@@ -11,8 +10,8 @@ Anuj   35       IT        60000
 Raman  22       HR        50000
 Naman  26     Finance     54000
 
-
 Tasks:
-    1. Find average salary by department
-    2. Find max salary by department
-    3. Count employees per department
+    Create:
+    1. Barplot → Department vs Salary
+    2. Boxplot → Salary distribution
+    3. Heatmap using correlation between Age & Salary
