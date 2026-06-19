@@ -1,0 +1,15 @@
+
+Assignment 4: Data Analysis (Use GroupBy)
+
+Using employee dataset:
+
+Name   Age   Department   Salary
+Rahul  25       HR        30000
+Priya  30       IT        50000
+Amit   28     Finance     45000
+Anuj   35       IT        60000
+
+Tasks:
+    1. Find average salary by department
+    2. Find max salary by department
+    3. Count employees per department
