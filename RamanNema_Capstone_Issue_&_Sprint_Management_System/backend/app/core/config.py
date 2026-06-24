@@ -1,12 +1,19 @@
-from pydantic_settings import BaseSettings
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from a local .env file when available.
+load_dotenv()
 
 
-class Settings(BaseSettings):
-    MONGO_URI: str
-    DATABASE_NAME: str
+class Settings:
+    """Environment-backed configuration used by the application."""
 
-    class Config:
-        env_file = ".env"
+    # MongoDB connection string used by the database client.
+    mongo_uri = os.getenv("MONGO_URI")
+
+    # Default database selected for application data.
+    database_name = os.getenv("DATABASE_NAME")
 
 
+# Shared settings instance imported by the rest of the application.
 settings = Settings()

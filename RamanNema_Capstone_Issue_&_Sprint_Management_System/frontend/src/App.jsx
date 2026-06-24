@@ -1,9 +1,15 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import RegisterPage from "./pages/RegisterPage";
+
 function App() {
-    return (
-        <div>
-            <h1>Issue & Sprint Management System</h1>
-        </div>
-    );
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/register" element={<RegisterPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
