@@ -1,7 +1,10 @@
 from fastapi.responses import JSONResponse
 from fastapi import Request
 
-from app.exceptions.custom_exceptions import UserAlreadyExistsException
+from app.exceptions.custom_exceptions import (
+    UserAlreadyExistsException,
+    InvalidCredentialsException,
+)
 
 
 async def user_exists_handler(request: Request, exc: UserAlreadyExistsException):
@@ -9,5 +12,25 @@ async def user_exists_handler(request: Request, exc: UserAlreadyExistsException)
 
     return JSONResponse(
         status_code=409,
-        content={"success": False, "message": "User_Email already exists", "data": None},
+        content={
+            "success": False,
+            "message": "User_Email already exists",
+            "data": None,
+        },
+    )
+
+
+async def invalid_credentials_handler(
+    request: Request, exc: InvalidCredentialsException
+):
+    """Return an unauthorized response for failed login attempts."""
+
+    # Keep authentication error responses consistent with the API response shape.
+    return JSONResponse(
+        status_code=401,
+        content={
+            "success": False,
+            "message": "Invalid email or password",
+            "data": None,
+        },
     )

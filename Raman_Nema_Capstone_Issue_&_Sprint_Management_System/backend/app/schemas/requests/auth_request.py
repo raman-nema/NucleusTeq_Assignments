@@ -12,6 +12,7 @@ class RegisterRequest(BaseModel):
     password: str
     role: Role
 
+
 class LoginRequest(BaseModel):
     """User login request schema."""
 

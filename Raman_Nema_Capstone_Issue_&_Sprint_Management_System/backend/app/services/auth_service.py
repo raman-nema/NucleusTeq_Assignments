@@ -3,6 +3,20 @@ from app.repositories.user_repository import UserRepository
 from app.core.security import hash_password
 from app.exceptions.custom_exceptions import UserAlreadyExistsException
 from app.schemas.responses.auth_response import RegisterResponse
+import uuid
+
+from datetime import datetime
+from datetime import timedelta
+
+from app.core.security import hash_password, verify_password
+
+from app.models.token_model import TokenModel
+
+from app.repositories.token_repository import TokenRepository
+
+from app.schemas.responses.auth_response import LoginResponse
+
+from app.exceptions.custom_exceptions import InvalidCredentialsException
 
 
 class AuthService:
@@ -33,3 +47,40 @@ class AuthService:
         UserRepository.create_user(user)
 
         return RegisterResponse(message="User registered successfully")
+
+    @staticmethod
+    def login_user(request):
+
+        # Look up the user by email before checking the submitted password.
+        user = UserRepository.find_by_email(request.email)
+
+        # Reject login attempts when the email is not registered.
+        if not user:
+            raise InvalidCredentialsException()
+
+        # Reject login attempts when the submitted password does not match.
+        if not verify_password(request.password, user["password"]):
+            raise InvalidCredentialsException()
+
+        # Remove older tokens so only the latest login session remains active.
+        TokenRepository.delete_user_tokens(str(user["_id"]))
+
+        # Create a new token value and set a 24-hour expiry time.
+        token = str(uuid.uuid4())
+
+        expires_at = datetime.utcnow() + timedelta(hours=24)
+
+        # Build and persist the token document for later authentication checks.
+        token_document = TokenModel.build(
+            user_id=str(user["_id"]),
+            email=user["email"],
+            token=token,
+            expires_at=expires_at,
+        )
+
+        TokenRepository.create_token(token_document)
+
+        # Return token details to the router for the login API response.
+        return LoginResponse(
+            access_token=token, role=user["role"], expires_at=expires_at
+        )
