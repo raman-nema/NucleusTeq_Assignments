@@ -116,3 +116,10 @@
 .auth-link:hover {
   text-decoration: underline;
 }
+
+.error-message {
+    color: #dc2626;
+    font-size: 0.85rem;
+    margin-top: 4px;
+    margin-bottom: 10px;
+}

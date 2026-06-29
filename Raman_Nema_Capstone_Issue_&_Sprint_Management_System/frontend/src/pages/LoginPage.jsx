@@ -6,6 +6,7 @@ import Button from "../components/common/Button";
 
 import { loginUser } from "../services/auth-service";
 import { saveToken, saveRole } from "../utils/storage";
+import { validateLogin } from "../../src/utils/validations";
 
 import "../styles/LoginPage.css";
 
@@ -17,6 +18,7 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -26,10 +28,22 @@ function LoginPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Reset feedback messages before starting a new login request.
-    setLoading(true);
+    // Reset previous success and error messages.
     setMessage("");
     setError("");
+
+    // Validate all form fields.
+    const validationErrors = validateLogin(formData);
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    // Clear previous validation errors.
+    setErrors({});
+
+    setLoading(true);
 
     try {
       // Send credentials to the backend and receive the login response.
@@ -51,7 +65,6 @@ function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-card">
-
         <h1 className="app-title">SprintFlow</h1>
         <p className="page-subtitle">Welcome back! Please sign in.</p>
 
@@ -64,6 +77,7 @@ function LoginPage() {
               value={formData.email}
               onChange={handleChange}
             />
+            {errors.email && <p className="error-message">{errors.email}</p>}
           </div>
 
           <div className="form-group">
@@ -74,10 +88,13 @@ function LoginPage() {
               value={formData.password}
               onChange={handleChange}
             />
+            {errors.password && (
+              <p className="error-message">{errors.password}</p>
+            )}
           </div>
 
           {message && <p className="success-message">{message}</p>}
-          {error   && <p className="error-message">{error}</p>}
+          {error && <p className="error-message">{error}</p>}
 
           <Button
             type="submit"
@@ -93,7 +110,6 @@ function LoginPage() {
             Register
           </span>
         </p>
-
       </div>
     </div>
   );

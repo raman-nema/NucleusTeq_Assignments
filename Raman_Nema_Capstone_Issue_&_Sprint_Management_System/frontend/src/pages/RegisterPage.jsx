@@ -8,6 +8,8 @@ import { registerUser } from "../services/auth-service";
 
 import "../styles/RegisterPage.css";
 
+import { validateRegister } from "../../src/utils/validations";
+
 function RegisterPage() {
   const navigate = useNavigate();
 
@@ -19,6 +21,8 @@ function RegisterPage() {
     role: "MEMBER",
   });
 
+  const [errors, setErrors] = useState({});
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     // Update the field that changed while preserving the other form values.
@@ -27,6 +31,17 @@ function RegisterPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    // Validate all form fields.
+    const validationErrors = validateRegister(formData);
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    // Clear previous validation errors.
+    setErrors({});
 
     try {
       // Send the completed form data to the backend registration endpoint.
@@ -57,6 +72,7 @@ function RegisterPage() {
               value={formData.name}
               onChange={handleChange}
             />
+            {errors.name && <p className="error-message">{errors.name}</p>}
           </div>
 
           <div className="form-group">
@@ -67,6 +83,7 @@ function RegisterPage() {
               value={formData.email}
               onChange={handleChange}
             />
+            {errors.email && <p className="error-message">{errors.email}</p>}
           </div>
 
           <div className="form-group">
@@ -77,16 +94,20 @@ function RegisterPage() {
               value={formData.password}
               onChange={handleChange}
             />
+            {errors.password && (
+              <p className="error-message">{errors.password}</p>
+            )}
           </div>
 
           <div className="form-group">
             <label>Role</label>
             <div className="select-wrapper">
               <select name="role" value={formData.role} onChange={handleChange}>
-                <option value="MEMBER">Select a role</option>
+                <option value="#">Select a role</option>
                 <option value="MEMBER">Member</option>
                 <option value="VIEWER">Viewer</option>
               </select>
+              {errors.role && <p className="error-message">{errors.role}</p>}
             </div>
           </div>
 
