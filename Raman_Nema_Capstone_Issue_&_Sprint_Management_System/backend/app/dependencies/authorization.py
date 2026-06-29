@@ -18,13 +18,13 @@ def require_admin(current_user=Depends(get_current_user)):
     return current_user
 
 
-def require_manager(current_user=Depends(get_current_user)):
+def require_member(current_user=Depends(get_current_user)):
     """
-    Allows only MANAGER users.
+    Allows only MEMBER users.
     """
 
     # Block the request if the authenticated user is not a manager.
-    if current_user["role"] != Role.MANAGER.value:
+    if current_user["role"] != Role.MEMBER.value:
 
         raise ForbiddenException()
 
@@ -44,13 +44,13 @@ def require_viewer(current_user=Depends(get_current_user)):
     return current_user
 
 
-def require_admin_or_manager(current_user=Depends(get_current_user)):
+def require_admin_or_member(current_user=Depends(get_current_user)):
     """
-    Allows ADMIN and MANAGER.
+    Allows ADMIN and MEMBER.
     """
 
     # Allow shared access for admin and manager roles only.
-    if current_user["role"] not in [Role.ADMIN.value, Role.MANAGER.value]:
+    if current_user["role"] not in [Role.ADMIN.value, Role.MEMBER.value]:
 
         raise ForbiddenException()
 

@@ -6,6 +6,8 @@ from app.exceptions.custom_exceptions import (
     UnauthorizedException,
     ExpiredTokenException,
     ForbiddenException,
+    ProjectAlreadyExistsException,
+    ProjectNotFoundException,
 )
 
 
@@ -59,4 +61,30 @@ async def forbidden_handler(request: Request, exc: ForbiddenException):
     return JSONResponse(
         status_code=403,
         content={"success": False, "message": "Access denied", "data": None},
+    )
+
+
+async def project_exists_handler(request: Request, exc: ProjectAlreadyExistsException):
+    """Return a conflict response for duplicate project creation."""
+
+    return JSONResponse(
+        status_code=409,
+        content={
+            "success": False,
+            "message": "Project already exists",
+            "data": None,
+        },
+    )
+
+
+async def project_not_found_handler(request: Request, exc: ProjectNotFoundException):
+    """Return a not found response when the project does not exist."""
+
+    return JSONResponse(
+        status_code=404,
+        content={
+            "success": False,
+            "message": "Project not found",
+            "data": None,
+        },
     )

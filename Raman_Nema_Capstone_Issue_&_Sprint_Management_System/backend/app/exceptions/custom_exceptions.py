@@ -26,3 +26,15 @@ class ForbiddenException(Exception):
     """Raised when user lacks permission."""
 
     pass
+
+
+class ProjectAlreadyExistsException(Exception):
+    """Raised when a project with the same name already exists."""
+
+    pass
+
+
+class ProjectNotFoundException(Exception):
+    """Raised when the requested project does not exist."""
+
+    pass

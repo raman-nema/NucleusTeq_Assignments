@@ -49,19 +49,19 @@ def test_admin_can_access_dashboard(client):
     assert response.status_code == 200
 
 
-def test_manager_cannot_access_dashboard(client):
+def test_member_cannot_access_dashboard(client):
 
     register_user(
         client,
-        "Manager",
-        "manager@test.com",
+        "Member",
+        "member@test.com",
         "Admin@123",
         Role.MEMBER.value,
     )
 
     token = login_user(
         client,
-        "manager@test.com",
+        "member@test.com",
         "Admin@123",
     )
 
