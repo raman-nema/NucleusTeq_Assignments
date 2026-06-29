@@ -1,20 +1,52 @@
-from pydantic import BaseModel
-from pydantic import EmailStr
-
+import re
+from pydantic import (
+    BaseModel,
+    EmailStr,
+    Field,
+    field_validator,
+)
 from app.common.enums import Role
 
 
 class RegisterRequest(BaseModel):
     """User registration request schema."""
 
-    name: str
+    name: str = Field(
+        min_length=3,
+        max_length=50,
+    )
+
     email: EmailStr
-    password: str
+
+    password: str = Field(
+        min_length=8,
+        max_length=20,
+    )
+
     role: Role
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, value: str):
+
+         # Require uppercase, lowercase, number, special character, and 8–20 characters.
+        password_pattern = (
+            r"^(?=.*[a-z])" r"(?=.*[A-Z])" r"(?=.*\d)" r"(?=.*[@$!%*?&]).{8,20}$"
+        )
+
+        if not re.match(password_pattern, value):
+            raise ValueError(
+                "Password must be 8-20 characters long and contain an uppercase letter, "
+                "lowercase letter, number and special character."
+            )
+        return value
 
 
 class LoginRequest(BaseModel):
     """User login request schema."""
 
     email: EmailStr
-    password: str
+
+    password: str = Field(
+        min_length=8,
+    )
