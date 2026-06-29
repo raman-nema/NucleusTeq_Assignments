@@ -3,7 +3,26 @@ class UserAlreadyExistsException(Exception):
 
     pass
 
+
 class InvalidCredentialsException(Exception):
     """Raised when login credentials are invalid."""
+
+    pass
+
+
+class UnauthorizedException(Exception):
+    """Raised when authentication fails."""
+
+    pass
+
+
+class ExpiredTokenException(Exception):
+    """Raised when authentication token has expired."""
+
+    pass
+
+
+class ForbiddenException(Exception):
+    """Raised when user lacks permission."""
 
     pass

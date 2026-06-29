@@ -1,4 +1,5 @@
 from app.core.database import database
+from datetime import datetime
 
 
 class TokenRepository:
@@ -25,3 +26,11 @@ class TokenRepository:
 
         # Remove all active tokens for a user, such as during logout from all sessions.
         return database.auth_tokens.delete_many({"user_id": user_id})
+
+    @staticmethod
+    def delete_expired_tokens():
+        """Delete expired authentication tokens."""
+
+        return database.auth_tokens.delete_many(
+            {"expires_at": {"$lt": datetime.utcnow()}}
+        )

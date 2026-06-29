@@ -13,3 +13,18 @@ export async function loginUser(userData) {
 
   return response.data;
 }
+export async function logoutUser() {
+  const token = localStorage.getItem("token");
+
+  const response = await apiClient.post(
+    "/auth/logout",
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  return response.data;
+}
