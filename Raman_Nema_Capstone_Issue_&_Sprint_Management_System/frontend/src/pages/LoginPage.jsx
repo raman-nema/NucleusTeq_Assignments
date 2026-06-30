@@ -52,7 +52,9 @@ function LoginPage() {
       saveToken(response.data.access_token);
       saveRole(response.data.role);
       setMessage(response.message);
-      // navigate("/dashboard");
+
+      navigate("/projects");
+
     } catch (error) {
       // Show the backend error message when login fails.
       setError(error.response?.data?.message || "Unable to login.");

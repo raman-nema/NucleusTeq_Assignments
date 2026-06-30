@@ -26,7 +26,7 @@ class ProjectRepository:
     def find_all():
         """Retrieve all projects."""
 
-        return list(database.projects.find())
+        return database.projects.find().sort("created_at", -1)
 
     @staticmethod
     def update_project(
