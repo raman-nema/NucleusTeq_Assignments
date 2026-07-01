@@ -39,6 +39,32 @@
   flex-direction: column;
 }
 
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper .input-field input {
+  padding-right: 64px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  bottom: 7px;
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: #555;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: #2d2d2d;
+}
+
 .success-message {
   font-size: 0.85rem;
   color: #2d7a4f;

@@ -13,26 +13,23 @@ import "../styles/LoginPage.css";
 function LoginPage() {
   const navigate = useNavigate();
 
-  // Keep login form values and UI feedback in local component state.
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    // Update only the input field that changed.
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Reset previous success and error messages.
     setMessage("");
     setError("");
 
-    // Validate all form fields.
     const validationErrors = validateLogin(formData);
 
     if (Object.keys(validationErrors).length > 0) {
@@ -40,26 +37,18 @@ function LoginPage() {
       return;
     }
 
-    // Clear previous validation errors.
     setErrors({});
-
     setLoading(true);
 
     try {
-      // Send credentials to the backend and receive the login response.
       const response = await loginUser(formData);
-      // Save session details for authenticated requests and role-based access.
       saveToken(response.data.access_token);
       saveRole(response.data.role);
       setMessage(response.message);
-
       navigate("/projects");
-
     } catch (error) {
-      // Show the backend error message when login fails.
       setError(error.response?.data?.message || "Unable to login.");
     } finally {
-      // Re-enable the login button after the request finishes.
       setLoading(false);
     }
   };
@@ -83,13 +72,23 @@ function LoginPage() {
           </div>
 
           <div className="form-group">
-            <InputField
-              label="Password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-            />
+            <div className="password-wrapper">
+              <InputField
+                label="Password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
             {errors.password && (
               <p className="error-message">{errors.password}</p>
             )}
@@ -108,7 +107,6 @@ function LoginPage() {
         <p className="auth-switch">
           Don't have an account?{" "}
           <span className="auth-link" onClick={() => navigate("/register")}>
-            {/* Navigate new users to the registration page. */}
             Register
           </span>
         </p>
