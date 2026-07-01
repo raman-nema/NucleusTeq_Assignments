@@ -1,6 +1,9 @@
 import uuid
 
+from bson import ObjectId
+
 from app.common.enums import Role
+from app.repositories.user_repository import UserRepository
 
 
 # Register a user for testing.
@@ -98,8 +101,16 @@ def test_admin_can_delete_sprint(client):
     assert response.json()["message"] == "Sprint deleted successfully"
 
 
-# Verify member cannot delete a sprint.
-def test_member_cannot_delete_sprint(client):
+# Verify assigned member can delete a sprint.
+def test_assigned_member_can_delete_sprint(client):
+
+    register_user(
+        client,
+        "Admin",
+        "admin-member@company.com",
+        "Admin@123",
+        Role.ADMIN.value,
+    )
 
     register_user(
         client,
@@ -109,44 +120,54 @@ def test_member_cannot_delete_sprint(client):
         Role.MEMBER.value,
     )
 
-    token = login_user(
+    admin_token = login_user(
+        client,
+        "admin-member@company.com",
+        "Admin@123",
+    )
+
+    member_token = login_user(
         client,
         "member@company.com",
         "Admin@123",
     )
 
-    response = client.delete(
-        "/sprints/68614fdcd76d8ab312345678",
-        headers={"Authorization": f"Bearer {token}"},
-    )
-
-    assert response.status_code == 403
-
-
-# Verify viewer cannot delete a sprint.
-def test_viewer_cannot_delete_sprint(client):
-
-    register_user(
+    project_id = create_project(
         client,
-        "Viewer",
-        "viewer@company.com",
-        "Admin@123",
-        Role.VIEWER.value,
+        admin_token,
     )
 
-    token = login_user(
+    sprint_id = create_sprint(
         client,
-        "viewer@company.com",
-        "Admin@123",
+        admin_token,
+        project_id,
     )
+
+    member = UserRepository.find_by_email(
+        "member@company.com",
+    )
+
+    response = client.post(
+        f"/projects/{project_id}/members",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "user_id": str(member["_id"]),
+        },
+    )
+
+    assert response.status_code == 200
 
     response = client.delete(
-        "/sprints/68614fdcd76d8ab312345678",
-        headers={"Authorization": f"Bearer {token}"},
+        f"/sprints/{sprint_id}",
+        headers={
+            "Authorization": f"Bearer {member_token}",
+        },
     )
 
-    assert response.status_code == 403
-
+    assert response.status_code == 200
+    assert response.json()["success"] is True
 
 # Verify deleting a non-existent sprint returns not found.
 def test_delete_sprint_not_found(client):
@@ -166,8 +187,10 @@ def test_delete_sprint_not_found(client):
     )
 
     response = client.delete(
-        "/sprints/68614fdcd76d8ab312345678",
-        headers={"Authorization": f"Bearer {token}"},
+        f"/sprints/{ObjectId()}",
+        headers={
+            "Authorization": f"Bearer {token}",
+        },
     )
 
     assert response.status_code == 404

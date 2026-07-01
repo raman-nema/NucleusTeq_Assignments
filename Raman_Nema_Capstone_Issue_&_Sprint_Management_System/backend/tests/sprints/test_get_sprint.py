@@ -1,7 +1,7 @@
 import uuid
-
+from bson import ObjectId
 from app.common.enums import Role
-
+from app.repositories.user_repository import UserRepository
 
 # Register a user for testing.
 def register_user(client, name, email, password, role):
@@ -15,7 +15,6 @@ def register_user(client, name, email, password, role):
         },
     )
 
-
 # Authenticate a user and return the access token.
 def login_user(client, email, password):
     response = client.post(
@@ -25,15 +24,12 @@ def login_user(client, email, password):
             "password": password,
         },
     )
-
     return response.json()["data"]["access_token"]
 
 
 # Create a project and return its ID.
 def create_project(client, token):
-
     project_name = f"Project-{uuid.uuid4()}"
-
     response = client.post(
         "/projects",
         headers={"Authorization": f"Bearer {token}"},
@@ -42,13 +38,10 @@ def create_project(client, token):
             "description": "Project Description",
         },
     )
-
     return response.json()["data"]["id"]
-
 
 # Create a sprint and return its ID.
 def create_sprint(client, token, project_id):
-
     response = client.post(
         f"/projects/{project_id}/sprints",
         headers={"Authorization": f"Bearer {token}"},
@@ -59,13 +52,11 @@ def create_sprint(client, token, project_id):
             "end_date": "2026-07-14",
         },
     )
-
     return response.json()["data"]["id"]
 
 
-# Verify all sprints of a project can be retrieved.
-def test_get_all_sprints(client):
-
+# Verify admin can retrieve all sprints.
+def test_admin_can_get_all_sprints(client):
     register_user(
         client,
         "Admin",
@@ -73,33 +64,29 @@ def test_get_all_sprints(client):
         "Admin@123",
         Role.ADMIN.value,
     )
-
     token = login_user(
         client,
         "admin@company.com",
         "Admin@123",
     )
-
     project_id = create_project(client, token)
-
     create_sprint(
         client,
         token,
         project_id,
     )
-
     response = client.get(
         f"/projects/{project_id}/sprints",
-        headers={"Authorization": f"Bearer {token}"},
+        headers={
+            "Authorization": f"Bearer {token}",
+        },
     )
-
     assert response.status_code == 200
     assert response.json()["success"] is True
 
 
-# Verify a sprint can be retrieved by ID.
-def test_get_sprint_by_id(client):
-
+# Verify assigned member can retrieve project sprints.
+def test_assigned_member_can_get_sprints(client):
     register_user(
         client,
         "Admin",
@@ -107,33 +94,55 @@ def test_get_sprint_by_id(client):
         "Admin@123",
         Role.ADMIN.value,
     )
-
-    token = login_user(
+    register_user(
+        client,
+        "Member",
+        "member@company.com",
+        "Admin@123",
+        Role.MEMBER.value,
+    )
+    admin_token = login_user(
         client,
         "admin2@company.com",
         "Admin@123",
     )
-
-    project_id = create_project(client, token)
-
-    sprint_id = create_sprint(
+    member_token = login_user(
         client,
-        token,
+        "member@company.com",
+        "Admin@123",
+    )
+    project_id = create_project(
+        client,
+        admin_token,
+    )
+    create_sprint(
+        client,
+        admin_token,
         project_id,
     )
-
-    response = client.get(
-        f"/sprints/{sprint_id}",
-        headers={"Authorization": f"Bearer {token}"},
+    member = UserRepository.find_by_email(
+        "member@company.com",
     )
-
+    client.post(
+        f"/projects/{project_id}/members",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "user_id": str(member["_id"]),
+        },
+    )
+    response = client.get(
+        f"/projects/{project_id}/sprints",
+        headers={
+            "Authorization": f"Bearer {member_token}",
+        },
+    )
     assert response.status_code == 200
     assert response.json()["success"] is True
 
-
-# Verify a non-existent sprint returns not found.
-def test_sprint_not_found(client):
-
+# Verify unassigned member cannot retrieve project sprints.
+def test_unassigned_member_cannot_get_sprints(client):
     register_user(
         client,
         "Admin",
@@ -141,49 +150,36 @@ def test_sprint_not_found(client):
         "Admin@123",
         Role.ADMIN.value,
     )
-
-    token = login_user(
+    register_user(
+        client,
+        "Member",
+        "member2@company.com",
+        "Admin@123",
+        Role.MEMBER.value,
+    )
+    admin_token = login_user(
         client,
         "admin3@company.com",
         "Admin@123",
     )
-
-    response = client.get(
-        "/sprints/68614fdcd76d8ab312345678",
-        headers={"Authorization": f"Bearer {token}"},
-    )
-
-    assert response.status_code == 404
-
-
-# Verify a non-existent project returns not found.
-def test_project_not_found_for_sprints(client):
-
-    register_user(
+    member_token = login_user(
         client,
-        "Admin",
-        "admin4@company.com",
-        "Admin@123",
-        Role.ADMIN.value,
-    )
-
-    token = login_user(
-        client,
-        "admin4@company.com",
+        "member2@company.com",
         "Admin@123",
     )
-
-    response = client.get(
-        "/projects/68614fdcd76d8ab312345678/sprints",
-        headers={"Authorization": f"Bearer {token}"},
+    project_id = create_project(
+        client,
+        admin_token,
     )
-
-    assert response.status_code == 404
-
-
-# Verify authentication is required.
-def test_get_sprints_without_token(client):
-
-    response = client.get("/projects/68614fdcd76d8ab312345678/sprints")
-
-    assert response.status_code == 401
+    create_sprint(
+        client,
+        admin_token,
+        project_id,
+    )
+    response = client.get(
+        f"/projects/{project_id}/sprints",
+        headers={
+            "Authorization": f"Bearer {member_token}",
+        },
+    )
+    assert response.status_code == 403

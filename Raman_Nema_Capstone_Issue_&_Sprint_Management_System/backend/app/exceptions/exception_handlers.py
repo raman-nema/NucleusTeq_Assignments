@@ -10,6 +10,9 @@ from app.exceptions.custom_exceptions import (
     ProjectNotFoundException,
     SprintAlreadyExistsException,
     SprintNotFoundException,
+    UserNotFoundException,
+    MemberAlreadyAssignedException,
+    MemberNotAssignedException,
 )
 
 
@@ -113,6 +116,42 @@ async def sprint_not_found_handler(request: Request, exc: SprintNotFoundExceptio
         content={
             "success": False,
             "message": "Sprint not found",
+            "data": None,
+        },
+    )
+
+
+async def user_not_found_handler(request: Request, exc: UserNotFoundException):
+
+    return JSONResponse(
+        status_code=404,
+        content={
+            "success": False,
+            "message": "User not found",
+            "data": None,
+        },
+    )
+
+
+async def member_already_assigned_handler(request: Request, exc: MemberAlreadyAssignedException):
+
+    return JSONResponse(
+        status_code=409,
+        content={
+            "success": False,
+            "message": "Member already assigned",
+            "data": None,
+        },
+    )
+
+
+async def member_not_assigned_handler(request: Request, exc: MemberNotAssignedException):
+
+    return JSONResponse(
+        status_code=404,
+        content={
+            "success": False,
+            "message": "Member not assigned",
             "data": None,
         },
     )

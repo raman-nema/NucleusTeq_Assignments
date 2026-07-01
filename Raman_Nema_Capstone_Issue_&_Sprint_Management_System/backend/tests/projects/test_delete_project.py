@@ -1,5 +1,7 @@
 import uuid
 
+from bson import ObjectId
+
 from app.common.enums import Role
 
 
@@ -91,7 +93,7 @@ def test_member_cannot_delete_project(client):
     )
 
     response = client.delete(
-        "/projects/68614fdcd76d8ab312345678",
+        f"/projects/{ObjectId()}",
         headers={"Authorization": f"Bearer {token}"},
     )
 
@@ -116,7 +118,7 @@ def test_viewer_cannot_delete_project(client):
     )
 
     response = client.delete(
-        "/projects/68614fdcd76d8ab312345678",
+        f"/projects/{ObjectId()}",
         headers={"Authorization": f"Bearer {token}"},
     )
 
@@ -141,7 +143,7 @@ def test_delete_project_not_found(client):
     )
 
     response = client.delete(
-        "/projects/68614fdcd76d8ab312345678",
+        f"/projects/{ObjectId()}",
         headers={"Authorization": f"Bearer {token}"},
     )
 

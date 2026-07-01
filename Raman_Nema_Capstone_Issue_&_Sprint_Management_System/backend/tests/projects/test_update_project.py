@@ -1,6 +1,9 @@
 import uuid
 
+from bson import ObjectId
+
 from app.common.enums import Role
+from app.repositories.user_repository import UserRepository
 
 
 # Register a user for testing.
@@ -63,11 +66,16 @@ def test_admin_can_update_project(client):
         "Admin@123",
     )
 
-    project_id = create_project(client, token)
+    project_id = create_project(
+        client,
+        token,
+    )
 
     response = client.put(
         f"/projects/{project_id}",
-        headers={"Authorization": f"Bearer {token}"},
+        headers={
+            "Authorization": f"Bearer {token}",
+        },
         json={
             "name": f"Updated-{uuid.uuid4()}",
             "description": "Updated Description",
@@ -77,8 +85,16 @@ def test_admin_can_update_project(client):
     assert response.status_code == 200
 
 
-# Verify member can update a project.
-def test_member_can_update_project(client):
+# Verify assigned member can update a project.
+def test_assigned_member_can_update_project(client):
+
+    register_user(
+        client,
+        "Admin",
+        "admin5@company.com",
+        "Admin@123",
+        Role.ADMIN.value,
+    )
 
     register_user(
         client,
@@ -88,32 +104,42 @@ def test_member_can_update_project(client):
         Role.MEMBER.value,
     )
 
-    token = login_user(
-        client,
-        "member@company.com",
-        "Admin@123",
-    )
-
-    # Create a project using an admin account.
-    register_user(
-        client,
-        "Admin",
-        "admin5@company.com",
-        "Admin@123",
-        Role.ADMIN.value,
-    )
-
     admin_token = login_user(
         client,
         "admin5@company.com",
         "Admin@123",
     )
 
-    project_id = create_project(client, admin_token)
+    member_token = login_user(
+        client,
+        "member@company.com",
+        "Admin@123",
+    )
+
+    project_id = create_project(
+        client,
+        admin_token,
+    )
+
+    member = UserRepository.find_by_email(
+        "member@company.com",
+    )
+
+    client.post(
+        f"/projects/{project_id}/members",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "user_id": str(member["_id"]),
+        },
+    )
 
     response = client.put(
         f"/projects/{project_id}",
-        headers={"Authorization": f"Bearer {token}"},
+        headers={
+            "Authorization": f"Bearer {member_token}",
+        },
         json={
             "name": f"Updated-{uuid.uuid4()}",
             "description": "Updated Description",
@@ -121,6 +147,56 @@ def test_member_can_update_project(client):
     )
 
     assert response.status_code == 200
+
+
+# Verify unassigned member cannot update a project.
+def test_unassigned_member_cannot_update_project(client):
+
+    register_user(
+        client,
+        "Admin",
+        "admin6@company.com",
+        "Admin@123",
+        Role.ADMIN.value,
+    )
+
+    register_user(
+        client,
+        "Member",
+        "member2@company.com",
+        "Admin@123",
+        Role.MEMBER.value,
+    )
+
+    admin_token = login_user(
+        client,
+        "admin6@company.com",
+        "Admin@123",
+    )
+
+    member_token = login_user(
+        client,
+        "member2@company.com",
+        "Admin@123",
+    )
+
+    project_id = create_project(
+        client,
+        admin_token,
+    )
+
+    response = client.put(
+        f"/projects/{project_id}",
+        headers={
+            "Authorization": f"Bearer {member_token}",
+        },
+        json={
+            "name": f"Updated-{uuid.uuid4()}",
+            "description": "Updated Description",
+        },
+    )
+
+    assert response.status_code == 403
 
 
 # Verify viewer cannot update a project.
@@ -141,8 +217,10 @@ def test_viewer_cannot_update_project(client):
     )
 
     response = client.put(
-        "/projects/68614fdcd76d8ab312345678",
-        headers={"Authorization": f"Bearer {token}"},
+        f"/projects/{ObjectId()}",
+        headers={
+            "Authorization": f"Bearer {token}",
+        },
         json={
             "name": "Updated",
             "description": "Updated",
@@ -150,4 +228,3 @@ def test_viewer_cannot_update_project(client):
     )
 
     assert response.status_code == 403
-

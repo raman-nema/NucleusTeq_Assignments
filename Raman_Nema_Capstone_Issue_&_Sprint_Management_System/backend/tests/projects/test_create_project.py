@@ -58,8 +58,8 @@ def test_admin_can_create_project(client):
     assert response.json()["message"] == "Project created successfully"
 
 
-# Verify manager can create a project.
-def test_manager_can_create_project(client):
+# Verify member cannot create a project.
+def test_member_cannot_create_project(client):
 
     register_user(
         client,
@@ -80,11 +80,11 @@ def test_manager_can_create_project(client):
         headers={"Authorization": f"Bearer {token}"},
         json={
             "name": "Project Alpha",
-            "description": "Manager project.",
+            "description": "Should fail.",
         },
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 403
 
 
 # Verify viewer cannot create a project.
@@ -138,14 +138,12 @@ def test_duplicate_project(client):
         "description": "Testing duplicates.",
     }
 
-    # Create the project.
     client.post(
         "/projects",
         headers={"Authorization": f"Bearer {token}"},
         json=project,
     )
 
-    # Attempt to create the same project again.
     response = client.post(
         "/projects",
         headers={"Authorization": f"Bearer {token}"},

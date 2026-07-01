@@ -51,3 +51,20 @@ class SprintNotFoundException(Exception):
 
     def __init__(self):
         super().__init__("Sprint not found.")
+
+class UserNotFoundException(Exception):
+    """Raised when a user is not found."""
+
+    pass
+
+
+class MemberAlreadyAssignedException(Exception):
+    """Raised when the member is already assigned."""
+
+    pass
+
+
+class MemberNotAssignedException(Exception):
+    """Raised when the member is not assigned."""
+
+    pass

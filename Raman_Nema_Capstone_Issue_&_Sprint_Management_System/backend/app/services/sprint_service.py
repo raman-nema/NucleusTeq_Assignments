@@ -1,4 +1,5 @@
 from datetime import datetime, time
+from app.common.enums import Role
 from app.models.sprint_model import SprintModel
 from app.repositories.project_repository import ProjectRepository
 from app.repositories.sprint_repository import SprintRepository
@@ -12,11 +13,11 @@ from app.schemas.responses.sprint_response import (
     DeleteSprintResponse,
 )
 from app.exceptions.custom_exceptions import (
+    ForbiddenException,
     ProjectNotFoundException,
     SprintAlreadyExistsException,
     SprintNotFoundException,
 )
-
 
 class SprintService:
     """Handles sprint-related business logic."""
@@ -30,9 +31,14 @@ class SprintService:
         """Create a new sprint."""
 
         project = ProjectRepository.find_by_id(project_id)
-
         if not project:
             raise ProjectNotFoundException()
+
+        if current_user["role"] != Role.ADMIN.value and not ProjectRepository.is_member(
+            project_id,
+            str(current_user["_id"]),
+        ):
+            raise ForbiddenException()
 
         existing_sprint = SprintRepository.find_by_name(
             project_id,
@@ -67,13 +73,20 @@ class SprintService:
         )
 
     @staticmethod
-    def get_all_sprints(project_id: str):
+    def get_all_sprints(project_id: str, current_user: dict):
         """Retrieve all sprints for a project."""
 
         project = ProjectRepository.find_by_id(project_id)
 
         if not project:
             raise ProjectNotFoundException()
+
+        if current_user["role"] == Role.MEMBER.value:
+            if not ProjectRepository.is_member(
+                project_id,
+                str(current_user["_id"]),
+            ):
+                raise ForbiddenException()
 
         sprints = SprintRepository.find_all_by_project(project_id)
 
@@ -100,13 +113,20 @@ class SprintService:
         )
 
     @staticmethod
-    def get_sprint_by_id(sprint_id: str):
+    def get_sprint_by_id(sprint_id: str, current_user):
         """Retrieve a sprint by its ID."""
 
         sprint = SprintRepository.find_by_id(sprint_id)
 
         if not sprint:
             raise SprintNotFoundException()
+
+        if current_user["role"] == Role.MEMBER.value:
+            if not ProjectRepository.is_member(
+                str(sprint["project_id"]),
+                str(current_user["_id"]),
+            ):
+                raise ForbiddenException()
 
         return SprintResponse(
             id=str(sprint["_id"]),
@@ -125,13 +145,19 @@ class SprintService:
     def update_sprint(
         sprint_id: str,
         request: UpdateSprintRequest,
+        current_user,
     ):
         """Update an existing sprint."""
 
         sprint = SprintRepository.find_by_id(sprint_id)
-
         if not sprint:
             raise SprintNotFoundException()
+
+        if current_user["role"] != Role.ADMIN.value and not ProjectRepository.is_member(
+            str(sprint["project_id"]),
+            str(current_user["_id"]),
+        ):
+            raise ForbiddenException()
 
         existing_sprint = SprintRepository.find_by_name(
             str(sprint["project_id"]),
@@ -176,13 +202,22 @@ class SprintService:
         )
 
     @staticmethod
-    def delete_sprint(sprint_id: str):
+    def delete_sprint(
+        sprint_id: str,
+        current_user,
+    ):
         """Delete a sprint."""
 
         sprint = SprintRepository.find_by_id(sprint_id)
 
         if not sprint:
             raise SprintNotFoundException()
+
+        if current_user["role"] != Role.ADMIN.value and not ProjectRepository.is_member(
+            str(sprint["project_id"]),
+            str(current_user["_id"]),
+        ):
+            raise ForbiddenException()
 
         SprintRepository.delete_sprint(sprint_id)
 
