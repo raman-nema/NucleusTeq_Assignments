@@ -11,6 +11,8 @@ from app.dependencies.authorization import (
     require_admin,
     require_admin_or_member,
 )
+from app.services.sprint_service import SprintService
+from app.schemas.requests.sprint_request import CreateSprintRequest
 
 router = APIRouter(
     prefix="/projects",
@@ -105,4 +107,43 @@ def delete_project(
         success=True,
         message=response.message,
         data=None,
+    )
+
+# Sprint routes for a specific project.
+@router.post("/{project_id}/sprints", response_model=ApiResponse)
+def create_sprint(
+    project_id: str,
+    request: CreateSprintRequest,
+    current_user=Depends(require_admin_or_member),
+):
+    """Create a sprint for a project."""
+
+    response = SprintService.create_sprint(
+        project_id,
+        request,
+        current_user,
+    )
+
+    return ApiResponse(
+        success=True,
+        message="Sprint created successfully",
+        data=response.model_dump(),
+    )
+
+
+@router.get("/{project_id}/sprints", response_model=ApiResponse)
+def get_all_sprints(
+    project_id: str,
+    current_user=Depends(get_current_user),
+):
+    """Retrieve all sprints for a project."""
+
+    response = SprintService.get_all_sprints(
+        project_id,
+    )
+
+    return ApiResponse(
+        success=True,
+        message="Sprints retrieved successfully",
+        data=response.model_dump(),
     )

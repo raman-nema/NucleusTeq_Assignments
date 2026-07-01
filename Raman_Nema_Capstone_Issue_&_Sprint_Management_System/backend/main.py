@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from app.routers.auth_router import router as auth_router
 from app.routers import project_router
 from app.routers import admin_router
+from app.routers.sprint_router import router as sprint_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.seed import seed_admin
 from app.exceptions.custom_exceptions import (
@@ -12,6 +13,8 @@ from app.exceptions.custom_exceptions import (
     ForbiddenException,
     ProjectAlreadyExistsException,
     ProjectNotFoundException,
+    SprintAlreadyExistsException,
+    SprintNotFoundException
 )
 from app.exceptions.exception_handlers import (
     user_exists_handler,
@@ -21,6 +24,8 @@ from app.exceptions.exception_handlers import (
     forbidden_handler,
     project_exists_handler,
     project_not_found_handler,
+    sprint_exists_handler,
+    sprint_not_found_handler
 )
 
 app = FastAPI(title="Issue & Sprint Management System")
@@ -32,21 +37,19 @@ app.include_router(admin_router.router)
 
 app.include_router(project_router.router)
 
+app.include_router(sprint_router)
+
 # Map custom authentication exceptions to consistent JSON responses.
 app.add_exception_handler(UserAlreadyExistsException, user_exists_handler)
 app.add_exception_handler(InvalidCredentialsException, invalid_credentials_handler)
 app.add_exception_handler(UnauthorizedException, unauthorized_handler)
 app.add_exception_handler(ExpiredTokenException, expired_token_handler)
 app.add_exception_handler(ForbiddenException, forbidden_handler)
-app.add_exception_handler(
-    ProjectAlreadyExistsException,
-    project_exists_handler,
-)
+app.add_exception_handler(ProjectAlreadyExistsException,project_exists_handler)
+app.add_exception_handler(ProjectNotFoundException, project_not_found_handler)
+app.add_exception_handler(SprintNotFoundException, sprint_not_found_handler)
+app.add_exception_handler(SprintAlreadyExistsException, sprint_exists_handler)
 
-app.add_exception_handler(
-    ProjectNotFoundException,
-    project_not_found_handler,
-)
 
 # Allow the local frontend application to call the backend APIs.
 app.add_middleware(

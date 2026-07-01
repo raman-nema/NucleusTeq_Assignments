@@ -8,6 +8,8 @@ from app.exceptions.custom_exceptions import (
     ForbiddenException,
     ProjectAlreadyExistsException,
     ProjectNotFoundException,
+    SprintAlreadyExistsException,
+    SprintNotFoundException,
 )
 
 
@@ -85,6 +87,32 @@ async def project_not_found_handler(request: Request, exc: ProjectNotFoundExcept
         content={
             "success": False,
             "message": "Project not found",
+            "data": None,
+        },
+    )
+
+
+async def sprint_exists_handler(request: Request, exc: SprintAlreadyExistsException):
+    """Return a conflict response for duplicate sprint creation."""
+
+    return JSONResponse(
+        status_code=409,
+        content={
+            "success": False,
+            "message": "Sprint already exists",
+            "data": None,
+        },
+    )
+
+
+async def sprint_not_found_handler(request: Request, exc: SprintNotFoundException):
+    """Return a not found response when the sprint does not exist."""
+
+    return JSONResponse(
+        status_code=404,
+        content={
+            "success": False,
+            "message": "Sprint not found",
             "data": None,
         },
     )

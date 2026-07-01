@@ -38,3 +38,16 @@ class ProjectNotFoundException(Exception):
     """Raised when the requested project does not exist."""
 
     pass
+
+class SprintAlreadyExistsException(Exception):
+    """Raised when a sprint with the same name already exists."""
+
+    def __init__(self):
+        super().__init__("Sprint with this name already exists.")
+
+
+class SprintNotFoundException(Exception):
+    """Raised when a sprint is not found."""
+
+    def __init__(self):
+        super().__init__("Sprint not found.")
