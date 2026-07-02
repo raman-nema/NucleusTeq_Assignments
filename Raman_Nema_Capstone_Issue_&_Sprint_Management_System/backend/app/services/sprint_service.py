@@ -54,6 +54,7 @@ class SprintService:
             goal=request.goal,
             start_date=request.start_date,
             end_date=request.end_date,
+            status=request.status,
             created_by=str(current_user["_id"]),
         )
 
@@ -178,6 +179,7 @@ class SprintService:
                 request.end_date,
                 time.min,
             ),
+            "status": request.status,
             "updated_at": datetime.utcnow(),
         }
 

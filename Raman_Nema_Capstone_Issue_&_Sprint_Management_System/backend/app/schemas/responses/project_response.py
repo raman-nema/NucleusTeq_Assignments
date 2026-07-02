@@ -1,6 +1,15 @@
 from datetime import datetime
 from pydantic import BaseModel
 
+
+class ProjectMemberSummary(BaseModel):
+    """Basic member details shown on project cards."""
+
+    id: str
+    name: str
+    role: str
+
+
 class ProjectResponse(BaseModel):
     """Project response schema."""
 
@@ -8,7 +17,7 @@ class ProjectResponse(BaseModel):
     name: str
     description: str
     created_by: str
-    members: list[str]
+    members: list[ProjectMemberSummary]
     created_at: datetime
     updated_at: datetime
 

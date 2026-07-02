@@ -5,7 +5,7 @@ import InputField from "../components/common/InputField";
 import Button from "../components/common/Button";
 
 import { loginUser } from "../services/auth-service";
-import { saveToken, saveRole } from "../utils/storage";
+import { saveToken, saveRole, saveUserName } from "../utils/storage";
 import { validateLogin } from "../../src/utils/validations";
 
 import "../styles/LoginPage.css";
@@ -13,6 +13,7 @@ import "../styles/LoginPage.css";
 function LoginPage() {
   const navigate = useNavigate();
 
+  // Form and UI state
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -20,11 +21,13 @@ function LoginPage() {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
+  // Update form fields
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Validate and submit login form
   const handleSubmit = async (event) => {
     event.preventDefault();
     setMessage("");
@@ -42,8 +45,12 @@ function LoginPage() {
 
     try {
       const response = await loginUser(formData);
+
+      // Store user session
       saveToken(response.data.access_token);
+      saveUserName(response.data.name);
       saveRole(response.data.role);
+
       setMessage(response.message);
       navigate("/projects");
     } catch (error) {
@@ -56,10 +63,12 @@ function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-card">
+        {/* Login header */}
         <h1 className="app-title">SprintFlow</h1>
         <p className="page-subtitle">Welcome back! Please sign in.</p>
 
         <form onSubmit={handleSubmit}>
+          {/* Email field */}
           <div className="form-group">
             <InputField
               label="Email"
@@ -71,6 +80,7 @@ function LoginPage() {
             {errors.email && <p className="error-message">{errors.email}</p>}
           </div>
 
+          {/* Password field */}
           <div className="form-group">
             <div className="password-wrapper">
               <InputField
@@ -80,6 +90,8 @@ function LoginPage() {
                 value={formData.password}
                 onChange={handleChange}
               />
+
+              {/* Toggle password visibility */}
               <button
                 type="button"
                 className="password-toggle"
@@ -89,14 +101,17 @@ function LoginPage() {
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
+
             {errors.password && (
               <p className="error-message">{errors.password}</p>
             )}
           </div>
 
+          {/* Success and error messages */}
           {message && <p className="success-message">{message}</p>}
           {error && <p className="error-message">{error}</p>}
 
+          {/* Login button */}
           <Button
             type="submit"
             disabled={loading}
@@ -104,6 +119,7 @@ function LoginPage() {
           />
         </form>
 
+        {/* Registration link */}
         <p className="auth-switch">
           Don't have an account?{" "}
           <span className="auth-link" onClick={() => navigate("/register")}>

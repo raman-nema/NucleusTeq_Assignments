@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProjectPage from "./pages/ProjectPage";
+import SprintPage from "./pages/SprintPage";
 import DashboardPage from "./pages/DashboardPage";
 import Layout from "./components/layout/Layout";
 
@@ -23,7 +24,7 @@ function App() {
         />
         <Route
           path="/sprints"
-          element={<Layout><h1 style={{ padding: "32px 24px" }}>Sprints — coming soon</h1></Layout>}
+          element={<Layout><SprintPage /></Layout>}
         />
         <Route
           path="/issues"

@@ -12,6 +12,7 @@ class SprintModel:
         goal: str,
         start_date,
         end_date,
+        status: str,
         created_by: str,
     ):
         """Create a sprint document."""
@@ -34,8 +35,7 @@ class SprintModel:
                 end_date,
                 time.min,
             ),
-            # Default sprint status.
-            "status": "PLANNED",
+            "status": status,
             "created_by": created_by,
             # Audit fields.
             "created_at": current_time,

@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -19,6 +20,8 @@ class SprintRequest(BaseModel):
     start_date: date
 
     end_date: date
+
+    status: Literal["PLANNED", "ACTIVE", "COMPLETED"] = "PLANNED"
 
     @model_validator(mode="after")
     def validate_dates(self):

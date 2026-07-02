@@ -1,10 +1,11 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { clearStorage, getRole } from "../../utils/storage";
+import { clearStorage, getRole, getUserName } from "../../utils/storage";
 
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const role = getRole();
+  const userName = getUserName();
 
   function handleLogout() {
     clearStorage();
@@ -36,11 +37,11 @@ function Sidebar() {
 
       <div className="sidebar-user">
         <div className="sidebar-user-avatar">
-          {role ? role.charAt(0) : "U"}
+          {userName ? userName.charAt(0).toUpperCase() : "U"}
         </div>
         <div className="sidebar-user-info">
-          <span className="sidebar-user-role">{role || "User"}</span>
-          <span className="sidebar-user-label">Logged in</span>
+          <span className="sidebar-user-name">{userName || "User"}</span>
+          <span className="sidebar-user-role">{role || "Role"}</span>
         </div>
       </div>
 

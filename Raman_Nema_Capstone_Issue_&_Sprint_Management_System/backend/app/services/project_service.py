@@ -12,6 +12,7 @@ from app.schemas.responses.project_response import (
     ProjectListResponse,
     DeleteProjectResponse,
     ProjectMemberResponse,
+    ProjectMemberSummary,
 )
 from app.exceptions.custom_exceptions import (
     ForbiddenException,
@@ -24,6 +25,34 @@ from app.exceptions.custom_exceptions import (
 
 class ProjectService:
     """Handles project-related business logic."""
+
+    @staticmethod
+    def _build_member_summaries(member_ids):
+        """Build member display details from stored user IDs."""
+
+        members = []
+
+        for member_id in member_ids:
+            user = UserRepository.find_by_id(str(member_id))
+
+            if user:
+                members.append(
+                    ProjectMemberSummary(
+                        id=str(user["_id"]),
+                        name=user["name"],
+                        role=user["role"],
+                    )
+                )
+            else:
+                members.append(
+                    ProjectMemberSummary(
+                        id=str(member_id),
+                        name="Unknown user",
+                        role="UNKNOWN",
+                    )
+                )
+
+        return members
 
     @staticmethod
     def create_project(request, current_user):
@@ -49,7 +78,7 @@ class ProjectService:
             name=project["name"],
             description=project["description"],
             created_by=project["created_by"],
-            members=[str(member) for member in project["members"]],
+            members=ProjectService._build_member_summaries(project["members"]),
             created_at=project["created_at"],
             updated_at=project["updated_at"],
         )
@@ -75,10 +104,9 @@ class ProjectService:
                     name=project["name"],
                     description=project["description"],
                     created_by=project["created_by"],
-                    members=[
-                        str(member)
-                        for member in project.get("members", [])
-                    ],
+                    members=ProjectService._build_member_summaries(
+                        project.get("members", [])
+                    ),
                     created_at=project["created_at"],
                     updated_at=project["updated_at"],
                 )
@@ -113,10 +141,9 @@ class ProjectService:
             name=project["name"],
             description=project["description"],
             created_by=project["created_by"],
-            members=[
-                    str(member)
-                    for member in project.get("members", [])
-             ],
+            members=ProjectService._build_member_summaries(
+                project.get("members", [])
+            ),
             created_at=project["created_at"],
             updated_at=project["updated_at"],
         )
@@ -160,10 +187,9 @@ class ProjectService:
             name=project["name"],
             description=project["description"],
             created_by=project["created_by"],
-            members=[
-                str(member)
-                for member in project.get("members", [])
-            ],
+            members=ProjectService._build_member_summaries(
+                project.get("members", [])
+            ),
             created_at=project["created_at"],
             updated_at=project["updated_at"],
         )   

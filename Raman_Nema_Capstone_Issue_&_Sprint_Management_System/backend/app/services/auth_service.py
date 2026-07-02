@@ -83,7 +83,10 @@ class AuthService:
 
         # Return token details to the router for the login API response.
         return LoginResponse(
-            access_token=token, role=user["role"], expires_at=expires_at
+            access_token=token,
+            name=user["name"],
+            role=user["role"],
+            expires_at=expires_at,
         )
 
     @staticmethod

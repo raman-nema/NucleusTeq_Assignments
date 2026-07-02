@@ -13,6 +13,7 @@ class LoginResponse(BaseModel):
     """User login response schema."""
 
     access_token: str
+    name: str
     role: str
     expires_at: datetime
 
