@@ -3,6 +3,7 @@ from app.routers.auth_router import router as auth_router
 from app.routers import project_router
 from app.routers import admin_router
 from app.routers.sprint_router import router as sprint_router
+from app.routers.issue_router import router as issue_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.seed import seed_admin
 from app.exceptions.custom_exceptions import (
@@ -18,6 +19,8 @@ from app.exceptions.custom_exceptions import (
     MemberAlreadyAssignedException,
     MemberNotAssignedException,
     UserNotFoundException,
+    IssueAlreadyExistsException,
+    IssueNotFoundException,
 )
 from app.exceptions.exception_handlers import (
     user_exists_handler,
@@ -31,7 +34,9 @@ from app.exceptions.exception_handlers import (
     sprint_not_found_handler,
     member_already_assigned_handler,
     member_not_assigned_handler,
-    user_not_found_handler
+    user_not_found_handler,
+    issue_exists_handler,
+    issue_not_found_handler
 )
 
 app = FastAPI(title="Issue & Sprint Management System")
@@ -44,6 +49,9 @@ app.include_router(admin_router.router)
 app.include_router(project_router.router)
 
 app.include_router(sprint_router)
+
+app.include_router(issue_router)
+
 
 # Map custom authentication exceptions to consistent JSON responses.
 app.add_exception_handler(UserAlreadyExistsException, user_exists_handler)
@@ -58,6 +66,8 @@ app.add_exception_handler(SprintAlreadyExistsException, sprint_exists_handler)
 app.add_exception_handler(MemberAlreadyAssignedException, member_already_assigned_handler)
 app.add_exception_handler(MemberNotAssignedException, member_not_assigned_handler)
 app.add_exception_handler(UserNotFoundException, user_not_found_handler)
+app.add_exception_handler(IssueAlreadyExistsException, issue_exists_handler)
+app.add_exception_handler(IssueNotFoundException, issue_not_found_handler)
 
 
 # Allow the local frontend application to call the backend APIs.
@@ -74,3 +84,4 @@ app.add_middleware(
 def startup_event():
     # Ensure the default admin user exists when the application starts.
     seed_admin()
+    

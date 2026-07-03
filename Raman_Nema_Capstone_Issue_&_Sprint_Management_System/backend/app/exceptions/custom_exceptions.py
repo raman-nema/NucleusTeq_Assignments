@@ -39,6 +39,7 @@ class ProjectNotFoundException(Exception):
 
     pass
 
+
 class SprintAlreadyExistsException(Exception):
     """Raised when a sprint with the same name already exists."""
 
@@ -51,6 +52,7 @@ class SprintNotFoundException(Exception):
 
     def __init__(self):
         super().__init__("Sprint not found.")
+
 
 class UserNotFoundException(Exception):
     """Raised when a user is not found."""
@@ -66,5 +68,17 @@ class MemberAlreadyAssignedException(Exception):
 
 class MemberNotAssignedException(Exception):
     """Raised when the member is not assigned."""
+
+    pass
+
+
+class IssueAlreadyExistsException(Exception):
+    """Raised when an issue with the same title already exists."""
+
+    pass
+
+
+class IssueNotFoundException(Exception):
+    """Raised when the requested issue does not exist."""
 
     pass

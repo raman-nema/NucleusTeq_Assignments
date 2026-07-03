@@ -13,6 +13,8 @@ from app.exceptions.custom_exceptions import (
     UserNotFoundException,
     MemberAlreadyAssignedException,
     MemberNotAssignedException,
+    IssueAlreadyExistsException,
+    IssueNotFoundException,
 )
 
 
@@ -133,7 +135,9 @@ async def user_not_found_handler(request: Request, exc: UserNotFoundException):
     )
 
 
-async def member_already_assigned_handler(request: Request, exc: MemberAlreadyAssignedException):
+async def member_already_assigned_handler(
+    request: Request, exc: MemberAlreadyAssignedException
+):
 
     return JSONResponse(
         status_code=409,
@@ -145,13 +149,43 @@ async def member_already_assigned_handler(request: Request, exc: MemberAlreadyAs
     )
 
 
-async def member_not_assigned_handler(request: Request, exc: MemberNotAssignedException):
+async def member_not_assigned_handler(
+    request: Request, exc: MemberNotAssignedException
+):
 
     return JSONResponse(
         status_code=404,
         content={
             "success": False,
             "message": "Member not assigned",
+            "data": None,
+        },
+    )
+
+
+async def issue_exists_handler(
+    request: Request,
+    exc: IssueAlreadyExistsException,
+):
+    return JSONResponse(
+        status_code=409,
+        content={
+            "success": False,
+            "message": "Issue already exists",
+            "data": None,
+        },
+    )
+
+
+async def issue_not_found_handler(
+    request: Request,
+    exc: IssueNotFoundException,
+):
+    return JSONResponse(
+        status_code=404,
+        content={
+            "success": False,
+            "message": "Issue not found",
             "data": None,
         },
     )

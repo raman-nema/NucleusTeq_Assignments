@@ -17,6 +17,9 @@ from app.schemas.requests.project_member_request import (
     AssignMemberRequest,
 )
 
+from app.services.issue_service import IssueService
+from app.schemas.requests.issue_request import CreateIssueRequest
+
 router = APIRouter(
     prefix="/projects",
     tags=["Projects"],
@@ -196,5 +199,45 @@ def get_all_sprints(
     return ApiResponse(
         success=True,
         message="Sprints retrieved successfully",
+        data=response.model_dump(),
+    )
+
+
+# Issue routes for a specific project.
+@router.post("/{project_id}/issues", response_model=ApiResponse)
+def create_issue(
+    project_id: str,
+    request: CreateIssueRequest,
+    current_user=Depends(require_admin_or_member),
+):
+    """Create an issue for a project."""
+
+    response = IssueService.create_issue(
+        project_id,
+        request,
+        current_user,
+    )
+
+    return ApiResponse(
+        success=True,
+        message="Issue created successfully",
+        data=response.model_dump(),
+    )
+
+@router.get("/{project_id}/issues", response_model=ApiResponse)
+def get_all_issues(
+    project_id: str,
+    current_user=Depends(get_current_user),
+):
+    """Retrieve all issues for a project."""
+
+    response = IssueService.get_all_issues(
+        project_id,
+        current_user,
+    )
+
+    return ApiResponse(
+        success=True,
+        message="Issues retrieved successfully",
         data=response.model_dump(),
     )
