@@ -39,15 +39,30 @@ class SprintRepository:
         )
 
     @staticmethod
-    def find_all_by_project(project_id: str):
+    def find_all_by_project(project_id: str, limit: int | None = None):
         """Retrieve all sprints for a project."""
 
         # Return project sprints in descending creation order.
-        return database.sprints.find(
+        query = database.sprints.find(
             {
                 "project_id": ObjectId(project_id),
             }
         ).sort("created_at", -1)
+
+        if limit:
+            query = query.limit(limit)
+
+        return query
+
+    @staticmethod
+    def count_by_project(project_id: str):
+        """Count sprints for a project."""
+
+        return database.sprints.count_documents(
+            {
+                "project_id": ObjectId(project_id),
+            }
+        )
 
     @staticmethod
     def update_sprint(

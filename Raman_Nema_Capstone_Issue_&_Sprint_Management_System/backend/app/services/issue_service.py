@@ -1,5 +1,9 @@
 from datetime import datetime
 from app.common.enums import Role
+from app.common.pagination import (
+    apply_pagination,
+    build_pagination_meta,
+)
 from app.models.issue_model import IssueModel
 from app.repositories.project_repository import ProjectRepository
 from app.repositories.sprint_repository import SprintRepository
@@ -119,6 +123,7 @@ class IssueService:
     def get_all_issues(
         project_id: str,
         current_user: dict,
+        pagination,
     ):
         """Retrieve all issues for a project."""
 
@@ -136,7 +141,11 @@ class IssueService:
         ):
             raise ForbiddenException()
 
-        issues = IssueRepository.find_all_by_project(project_id)
+        total_issues = IssueRepository.count_by_project(project_id)
+        issues = apply_pagination(
+            IssueRepository.find_all_by_project(project_id),
+            pagination,
+        )
 
         issue_list = []
 
@@ -159,6 +168,10 @@ class IssueService:
 
         return IssueListResponse(
             issues=issue_list,
+            pagination=build_pagination_meta(
+                total_issues,
+                pagination,
+            ),
         )
 
     @staticmethod

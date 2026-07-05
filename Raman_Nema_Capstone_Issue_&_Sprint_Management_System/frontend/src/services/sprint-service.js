@@ -11,8 +11,10 @@ export async function createSprint(projectId, sprintData) {
 }
 
 // Fetch all sprints for a project.
-export async function getProjectSprints(projectId) {
-  const response = await apiClient.get(`/projects/${projectId}/sprints`);
+export async function getProjectSprints(projectId, params = {}) {
+  const response = await apiClient.get(`/projects/${projectId}/sprints`, {
+    params,
+  });
 
   return response.data;
 }

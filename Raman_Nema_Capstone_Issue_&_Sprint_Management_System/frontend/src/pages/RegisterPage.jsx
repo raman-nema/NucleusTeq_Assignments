@@ -5,6 +5,7 @@ import InputField from "../components/common/InputField";
 import Button from "../components/common/Button";
 
 import { registerUser } from "../services/auth-service";
+import { useNotification } from "../context/useNotification";
 
 import "../styles/RegisterPage.css";
 
@@ -12,6 +13,7 @@ import { validateRegister } from "../../src/utils/validations";
 
 function RegisterPage() {
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   // Keep all registration form fields in one state object.
   const [formData, setFormData] = useState({
@@ -47,13 +49,13 @@ function RegisterPage() {
     try {
       // Send the completed form data to the backend registration endpoint.
       const response = await registerUser(formData);
-      alert(response.message);
+      showNotification(response.message);
       // Reset the form after successful registration.
       setFormData({ name: "", email: "", password: "", role: "MEMBER" });
     } catch (error) {
       // Show the backend error message when available.
       const message = error.response?.data?.message || "Registration Failed";
-      alert(message);
+      showNotification(message, "error");
       console.error(error);
     }
   };

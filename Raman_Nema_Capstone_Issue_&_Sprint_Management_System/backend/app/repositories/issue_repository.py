@@ -50,6 +50,16 @@ class IssueRepository:
         )
 
     @staticmethod
+    def count_by_project(project_id: str):
+        """Count issues for a project."""
+
+        return database.issues.count_documents(
+            {
+                "project_id": ObjectId(project_id),
+            }
+        )
+
+    @staticmethod
     def update_issue(
         issue_id: str,
         updated_data: dict,

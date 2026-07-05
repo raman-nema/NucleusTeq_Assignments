@@ -1,6 +1,10 @@
 from datetime import datetime
 from bson import ObjectId
 from app.common.enums import Role
+from app.common.pagination import (
+    apply_pagination,
+    build_pagination_meta,
+)
 from app.models.project_model import ProjectModel
 from app.repositories.project_repository import ProjectRepository
 from app.repositories.user_repository import UserRepository
@@ -84,15 +88,24 @@ class ProjectService:
         )
     
     @staticmethod
-    def get_all_projects(current_user):
+    def get_all_projects(current_user, pagination):
         """Retrieve projects based on user role."""
 
         if current_user["role"] == Role.ADMIN.value or current_user["role"] == Role.VIEWER.value:
             projects = ProjectRepository.find_all()
+            total_projects = ProjectRepository.count_all()
         else:
             projects = ProjectRepository.find_by_member(
                 str(current_user["_id"])
             )
+            total_projects = ProjectRepository.count_by_member(
+                str(current_user["_id"])
+            )
+
+        projects = apply_pagination(
+            projects,
+            pagination,
+        )
 
         project_list = []
 
@@ -114,6 +127,10 @@ class ProjectService:
 
         return ProjectListResponse(
             projects=project_list,
+            pagination=build_pagination_meta(
+                total_projects,
+                pagination,
+            ),
         )
     @staticmethod
     def get_project_by_id(

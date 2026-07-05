@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getProjects,
   createProject,
@@ -10,10 +11,19 @@ import {
 import ProjectForm from "../components/project/ProjectForm";
 import ProjectCard from "../components/project/ProjectCard";
 import Button from "../components/common/Button";
+import Pagination from "../components/common/Pagination";
 import { getRole } from "../utils/storage";
+import {
+  buildPaginationParams,
+  DEFAULT_PAGE,
+  getDefaultPagination,
+} from "../utils/pagination";
+import { useNotification } from "../context/useNotification";
 import "../styles/ProjectPage.css";
 
 function ProjectPage() {
+  const navigate = useNavigate();
+  const { showNotification } = useNotification();
   // Component state
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +32,8 @@ function ProjectPage() {
   const [saving, setSaving] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(DEFAULT_PAGE);
+  const [pagination, setPagination] = useState(getDefaultPagination());
 
   // Get current user role
   const role = getRole();
@@ -29,17 +41,18 @@ function ProjectPage() {
 
   // Load projects on page load
   useEffect(() => {
-    loadProjects();
-  }, []);
+    loadProjects(page);
+  }, [page]);
 
   // Fetch all projects
-  async function loadProjects() {
+  async function loadProjects(nextPage = page) {
     setLoading(true);
     setError("");
 
     try {
-      const response = await getProjects();
+      const response = await getProjects(buildPaginationParams(nextPage));
       setProjects(response.data.projects);
+      setPagination(response.data.pagination || getDefaultPagination());
     } catch (error) {
       setError(error.response?.data?.message || "Unable to load projects.");
     } finally {
@@ -52,12 +65,17 @@ function ProjectPage() {
     setSaving(true);
 
     try {
-      await createProject(projectData);
-      await loadProjects();
+      const response = await createProject(projectData);
+      setPage(DEFAULT_PAGE);
+      await loadProjects(DEFAULT_PAGE);
       setSelectedProject(null);
       setShowForm(false);
+      showNotification(response.message);
     } catch (error) {
-      setError(error.response?.data?.message || "Unable to create project.");
+      const message =
+        error.response?.data?.message || "Unable to create project.";
+      setError(message);
+      showNotification(message, "error");
     } finally {
       setSaving(false);
     }
@@ -68,12 +86,16 @@ function ProjectPage() {
     setSaving(true);
 
     try {
-      await updateProject(selectedProject.id, projectData);
+      const response = await updateProject(selectedProject.id, projectData);
       await loadProjects();
       setSelectedProject(null);
       setShowForm(false);
+      showNotification(response.message);
     } catch (error) {
-      setError(error.response?.data?.message || "Unable to update project.");
+      const message =
+        error.response?.data?.message || "Unable to update project.";
+      setError(message);
+      showNotification(message, "error");
     } finally {
       setSaving(false);
     }
@@ -88,10 +110,14 @@ function ProjectPage() {
     if (!confirmed) return;
 
     try {
-      await deleteProject(projectId);
+      const response = await deleteProject(projectId);
       await loadProjects();
+      showNotification(response.message);
     } catch (error) {
-      setError(error.response?.data?.message || "Unable to delete project.");
+      const message =
+        error.response?.data?.message || "Unable to delete project.";
+      setError(message);
+      showNotification(message, "error");
     }
   }
 
@@ -100,15 +126,21 @@ function ProjectPage() {
     setError("");
 
     if (!/^[a-f\d]{24}$/i.test(userId)) {
-      setError("Enter a valid member user ID.");
+      const message = "Enter a valid member user ID.";
+      setError(message);
+      showNotification(message, "error");
       return;
     }
 
     try {
-      await assignMember(projectId, userId);
+      const response = await assignMember(projectId, userId);
       await loadProjects();
+      showNotification(response.message);
     } catch (error) {
-      setError(error.response?.data?.message || "Unable to assign member.");
+      const message =
+        error.response?.data?.message || "Unable to assign member.";
+      setError(message);
+      showNotification(message, "error");
     }
   }
 
@@ -123,10 +155,14 @@ function ProjectPage() {
     setError("");
 
     try {
-      await removeMember(projectId, userId);
+      const response = await removeMember(projectId, userId);
       await loadProjects();
+      showNotification(response.message);
     } catch (error) {
-      setError(error.response?.data?.message || "Unable to remove member.");
+      const message =
+        error.response?.data?.message || "Unable to remove member.";
+      setError(message);
+      showNotification(message, "error");
     }
   }
 
@@ -203,10 +239,21 @@ function ProjectPage() {
                 setShowForm(true);
               }}
               onDelete={handleDeleteProject}
+              onViewSprints={(projectId) => {
+                navigate(`/sprints?projectId=${projectId}`);
+              }}
               onAssignMember={handleAssignMember}
               onRemoveMember={handleRemoveMember}
             />
           ))}
+
+        {!loading && !error && (
+          <Pagination
+            pagination={pagination}
+            disabled={loading}
+            onPageChange={setPage}
+          />
+        )}
       </div>
     </div>
   );

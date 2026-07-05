@@ -141,8 +141,8 @@ function SprintForm({ initialData, onSubmit, onCancel, loading }) {
             onChange={handleChange}
           >
             <option value="PLANNED">Planned</option>
-            <option value="ACTIVE">Active</option>
-            <option value="COMPLETED">Completed</option>
+            <option value="ACTIVE">In Progress</option>
+            <option value="COMPLETED">Done</option>
           </select>
 
           {errors.status && <p className="error-message">{errors.status}</p>}

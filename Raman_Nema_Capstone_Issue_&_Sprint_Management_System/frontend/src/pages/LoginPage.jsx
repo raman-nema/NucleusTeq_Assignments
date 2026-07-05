@@ -7,16 +7,17 @@ import Button from "../components/common/Button";
 import { loginUser } from "../services/auth-service";
 import { saveToken, saveRole, saveUserName } from "../utils/storage";
 import { validateLogin } from "../../src/utils/validations";
+import { useNotification } from "../context/useNotification";
 
 import "../styles/LoginPage.css";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   // Form and UI state
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false); // prevents multipole loading req
   const [error, setError] = useState("");
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
@@ -30,7 +31,6 @@ function LoginPage() {
   // Validate and submit login form
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setMessage("");
     setError("");
 
     const validationErrors = validateLogin(formData);
@@ -51,10 +51,12 @@ function LoginPage() {
       saveUserName(response.data.name);
       saveRole(response.data.role);
 
-      setMessage(response.message);
+      showNotification(response.message);
       navigate("/projects");
     } catch (error) {
-      setError(error.response?.data?.message || "Unable to login.");
+      const message = error.response?.data?.message || "Unable to login.";
+      setError(message);
+      showNotification(message, "error");
     } finally {
       setLoading(false);
     }
@@ -108,7 +110,6 @@ function LoginPage() {
           </div>
 
           {/* Success and error messages */}
-          {message && <p className="success-message">{message}</p>}
           {error && <p className="error-message">{error}</p>}
 
           {/* Login button */}

@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from fastapi import Depends
 from app.common.api_response import ApiResponse
+from app.common.pagination import get_pagination_params
 from app.services.project_service import ProjectService
 from app.schemas.requests.project_request import (
     CreateProjectRequest,
@@ -47,12 +48,14 @@ def create_project(
 
 @router.get("", response_model=ApiResponse)
 def get_all_projects(
+    pagination=Depends(get_pagination_params),
     current_user=Depends(get_current_user),
 ):
     """Retrieve all projects."""
 
     response = ProjectService.get_all_projects(
         current_user,
+        pagination,
     )
 
     return ApiResponse(
@@ -187,6 +190,7 @@ def create_sprint(
 @router.get("/{project_id}/sprints", response_model=ApiResponse)
 def get_all_sprints(
     project_id: str,
+    pagination=Depends(get_pagination_params),
     current_user=Depends(get_current_user),
 ):
     """Retrieve all sprints for a project."""
@@ -194,6 +198,7 @@ def get_all_sprints(
     response = SprintService.get_all_sprints(
         project_id,
         current_user,
+        pagination,
     )
 
     return ApiResponse(
@@ -227,6 +232,7 @@ def create_issue(
 @router.get("/{project_id}/issues", response_model=ApiResponse)
 def get_all_issues(
     project_id: str,
+    pagination=Depends(get_pagination_params),
     current_user=Depends(get_current_user),
 ):
     """Retrieve all issues for a project."""
@@ -234,6 +240,7 @@ def get_all_issues(
     response = IssueService.get_all_issues(
         project_id,
         current_user,
+        pagination,
     )
 
     return ApiResponse(

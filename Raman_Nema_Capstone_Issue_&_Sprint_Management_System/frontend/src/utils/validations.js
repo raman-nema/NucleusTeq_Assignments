@@ -146,3 +146,46 @@ export function validateSprint(formData) {
 
   return errors;
 }
+
+/**
+ * Validate the issue form fields.
+ */
+export function validateIssue(formData) {
+  const errors = {};
+  const allowedPriorities = ["LOW", "MEDIUM", "HIGH"];
+  const allowedStatuses = ["TODO", "IN_PROGRESS", "DONE"];
+
+  if (!formData.title.trim()) {
+    errors.title = "Issue title is required.";
+  } else if (formData.title.trim().length < 3) {
+    errors.title = "Issue title must be at least 3 characters.";
+  } else if (formData.title.trim().length > 100) {
+    errors.title = "Issue title cannot exceed 100 characters.";
+  }
+
+  if (!formData.description.trim()) {
+    errors.description = "Issue description is required.";
+  } else if (formData.description.trim().length < 10) {
+    errors.description = "Issue description must be at least 10 characters.";
+  } else if (formData.description.trim().length > 500) {
+    errors.description = "Issue description cannot exceed 500 characters.";
+  }
+
+  if (!formData.assignee) {
+    errors.assignee = "Assignee is required.";
+  }
+
+  if (!formData.sprint_id) {
+    errors.sprint_id = "Sprint is required.";
+  }
+
+  if (!allowedPriorities.includes(formData.priority)) {
+    errors.priority = "Please select a valid issue priority.";
+  }
+
+  if (!allowedStatuses.includes(formData.status)) {
+    errors.status = "Please select a valid issue status.";
+  }
+
+  return errors;
+}

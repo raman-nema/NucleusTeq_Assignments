@@ -29,6 +29,12 @@ class ProjectRepository:
         return database.projects.find().sort("created_at", -1)
 
     @staticmethod
+    def count_all():
+        """Count all projects."""
+
+        return database.projects.count_documents({})
+
+    @staticmethod
     def update_project(
         project_id: str,
         updated_data: dict,
@@ -92,6 +98,16 @@ class ProjectRepository:
         ).sort(
             "created_at",
             -1,
+        )
+
+    @staticmethod
+    def count_by_member(user_id: str):
+        """Count projects assigned to a member."""
+
+        return database.projects.count_documents(
+            {
+                "members": ObjectId(user_id),
+            }
         )
 
 
