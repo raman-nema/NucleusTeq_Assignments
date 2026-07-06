@@ -153,6 +153,7 @@ export function validateSprint(formData) {
 export function validateIssue(formData) {
   const errors = {};
   const allowedPriorities = ["LOW", "MEDIUM", "HIGH"];
+  const allowedTypes = ["TASK", "BUG", "STORY"];
   const allowedStatuses = ["TODO", "IN_PROGRESS", "DONE"];
 
   if (!formData.title.trim()) {
@@ -181,6 +182,10 @@ export function validateIssue(formData) {
 
   if (!allowedPriorities.includes(formData.priority)) {
     errors.priority = "Please select a valid issue priority.";
+  }
+
+  if (!allowedTypes.includes(formData.type)) {
+    errors.type = "Please select a valid issue type.";
   }
 
   if (!allowedStatuses.includes(formData.status)) {

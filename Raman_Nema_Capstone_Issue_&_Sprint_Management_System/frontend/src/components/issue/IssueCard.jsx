@@ -23,9 +23,12 @@ function IssueCard({
       <div className="project-info">
         <div className="sprint-card-heading">
           <h3>{issue.title}</h3>
-          <span className={`issue-priority priority-${issue.priority}`}>
-            {formatValue(issue.priority, "MEDIUM")}
-          </span>
+          <div className="issue-badges">
+            <span className="issue-type">{formatValue(issue.type, "TASK")}</span>
+            <span className={`issue-priority priority-${issue.priority}`}>
+              {formatValue(issue.priority, "MEDIUM")}
+            </span>
+          </div>
         </div>
 
         <p>{issue.description}</p>

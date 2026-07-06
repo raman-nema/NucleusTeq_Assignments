@@ -37,27 +37,41 @@ class IssueRepository:
         )
 
     @staticmethod
-    def find_all_by_project(project_id: str):
+    def find_all_by_project(
+        project_id: str,
+        status: str | None = None,
+    ):
         """Retrieve all issues for a project."""
 
+        query = {
+            "project_id": ObjectId(project_id),
+        }
+
+        if status:
+            query["status"] = status
+
         return database.issues.find(
-            {
-                "project_id": ObjectId(project_id),
-            }
+            query
         ).sort(
             "created_at",
             -1,
         )
 
     @staticmethod
-    def count_by_project(project_id: str):
+    def count_by_project(
+        project_id: str,
+        status: str | None = None,
+    ):
         """Count issues for a project."""
 
-        return database.issues.count_documents(
-            {
-                "project_id": ObjectId(project_id),
-            }
-        )
+        query = {
+            "project_id": ObjectId(project_id),
+        }
+
+        if status:
+            query["status"] = status
+
+        return database.issues.count_documents(query)
 
     @staticmethod
     def update_issue(

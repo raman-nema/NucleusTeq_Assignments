@@ -13,6 +13,7 @@ class IssueResponse(BaseModel):
     title: str
     description: str
     priority: str
+    type: str = "TASK"
     status: str
     assignee: str
     reporter: str

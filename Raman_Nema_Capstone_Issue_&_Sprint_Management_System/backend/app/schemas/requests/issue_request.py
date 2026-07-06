@@ -29,6 +29,12 @@ class IssueRequest(BaseModel):
         "HIGH",
     ] = "MEDIUM"
 
+    type: Literal[
+        "TASK",
+        "BUG",
+        "STORY",
+    ] = "TASK"
+
     status: Literal[
         "TODO",
         "IN_PROGRESS",

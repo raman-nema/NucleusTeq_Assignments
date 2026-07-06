@@ -104,6 +104,7 @@ def create_issue(
     project_id,
     sprint_id,
     assignee_id,
+    status="TODO",
 ):
     """Create issue."""
 
@@ -118,7 +119,7 @@ def create_issue(
             "assignee": assignee_id,
             "sprint_id": sprint_id,
             "priority": "HIGH",
-            "status": "TODO",
+            "status": status,
         },
     )
 
@@ -192,6 +193,88 @@ def test_admin_can_get_all_issues(client):
     assert response.status_code == 200
     assert response.json()["success"] is True
     assert len(response.json()["data"]["issues"]) == 1
+
+
+def test_admin_can_filter_issues_by_status(client):
+
+    register_user(
+        client,
+        "Admin",
+        "admin@company.com",
+        "Admin@123",
+        Role.ADMIN.value,
+    )
+
+    register_user(
+        client,
+        "Member",
+        "member@company.com",
+        "Member@123",
+        Role.MEMBER.value,
+    )
+
+    admin_token = login_user(
+        client,
+        "admin@company.com",
+        "Admin@123",
+    )
+
+    member_id = get_user_id(
+        "member@company.com",
+    )
+
+    project_id = create_project(
+        client,
+        admin_token,
+    )
+
+    client.post(
+        f"/projects/{project_id}/members",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "user_id": member_id,
+        },
+    )
+
+    sprint_id = create_sprint(
+        client,
+        admin_token,
+        project_id,
+    )
+
+    create_issue(
+        client,
+        admin_token,
+        project_id,
+        sprint_id,
+        member_id,
+        "TODO",
+    )
+
+    create_issue(
+        client,
+        admin_token,
+        project_id,
+        sprint_id,
+        member_id,
+        "DONE",
+    )
+
+    response = client.get(
+        f"/projects/{project_id}/issues?status=DONE",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+    )
+
+    issues = response.json()["data"]["issues"]
+
+    assert response.status_code == 200
+    assert len(issues) == 1
+    assert issues[0]["status"] == "DONE"
+    assert response.json()["data"]["pagination"]["total"] == 1
 
 
 def test_member_can_get_all_issues(client):

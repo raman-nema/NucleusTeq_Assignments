@@ -246,6 +246,25 @@
   text-transform: capitalize;
 }
 
+.issue-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.issue-type {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-transform: capitalize;
+}
+
 .priority-LOW {
   background: #ecfdf5;
   color: #047857;

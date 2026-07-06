@@ -33,6 +33,9 @@ function IssuePage() {
   const [selectedSprintId, setSelectedSprintId] = useState(
     searchParams.get("sprintId") || "",
   );
+  const [statusFilter, setStatusFilter] = useState(
+    searchParams.get("status") || "",
+  );
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -56,15 +59,22 @@ function IssuePage() {
   useEffect(() => {
     if (selectedProjectId) {
       loadSprints(selectedProjectId);
-      loadIssues(selectedProjectId, page);
+      loadIssues(selectedProjectId, page, statusFilter);
       setSearchParams((previous) => {
         const params = new URLSearchParams(previous);
         params.set("projectId", selectedProjectId);
         params.set("page", String(page));
+
+        if (statusFilter) {
+          params.set("status", statusFilter);
+        } else {
+          params.delete("status");
+        }
+
         return params;
       });
     }
-  }, [selectedProjectId, page]);
+  }, [selectedProjectId, page, statusFilter]);
 
   useEffect(() => {
     setSearchParams((previous) => {
@@ -136,14 +146,21 @@ function IssuePage() {
     }
   }
 
-  async function loadIssues(projectId, nextPage = page) {
+  async function loadIssues(
+    projectId,
+    nextPage = page,
+    nextStatus = statusFilter,
+  ) {
     setLoadingIssues(true);
     setError("");
 
     try {
       const response = await getProjectIssues(
         projectId,
-        buildPaginationParams(nextPage),
+        {
+          ...buildPaginationParams(nextPage),
+          ...(nextStatus ? { status: nextStatus } : {}),
+        },
       );
       setIssues(response.data.issues || []);
       setPagination(response.data.pagination || getDefaultPagination());
@@ -170,7 +187,7 @@ function IssuePage() {
     try {
       const response = await createIssue(selectedProjectId, issueData);
       setPage(DEFAULT_PAGE);
-      await loadIssues(selectedProjectId, DEFAULT_PAGE);
+      await loadIssues(selectedProjectId, DEFAULT_PAGE, statusFilter);
       setSelectedIssue(null);
       setShowForm(false);
       showNotification(response.message);
@@ -190,7 +207,7 @@ function IssuePage() {
 
     try {
       const response = await updateIssue(selectedIssue.id, issueData);
-      await loadIssues(selectedProjectId);
+      await loadIssues(selectedProjectId, page, statusFilter);
       setSelectedIssue(null);
       setShowForm(false);
       showNotification(response.message);
@@ -215,7 +232,7 @@ function IssuePage() {
 
     try {
       const response = await deleteIssue(issueId);
-      await loadIssues(selectedProjectId);
+      await loadIssues(selectedProjectId, page, statusFilter);
       showNotification(response.message);
     } catch (error) {
       const message =
@@ -232,6 +249,13 @@ function IssuePage() {
     setSelectedIssue(null);
     setShowForm(false);
     setSearchTerm("");
+  }
+
+  function handleStatusFilterChange(event) {
+    setStatusFilter(event.target.value);
+    setPage(DEFAULT_PAGE);
+    setSelectedIssue(null);
+    setShowForm(false);
   }
 
   function handleSprintChange(event) {
@@ -316,6 +340,18 @@ function IssuePage() {
                   {sprint.name}
                 </option>
               ))}
+            </select>
+
+            <select
+              className="search-input select-input"
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+              disabled={!selectedProjectId}
+            >
+              <option value="">All statuses</option>
+              <option value="TODO">Todo</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="DONE">Done</option>
             </select>
 
             <input

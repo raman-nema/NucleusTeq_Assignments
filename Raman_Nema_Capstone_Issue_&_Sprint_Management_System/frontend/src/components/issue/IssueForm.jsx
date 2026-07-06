@@ -11,6 +11,7 @@ function getInitialFormData(initialData, selectedSprintId, members) {
       assignee: initialData.assignee,
       sprint_id: initialData.sprint_id || selectedSprintId,
       priority: initialData.priority || "MEDIUM",
+      type: initialData.type || "TASK",
       status: initialData.status || "TODO",
     };
   }
@@ -21,6 +22,7 @@ function getInitialFormData(initialData, selectedSprintId, members) {
     assignee: members[0]?.id || "",
     sprint_id: selectedSprintId,
     priority: "MEDIUM",
+    type: "TASK",
     status: "TODO",
   };
 }
@@ -157,6 +159,23 @@ function IssueForm({
           {errors.priority && (
             <p className="error-message">{errors.priority}</p>
           )}
+        </div>
+
+        <div className="form-group">
+          <label>Type</label>
+
+          <select
+            className="search-input"
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+          >
+            <option value="TASK">Task</option>
+            <option value="BUG">Bug</option>
+            <option value="STORY">Story</option>
+          </select>
+
+          {errors.type && <p className="error-message">{errors.type}</p>}
         </div>
 
         <div className="form-group">

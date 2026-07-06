@@ -15,6 +15,7 @@ from app.exceptions.custom_exceptions import (
     MemberNotAssignedException,
     IssueAlreadyExistsException,
     IssueNotFoundException,
+    InvalidIssueStatusTransitionException,
 )
 
 
@@ -186,6 +187,20 @@ async def issue_not_found_handler(
         content={
             "success": False,
             "message": "Issue not found",
+            "data": None,
+        },
+    )
+
+
+async def invalid_issue_status_transition_handler(
+    request: Request,
+    exc: InvalidIssueStatusTransitionException,
+):
+    return JSONResponse(
+        status_code=400,
+        content={
+            "success": False,
+            "message": "Issues in DONE state cannot move backward",
             "data": None,
         },
     )

@@ -82,3 +82,9 @@ class IssueNotFoundException(Exception):
     """Raised when the requested issue does not exist."""
 
     pass
+
+
+class InvalidIssueStatusTransitionException(Exception):
+    """Raised when an issue status transition is not allowed."""
+
+    pass

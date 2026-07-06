@@ -278,6 +278,195 @@ def test_member_can_update_issue(client):
     assert response.status_code == 200
     assert response.json()["success"] is True
 
+
+def test_admin_can_move_done_issue_backward(client):
+
+    register_user(
+        client,
+        "Admin",
+        "admin@company.com",
+        "Admin@123",
+        Role.ADMIN.value,
+    )
+
+    register_user(
+        client,
+        "Member",
+        "member@company.com",
+        "Member@123",
+        Role.MEMBER.value,
+    )
+
+    admin_token = login_user(
+        client,
+        "admin@company.com",
+        "Admin@123",
+    )
+
+    member_id = get_user_id(
+        "member@company.com",
+    )
+
+    project_id = create_project(
+        client,
+        admin_token,
+    )
+
+    client.post(
+        f"/projects/{project_id}/members",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "user_id": member_id,
+        },
+    )
+
+    sprint_id = create_sprint(
+        client,
+        admin_token,
+        project_id,
+    )
+
+    issue_id = create_issue(
+        client,
+        admin_token,
+        project_id,
+        sprint_id,
+        member_id,
+    )
+
+    client.put(
+        f"/issues/{issue_id}",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "title": "Finished Issue",
+            "description": "Finished issue description.",
+            "assignee": member_id,
+            "sprint_id": sprint_id,
+            "priority": "HIGH",
+            "status": "DONE",
+        },
+    )
+
+    response = client.put(
+        f"/issues/{issue_id}",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "title": "Finished Issue",
+            "description": "Finished issue description.",
+            "assignee": member_id,
+            "sprint_id": sprint_id,
+            "priority": "HIGH",
+            "status": "IN_PROGRESS",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["data"]["status"] == "IN_PROGRESS"
+
+
+def test_member_cannot_move_done_issue_backward(client):
+
+    register_user(
+        client,
+        "Admin",
+        "admin@company.com",
+        "Admin@123",
+        Role.ADMIN.value,
+    )
+
+    register_user(
+        client,
+        "Member",
+        "member@company.com",
+        "Member@123",
+        Role.MEMBER.value,
+    )
+
+    admin_token = login_user(
+        client,
+        "admin@company.com",
+        "Admin@123",
+    )
+
+    member_token = login_user(
+        client,
+        "member@company.com",
+        "Member@123",
+    )
+
+    member_id = get_user_id(
+        "member@company.com",
+    )
+
+    project_id = create_project(
+        client,
+        admin_token,
+    )
+
+    client.post(
+        f"/projects/{project_id}/members",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "user_id": member_id,
+        },
+    )
+
+    sprint_id = create_sprint(
+        client,
+        admin_token,
+        project_id,
+    )
+
+    issue_id = create_issue(
+        client,
+        admin_token,
+        project_id,
+        sprint_id,
+        member_id,
+    )
+
+    client.put(
+        f"/issues/{issue_id}",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "title": "Finished Issue",
+            "description": "Finished issue description.",
+            "assignee": member_id,
+            "sprint_id": sprint_id,
+            "priority": "HIGH",
+            "status": "DONE",
+        },
+    )
+
+    response = client.put(
+        f"/issues/{issue_id}",
+        headers={
+            "Authorization": f"Bearer {member_token}",
+        },
+        json={
+            "title": "Finished Issue",
+            "description": "Finished issue description.",
+            "assignee": member_id,
+            "sprint_id": sprint_id,
+            "priority": "HIGH",
+            "status": "IN_PROGRESS",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["message"] == "Issues in DONE state cannot move backward"
+
+
 def test_viewer_cannot_update_issue(client):
 
     register_user(

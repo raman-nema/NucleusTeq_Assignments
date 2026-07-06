@@ -1,5 +1,8 @@
+from typing import Literal
+
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import Query
 from app.common.api_response import ApiResponse
 from app.common.pagination import get_pagination_params
 from app.services.project_service import ProjectService
@@ -232,6 +235,7 @@ def create_issue(
 @router.get("/{project_id}/issues", response_model=ApiResponse)
 def get_all_issues(
     project_id: str,
+    status: Literal["TODO", "IN_PROGRESS", "DONE"] | None = Query(None),
     pagination=Depends(get_pagination_params),
     current_user=Depends(get_current_user),
 ):
@@ -241,6 +245,7 @@ def get_all_issues(
         project_id,
         current_user,
         pagination,
+        status,
     )
 
     return ApiResponse(

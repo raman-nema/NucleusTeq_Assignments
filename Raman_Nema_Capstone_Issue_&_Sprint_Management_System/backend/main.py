@@ -21,6 +21,7 @@ from app.exceptions.custom_exceptions import (
     UserNotFoundException,
     IssueAlreadyExistsException,
     IssueNotFoundException,
+    InvalidIssueStatusTransitionException,
 )
 from app.exceptions.exception_handlers import (
     user_exists_handler,
@@ -36,7 +37,8 @@ from app.exceptions.exception_handlers import (
     member_not_assigned_handler,
     user_not_found_handler,
     issue_exists_handler,
-    issue_not_found_handler
+    issue_not_found_handler,
+    invalid_issue_status_transition_handler,
 )
 
 app = FastAPI(title="Issue & Sprint Management System")
@@ -68,6 +70,10 @@ app.add_exception_handler(MemberNotAssignedException, member_not_assigned_handle
 app.add_exception_handler(UserNotFoundException, user_not_found_handler)
 app.add_exception_handler(IssueAlreadyExistsException, issue_exists_handler)
 app.add_exception_handler(IssueNotFoundException, issue_not_found_handler)
+app.add_exception_handler(
+    InvalidIssueStatusTransitionException,
+    invalid_issue_status_transition_handler,
+)
 
 
 # Allow the local frontend application to call the backend APIs.

@@ -25,6 +25,7 @@ from app.exceptions.custom_exceptions import (
     IssueAlreadyExistsException,
     IssueNotFoundException,
     UserNotFoundException,
+    InvalidIssueStatusTransitionException,
 )
 
 class IssueService:
@@ -97,6 +98,7 @@ class IssueService:
             title=request.title,
             description=request.description,
             priority=request.priority,
+            type=request.type,
             status=request.status,
             assignee=request.assignee,
             reporter=str(current_user["_id"]),
@@ -112,6 +114,7 @@ class IssueService:
             title=issue["title"],
             description=issue["description"],
             priority=issue["priority"],
+            type=issue["type"],
             status=issue["status"],
             assignee=issue["assignee"],
             reporter=issue["reporter"],
@@ -124,6 +127,7 @@ class IssueService:
         project_id: str,
         current_user: dict,
         pagination,
+        status: str | None = None,
     ):
         """Retrieve all issues for a project."""
 
@@ -141,9 +145,15 @@ class IssueService:
         ):
             raise ForbiddenException()
 
-        total_issues = IssueRepository.count_by_project(project_id)
+        total_issues = IssueRepository.count_by_project(
+            project_id,
+            status,
+        )
         issues = apply_pagination(
-            IssueRepository.find_all_by_project(project_id),
+            IssueRepository.find_all_by_project(
+                project_id,
+                status,
+            ),
             pagination,
         )
 
@@ -158,6 +168,7 @@ class IssueService:
                     title=issue["title"],
                     description=issue["description"],
                     priority=issue["priority"],
+                    type=issue.get("type", "TASK"),
                     status=issue["status"],
                     assignee=issue["assignee"],
                     reporter=issue["reporter"],
@@ -202,6 +213,7 @@ class IssueService:
             title=issue["title"],
             description=issue["description"],
             priority=issue["priority"],
+            type=issue.get("type", "TASK"),
             status=issue["status"],
             assignee=issue["assignee"],
             reporter=issue["reporter"],
@@ -272,11 +284,19 @@ class IssueService:
         ):
             raise IssueAlreadyExistsException()
 
+        if (
+            current_user["role"] == Role.MEMBER.value
+            and issue["status"] == "DONE"
+            and request.status != "DONE"
+        ):
+            raise InvalidIssueStatusTransitionException()
+
         updated_data = {
             "sprint_id": sprint["_id"],
             "title": request.title,
             "description": request.description,
             "priority": request.priority,
+            "type": request.type,
             "status": request.status,
             "assignee": request.assignee,
             "updated_at": datetime.utcnow(),
@@ -296,6 +316,7 @@ class IssueService:
             title=issue["title"],
             description=issue["description"],
             priority=issue["priority"],
+            type=issue.get("type", "TASK"),
             status=issue["status"],
             assignee=issue["assignee"],
             reporter=issue["reporter"],
