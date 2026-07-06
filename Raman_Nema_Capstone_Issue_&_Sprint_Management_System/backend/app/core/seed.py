@@ -5,8 +5,6 @@ from app.core.security import hash_password
 
 def seed_admin():
     """Create the default admin user when one is not already present."""
-
-    # Avoid inserting duplicate admin accounts on repeated startup runs.
     existing_admin = database.users.find_one({"role": Role.ADMIN})
 
     if existing_admin:

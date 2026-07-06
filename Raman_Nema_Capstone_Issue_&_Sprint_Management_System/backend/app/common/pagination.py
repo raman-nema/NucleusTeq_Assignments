@@ -1,11 +1,9 @@
 from math import ceil
-
 from fastapi import Query
 from pydantic import BaseModel
 
-
 DEFAULT_PAGE = 1
-DEFAULT_LIMIT = 10  # Change this number to alter how many records appear per page.
+DEFAULT_LIMIT = 10
 MAX_LIMIT = 100
 
 

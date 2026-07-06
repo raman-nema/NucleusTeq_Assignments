@@ -1,6 +1,7 @@
 from bson import ObjectId
 from app.core.database import database
 
+
 class ProjectRepository:
     """Handles project database operations."""
 
@@ -50,7 +51,7 @@ class ProjectRepository:
         """Delete a project."""
 
         return database.projects.delete_one({"_id": ObjectId(project_id)})
-        
+
     @staticmethod
     def add_member(
         project_id: str,
@@ -109,7 +110,6 @@ class ProjectRepository:
                 "members": ObjectId(user_id),
             }
         )
-
 
     @staticmethod
     def is_member(

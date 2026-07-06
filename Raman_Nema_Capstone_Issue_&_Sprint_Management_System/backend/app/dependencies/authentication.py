@@ -11,9 +11,7 @@ from app.exceptions.custom_exceptions import (
 def get_current_user(
     authorization: str = Header(None),
 ):
-    """
-    Returns the currently authenticated user.
-    """
+    """Returns the currently authenticated user."""
 
     if authorization is None:
         raise UnauthorizedException()
@@ -21,13 +19,11 @@ def get_current_user(
     if not authorization.startswith("Bearer "):
         raise UnauthorizedException()
 
-    # Extract the token value from the Authorization header.
     token = authorization.replace(
         "Bearer ",
         "",
     )
 
-    # Validate that the token exists and has not expired.
     token_document = TokenRepository.find_by_token(token)
 
     if token_document is None:

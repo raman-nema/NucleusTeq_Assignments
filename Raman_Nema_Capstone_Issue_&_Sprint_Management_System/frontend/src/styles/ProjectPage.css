@@ -147,11 +147,12 @@
   justify-content: space-between;
   gap: 16px;
   position: relative;
+  flex-wrap: wrap;
 }
 
 .project-info {
   min-width: 0;
-  flex: 1;
+  flex: 1 1 0;
 }
 
 .project-info h3 {
@@ -167,6 +168,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .sprint-status {
@@ -280,6 +282,7 @@
   gap: 8px;
   flex-shrink: 0;
   margin-left: auto;
+  align-self: flex-start;
 }
 
 .btn-small {
@@ -439,6 +442,111 @@
 
 .project-menu {
   position: relative;
+}
+
+.issue-comments-section {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.issue-comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.issue-comment-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 0.84rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  overflow-wrap: anywhere;
+}
+
+.issue-comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.issue-comment-item strong {
+  font-size: 0.72rem;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.issue-comment-text {
+  margin: 0;
+  color: #334155;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.issue-comment-delete {
+  border: 1px solid transparent;
+  background: #fff;
+  color: #b91c1c;
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.issue-comment-delete:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.issue-comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.issue-comment-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 72px;
+  padding: 8px 10px;
+  border: 1px solid #dbe2ea;
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  background: #fff;
+}
+
+.issue-comment-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.issue-comment-submit {
+  padding: 7px 12px;
+  border: 1px solid #bbf7d0;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  background: #15803d;
+  color: #fff;
+}
+
+.empty-comments {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.84rem;
 }
 
 .project-container button.project-menu-toggle {

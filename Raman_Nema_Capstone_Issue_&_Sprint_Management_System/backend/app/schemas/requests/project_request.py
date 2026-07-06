@@ -24,7 +24,6 @@ class CreateProjectRequest(BaseModel):
     @classmethod
     def validate_name(cls, value: str):
 
-        # Remove leading and trailing whitespace.
         value = value.strip()
 
         # Regular expression for project name validation.
@@ -39,11 +38,8 @@ class CreateProjectRequest(BaseModel):
     @classmethod
     def validate_description(cls, value: str):
 
-        # Remove leading and trailing whitespace.
         return value.strip()
 
 
 class UpdateProjectRequest(CreateProjectRequest):
-    """Project update request schema."""
-
     pass

@@ -5,18 +5,12 @@ from app.exceptions.custom_exceptions import UserAlreadyExistsException
 from app.schemas.responses.auth_response import RegisterResponse
 from app.common.api_response import ApiResponse
 import uuid
-
 from datetime import datetime
 from datetime import timedelta
-
 from app.core.security import hash_password, verify_password
-
 from app.models.token_model import TokenModel
-
 from app.repositories.token_repository import TokenRepository
-
 from app.schemas.responses.auth_response import LoginResponse, LogoutResponse
-
 from app.exceptions.custom_exceptions import InvalidCredentialsException
 
 
@@ -25,15 +19,12 @@ class AuthService:
 
     @staticmethod
     def register_user(request):
-
-        # Check whether a user already exists with the same email.
         existing_user = UserRepository.find_by_email(request.email)
 
         # Stop registration if the email is already in use.
         if existing_user:
             raise UserAlreadyExistsException()
 
-        # Hash the password before storing it.
         hashed_password = hash_password(request.password)
 
         # Build the user document for database insertion.
@@ -43,8 +34,6 @@ class AuthService:
             password=hashed_password,
             role=request.role.value,
         )
-
-        # Save the new user record.
         UserRepository.create_user(user)
 
         return RegisterResponse(message="User registered successfully")
@@ -55,11 +44,9 @@ class AuthService:
         # Look up the user by email before checking the submitted password.
         user = UserRepository.find_by_email(request.email)
 
-        # Reject login attempts when the email is not registered.
         if not user:
             raise InvalidCredentialsException()
 
-        # Reject login attempts when the submitted password does not match.
         if not verify_password(request.password, user["password"]):
             raise InvalidCredentialsException()
 

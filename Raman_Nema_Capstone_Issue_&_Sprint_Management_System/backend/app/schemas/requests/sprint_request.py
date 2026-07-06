@@ -25,12 +25,8 @@ class SprintRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_dates(self):
-        """Ensure the sprint end date is not before the start date."""
-
         if self.end_date < self.start_date:
-            raise ValueError(
-                "End date cannot be before the start date."
-            )
+            raise ValueError("End date cannot be before the start date.")
 
         return self
 

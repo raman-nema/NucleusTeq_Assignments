@@ -50,9 +50,7 @@ class IssueRepository:
         if status:
             query["status"] = status
 
-        return database.issues.find(
-            query
-        ).sort(
+        return database.issues.find(query).sort(
             "created_at",
             -1,
         )
@@ -97,6 +95,38 @@ class IssueRepository:
             {
                 "_id": ObjectId(issue_id),
             }
+        )
+
+    @staticmethod
+    def add_comment(issue_id: str, comment: dict):
+        """Append a comment to an issue."""
+
+        return database.issues.update_one(
+            {
+                "_id": ObjectId(issue_id),
+            },
+            {
+                "$push": {
+                    "comments": comment,
+                },
+            },
+        )
+
+    @staticmethod
+    def delete_comment(issue_id: str, comment_id: str):
+        """Remove a comment from an issue."""
+
+        return database.issues.update_one(
+            {
+                "_id": ObjectId(issue_id),
+            },
+            {
+                "$pull": {
+                    "comments": {
+                        "_id": ObjectId(comment_id),
+                    },
+                },
+            },
         )
 
     @staticmethod
