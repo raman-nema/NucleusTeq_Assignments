@@ -48,6 +48,21 @@ def create_project(client, token):
     return response.json()["data"]["id"]
 
 
+def create_sprint(client, token, project_id):
+    response = client.post(
+        f"/projects/{project_id}/sprints",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "name": f"Sprint-{uuid.uuid4()}",
+            "goal": "Complete authentication module.",
+            "start_date": "2026-07-01",
+            "end_date": "2026-07-14",
+        },
+    )
+
+    return response.json()["data"]["id"]
+
+
 # Verify admin can delete a project.
 def test_admin_can_delete_project(client):
 
@@ -73,6 +88,39 @@ def test_admin_can_delete_project(client):
     )
 
     assert response.status_code == 200
+
+
+def test_project_with_sprint_cannot_be_deleted(client):
+    admin_email = f"admin-project-sprint-{uuid.uuid4()}@company.com"
+
+    register_user(
+        client,
+        "Admin",
+        admin_email,
+        "Admin@123",
+        Role.ADMIN.value,
+    )
+
+    token = login_user(
+        client,
+        admin_email,
+        "Admin@123",
+    )
+
+    project_id = create_project(client, token)
+    create_sprint(client, token, project_id)
+
+    response = client.delete(
+        f"/projects/{project_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 409
+    assert response.json()["success"] is False
+    assert (
+        response.json()["message"]
+        == "Project cannot be deleted because a sprint is assigned to it"
+    )
 
 
 # Verify member cannot delete a project.

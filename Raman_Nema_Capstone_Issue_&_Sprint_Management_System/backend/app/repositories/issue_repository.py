@@ -72,6 +72,16 @@ class IssueRepository:
         return database.issues.count_documents(query)
 
     @staticmethod
+    def count_by_sprint(sprint_id: str):
+        """Count issues assigned to a sprint."""
+
+        return database.issues.count_documents(
+            {
+                "sprint_id": ObjectId(sprint_id),
+            }
+        )
+
+    @staticmethod
     def update_issue(
         issue_id: str,
         updated_data: dict,

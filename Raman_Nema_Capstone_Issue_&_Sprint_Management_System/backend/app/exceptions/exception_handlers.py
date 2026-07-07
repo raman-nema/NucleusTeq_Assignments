@@ -7,8 +7,10 @@ from app.exceptions.custom_exceptions import (
     ExpiredTokenException,
     ForbiddenException,
     ProjectAlreadyExistsException,
+    ProjectHasSprintsException,
     ProjectNotFoundException,
     SprintAlreadyExistsException,
+    SprintHasIssuesException,
     SprintNotFoundException,
     UserNotFoundException,
     MemberAlreadyAssignedException,
@@ -91,6 +93,20 @@ async def project_not_found_handler(request: Request, exc: ProjectNotFoundExcept
     )
 
 
+async def project_has_sprints_handler(
+    request: Request,
+    exc: ProjectHasSprintsException,
+):
+    return JSONResponse(
+        status_code=409,
+        content={
+            "success": False,
+            "message": "Project cannot be deleted because a sprint is assigned to it",
+            "data": None,
+        },
+    )
+
+
 async def sprint_exists_handler(request: Request, exc: SprintAlreadyExistsException):
     return JSONResponse(
         status_code=409,
@@ -108,6 +124,20 @@ async def sprint_not_found_handler(request: Request, exc: SprintNotFoundExceptio
         content={
             "success": False,
             "message": "Sprint not found",
+            "data": None,
+        },
+    )
+
+
+async def sprint_has_issues_handler(
+    request: Request,
+    exc: SprintHasIssuesException,
+):
+    return JSONResponse(
+        status_code=409,
+        content={
+            "success": False,
+            "message": "Sprint cannot be deleted because an issue is present",
             "data": None,
         },
     )

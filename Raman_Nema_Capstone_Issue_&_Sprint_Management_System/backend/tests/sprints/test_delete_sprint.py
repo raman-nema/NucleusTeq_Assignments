@@ -66,6 +66,24 @@ def create_sprint(client, token, project_id):
     return response.json()["data"]["id"]
 
 
+def create_issue(client, token, project_id, sprint_id, assignee_id):
+    response = client.post(
+        f"/projects/{project_id}/issues",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "title": f"Issue-{uuid.uuid4()}",
+            "description": "Issue description for sprint deletion check.",
+            "assignee": assignee_id,
+            "sprint_id": sprint_id,
+            "priority": "MEDIUM",
+            "type": "TASK",
+            "status": "TODO",
+        },
+    )
+
+    return response.json()["data"]["id"]
+
+
 # Verify admin can delete a sprint.
 def test_admin_can_delete_sprint(client):
 
@@ -168,6 +186,79 @@ def test_assigned_member_can_delete_sprint(client):
 
     assert response.status_code == 200
     assert response.json()["success"] is True
+
+
+def test_sprint_with_issue_cannot_be_deleted(client):
+    admin_email = f"admin-sprint-issue-{uuid.uuid4()}@company.com"
+    member_email = f"member-sprint-issue-{uuid.uuid4()}@company.com"
+
+    register_user(
+        client,
+        "Admin",
+        admin_email,
+        "Admin@123",
+        Role.ADMIN.value,
+    )
+
+    register_user(
+        client,
+        "Member",
+        member_email,
+        "Admin@123",
+        Role.MEMBER.value,
+    )
+
+    admin_token = login_user(
+        client,
+        admin_email,
+        "Admin@123",
+    )
+
+    project_id = create_project(
+        client,
+        admin_token,
+    )
+
+    sprint_id = create_sprint(
+        client,
+        admin_token,
+        project_id,
+    )
+
+    member = UserRepository.find_by_email(member_email)
+
+    response = client.post(
+        f"/projects/{project_id}/members",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "user_id": str(member["_id"]),
+        },
+    )
+
+    assert response.status_code == 200
+
+    create_issue(
+        client,
+        admin_token,
+        project_id,
+        sprint_id,
+        str(member["_id"]),
+    )
+
+    response = client.delete(
+        f"/sprints/{sprint_id}",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+    )
+
+    assert response.status_code == 409
+    assert response.json()["success"] is False
+    assert response.json()["message"] == (
+        "Sprint cannot be deleted because an issue is present"
+    )
 
 # Verify deleting a non-existent sprint returns not found.
 def test_delete_sprint_not_found(client):
