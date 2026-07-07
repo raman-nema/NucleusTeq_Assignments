@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Button from "../common/Button";
+import { getAdminUsers } from "../../services/admin-service";
 import { getRole } from "../../utils/storage";
 
 function ProjectCard({
@@ -15,9 +16,40 @@ function ProjectCard({
 
   // Component state
   const [memberId, setMemberId] = useState("");
+  const [memberOptions, setMemberOptions] = useState([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [memberLoadError, setMemberLoadError] = useState("");
   const [showMemberForm, setShowMemberForm] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
   const [showActionMenu, setShowActionMenu] = useState(false);
+
+  async function loadMemberOptions() {
+    setLoadingMembers(true);
+    setMemberLoadError("");
+
+    try {
+      const response = await getAdminUsers({
+        role: "MEMBER",
+      });
+      const existingMemberIds = new Set(
+        (project.members || []).map((member) => member.id),
+      );
+      const availableMembers = (response.data.users || []).filter(
+        (member) => !existingMemberIds.has(member.id),
+      );
+
+      setMemberOptions(availableMembers);
+      setMemberId(availableMembers[0]?.id || "");
+    } catch (error) {
+      setMemberOptions([]);
+      setMemberId("");
+      setMemberLoadError(
+        error.response?.data?.message || "Unable to load members.",
+      );
+    } finally {
+      setLoadingMembers(false);
+    }
+  }
 
   // Assign a member to the project
   function handleAssignMember(event) {
@@ -31,12 +63,24 @@ function ProjectCard({
 
     onAssignMember(project.id, trimmedMemberId);
     setMemberId("");
+    setMemberOptions([]);
+    setMemberLoadError("");
     setShowMemberForm(false);
   }
 
   // Toggle member assignment form
   function handleToggleMemberForm() {
-    setShowMemberForm((current) => !current);
+    const nextState = !showMemberForm;
+
+    if (nextState) {
+      loadMemberOptions();
+    } else {
+      setMemberId("");
+      setMemberOptions([]);
+      setMemberLoadError("");
+    }
+
+    setShowMemberForm(nextState);
     setShowMembers(false);
     setShowActionMenu(false);
   }
@@ -60,19 +104,39 @@ function ProjectCard({
           <div className="member-manager">
             {showMemberForm && (
               <form className="member-form" onSubmit={handleAssignMember}>
-                <input
-                  className="member-input"
-                  type="text"
-                  value={memberId}
-                  placeholder="Member user ID"
-                  onChange={(event) => setMemberId(event.target.value)}
-                />
+                <div className="member-select-wrapper">
+                  <select
+                    className="member-input"
+                    value={memberId}
+                    onChange={(event) => setMemberId(event.target.value)}
+                    disabled={loadingMembers || memberOptions.length === 0}
+                  >
+                    {loadingMembers && (
+                      <option value="">Loading members...</option>
+                    )}
+
+                    {!loadingMembers && memberOptions.length === 0 && (
+                      <option value="">No members available</option>
+                    )}
+
+                    {!loadingMembers &&
+                      memberOptions.map((member) => (
+                        <option key={member.id} value={member.id}>
+                          {member.name} - {member.email}
+                        </option>
+                      ))}
+                  </select>
+
+                  {memberLoadError && (
+                    <p className="member-load-error">{memberLoadError}</p>
+                  )}
+                </div>
 
                 <Button
                   type="submit"
                   text="Save"
                   className="btn-small btn-success"
-                  disabled={!memberId.trim()}
+                  disabled={!memberId.trim() || loadingMembers}
                 />
 
                 <Button
@@ -80,6 +144,8 @@ function ProjectCard({
                   className="btn-small btn-muted"
                   onClick={() => {
                     setMemberId("");
+                    setMemberOptions([]);
+                    setMemberLoadError("");
                     setShowMemberForm(false);
                   }}
                 />

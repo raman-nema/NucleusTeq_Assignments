@@ -13,3 +13,11 @@ export async function updateDashboardUser(userId, userData) {
 
   return response.data;
 }
+
+export async function getAdminUsers(params = {}) {
+  const response = await apiClient.get("/admin/users", {
+    params,
+  });
+
+  return response.data;
+}

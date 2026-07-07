@@ -51,6 +51,38 @@ def admin_dashboard(
     }
 
 
+@router.get("/users")
+def get_users(
+    search: str | None = Query(None),
+    role: str | None = Query(None),
+    current_user=Depends(require_admin),
+):
+    users = []
+
+    for user in UserRepository.find_all(
+        search=search,
+        role=role,
+    ):
+        users.append(
+            {
+                "id": str(user["_id"]),
+                "name": user["name"],
+                "email": user["email"],
+                "role": user["role"],
+                "created_at": user.get("created_at"),
+                "updated_at": user.get("updated_at"),
+            }
+        )
+
+    return {
+        "success": True,
+        "message": "Users retrieved successfully",
+        "data": {
+            "users": users,
+        },
+    }
+
+
 @router.put("/users/{user_id}")
 def update_user(
     user_id: str,

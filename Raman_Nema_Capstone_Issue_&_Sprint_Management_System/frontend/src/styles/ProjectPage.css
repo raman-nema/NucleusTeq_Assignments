@@ -328,12 +328,19 @@
 
 .member-form {
   display: flex;
+  align-items: flex-start;
   gap: 8px;
   margin-bottom: 10px;
 }
 
+.member-select-wrapper {
+  flex: 1;
+  min-width: 0;
+}
+
 .member-input {
   flex: 1;
+  width: 100%;
   min-width: 0;
   box-sizing: border-box;
   padding: 8px 10px;
@@ -349,6 +356,13 @@
 .member-input:focus {
   border-color: #888;
   background: #fff;
+}
+
+.member-load-error {
+  margin: 6px 0 0;
+  color: #b91c1c;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 .member-list {

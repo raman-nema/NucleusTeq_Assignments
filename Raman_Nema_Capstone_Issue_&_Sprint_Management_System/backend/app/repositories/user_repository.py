@@ -42,22 +42,32 @@ class UserRepository:
         )
 
     @staticmethod
-    def find_all(search: str | None = None):
-        """Retrieve users, optionally filtered by name or ID."""
+    def find_all(
+        search: str | None = None,
+        role: str | None = None,
+    ):
+        """Retrieve users, optionally filtered by role, name, or ID."""
 
         query = {}
 
+        if role:
+            query["role"] = role
+
         if search:
-            query = {
-                "$or": [
-                    {
-                        "name": {
-                            "$regex": search,
-                            "$options": "i",
-                        }
+            query["$or"] = [
+                {
+                    "name": {
+                        "$regex": search,
+                        "$options": "i",
                     }
-                ]
-            }
+                },
+                {
+                    "email": {
+                        "$regex": search,
+                        "$options": "i",
+                    }
+                },
+            ]
 
             try:
                 query["$or"].append(
