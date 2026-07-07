@@ -13,7 +13,7 @@ function Sidebar() {
   }
 
   const navItems = [
-    { label: "Dashboard", path: "/dashboard" },
+    ...(role === "ADMIN" ? [{ label: "Users", path: "/dashboard" }] : []),
     { label: "Projects", path: "/projects" },
     { label: "Sprints", path: "/sprints" },
     { label: "Issues", path: "/issues" },

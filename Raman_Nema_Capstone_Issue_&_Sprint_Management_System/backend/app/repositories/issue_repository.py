@@ -82,6 +82,12 @@ class IssueRepository:
         )
 
     @staticmethod
+    def count_all():
+        """Count all issues."""
+
+        return database.issues.count_documents({})
+
+    @staticmethod
     def update_issue(
         issue_id: str,
         updated_data: dict,
