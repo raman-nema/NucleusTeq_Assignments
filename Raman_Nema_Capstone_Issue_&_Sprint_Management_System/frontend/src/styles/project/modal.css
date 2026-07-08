@@ -1,0 +1,39 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(17, 24, 39, 0.36);
+}
+
+.confirm-modal {
+  width: min(100%, 380px);
+  padding: 20px;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.22);
+}
+
+.confirm-modal h2 {
+  margin: 0 0 8px;
+  color: #2d2d2d;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.confirm-modal p {
+  margin: 0;
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}

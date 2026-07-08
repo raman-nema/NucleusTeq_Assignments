@@ -21,7 +21,7 @@ import {
 } from "../utils/pagination";
 import { useNotification } from "../context/useNotification";
 import { ROUTES } from "../constants/navigation";
-import "../styles/ProjectPage.css";
+import "../styles/project-styles";
 
 function ProjectPage() {
   const navigate = useNavigate();

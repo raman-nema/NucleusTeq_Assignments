@@ -1,0 +1,31 @@
+@media (max-width: 680px) {
+  .toolbar,
+  .project-card,
+  .member-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .select-input {
+    max-width: none;
+  }
+
+  .sprint-date-grid,
+  .issue-form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .project-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .pagination-bar {
+    justify-content: space-between;
+  }
+
+  .project-actions button.project-menu-toggle {
+    flex: 0 0 auto;
+  }
+}

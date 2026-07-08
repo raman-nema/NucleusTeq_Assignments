@@ -19,7 +19,7 @@ import {
   DEFAULT_PAGE,
   getDefaultPagination,
 } from "../utils/pagination";
-import "../styles/ProjectPage.css";
+import "../styles/project-styles";
 
 function SprintPage() {
   const navigate = useNavigate();

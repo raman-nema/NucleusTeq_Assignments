@@ -9,7 +9,7 @@ import { saveToken, saveRole, saveUserName } from "../utils/storage";
 import { validateLogin } from "../../src/utils/validations";
 import { useNotification } from "../context/useNotification";
 
-import "../styles/LoginPage.css";
+import "../styles/auth-login-styles";
 
 function LoginPage() {
   const navigate = useNavigate();

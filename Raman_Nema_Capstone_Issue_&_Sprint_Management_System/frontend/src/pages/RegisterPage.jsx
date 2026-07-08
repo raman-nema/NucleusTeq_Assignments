@@ -7,7 +7,7 @@ import Button from "../components/common/Button";
 import { registerUser } from "../services/auth-service";
 import { useNotification } from "../context/useNotification";
 
-import "../styles/RegisterPage.css";
+import "../styles/auth-register-styles";
 
 import { validateRegister } from "../../src/utils/validations";
 

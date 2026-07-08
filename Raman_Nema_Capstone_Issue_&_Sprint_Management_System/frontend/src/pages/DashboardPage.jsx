@@ -7,7 +7,7 @@ import {
 } from "../services/admin-service";
 import { getRole } from "../utils/storage";
 
-import "../styles/DashboardPage.css";
+import "../styles/dashboard-styles";
 
 function formatDate(value) {
   if (!value) {

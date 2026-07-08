@@ -1,0 +1,21 @@
+.success-message {
+  font-size: 0.85rem;
+  color: #2d7a4f;
+  background: #f0faf4;
+  border: 1px solid #c3e6d4;
+  border-radius: 7px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.error-message {
+  font-size: 0.85rem;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fcc;
+  border-radius: 7px;
+  padding: 8px 12px;
+  margin: 4px 0 12px;
+  text-align: center;
+}

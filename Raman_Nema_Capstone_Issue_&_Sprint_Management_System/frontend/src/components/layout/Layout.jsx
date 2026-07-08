@@ -1,5 +1,5 @@
 import Sidebar from "./Sidebar";
-import "../../styles/Layout.css";
+import "../../styles/layout-styles";
 
 function Layout({ children }) {
   return (

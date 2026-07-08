@@ -1,0 +1,24 @@
+.error-message {
+  font-size: 0.85rem;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fcc;
+  border-radius: 7px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.pagination-summary {
+  color: #555;
+  font-size: 0.84rem;
+  font-weight: 500;
+}
