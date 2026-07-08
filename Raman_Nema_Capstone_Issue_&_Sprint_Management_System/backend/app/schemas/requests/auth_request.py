@@ -6,6 +6,7 @@ from pydantic import (
     field_validator,
 )
 from app.common.enums import Role
+from app.core.security import decode_password
 
 
 class RegisterRequest(BaseModel):
@@ -33,6 +34,11 @@ class RegisterRequest(BaseModel):
 
         return value
 
+    @field_validator("password", mode="before")
+    @classmethod
+    def decode_encoded_password(cls, value: str):
+        return decode_password(value)
+
     @field_validator("password")
     @classmethod
     def validate_password(cls, value: str):
@@ -58,6 +64,11 @@ class LoginRequest(BaseModel):
     password: str = Field(
         min_length=8,
     )
+
+    @field_validator("password", mode="before")
+    @classmethod
+    def decode_encoded_password(cls, value: str):
+        return decode_password(value)
 
     @field_validator("email")
     @classmethod
