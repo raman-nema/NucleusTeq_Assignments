@@ -10,6 +10,7 @@ import {
 import SprintForm from "../components/sprint/SprintForm";
 import SprintCard from "../components/sprint/SprintCard";
 import Button from "../components/common/Button";
+import ConfirmModal from "../components/common/ConfirmModal";
 import Pagination from "../components/common/Pagination";
 import { getRole } from "../utils/storage";
 import { useNotification } from "../context/useNotification";
@@ -31,6 +32,7 @@ function SprintPage() {
     searchParams.get("projectId") || "",
   );
   const [selectedSprint, setSelectedSprint] = useState(null);
+  const [sprintToDelete, setSprintToDelete] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [loadingProjects, setLoadingProjects] = useState(true);
@@ -165,24 +167,20 @@ function SprintPage() {
   }
 
   // Delete a sprint
-  async function handleDeleteSprint(sprintId) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this sprint?",
-    );
-
-    if (!confirmed) return;
-
+  async function confirmDeleteSprint() {
+    if (!sprintToDelete) return;
     setError("");
 
     try {
-      const response = await deleteSprint(sprintId);
+      const response = await deleteSprint(sprintToDelete);
       await loadSprints(selectedProjectId);
       showNotification(response.message);
     } catch (error) {
       const message =
         error.response?.data?.message || "Unable to delete sprint.";
-      setError(message);
       showNotification(message, "error");
+    } finally {
+      setSprintToDelete(null);
     }
   }
 
@@ -310,7 +308,7 @@ function SprintPage() {
                 setSelectedSprint(sprint);
                 setShowForm(true);
               }}
-              onDelete={handleDeleteSprint}
+              onDelete={setSprintToDelete}
               onViewIssues={handleViewIssues}
             />
           ))}
@@ -320,6 +318,16 @@ function SprintPage() {
             pagination={pagination}
             disabled={loadingSprints}
             onPageChange={setPage}
+          />
+        )}
+
+        {sprintToDelete && (
+          <ConfirmModal
+            title="Delete sprint"
+            message="Are you sure you want to delete this sprint?"
+            confirmText="Delete"
+            onCancel={() => setSprintToDelete(null)}
+            onConfirm={confirmDeleteSprint}
           />
         )}
       </div>

@@ -2,7 +2,7 @@
 function Button({
   text,
   type = "button",
-  className = "",
+  className,
   onClick,
   disabled = false,
 }) {

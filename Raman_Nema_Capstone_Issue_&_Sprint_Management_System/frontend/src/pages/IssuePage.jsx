@@ -13,6 +13,7 @@ import {
 import IssueForm from "../components/issue/IssueForm";
 import IssueCard from "../components/issue/IssueCard";
 import Button from "../components/common/Button";
+import ConfirmModal from "../components/common/ConfirmModal";
 import Pagination from "../components/common/Pagination";
 import { getRole } from "../utils/storage";
 import { useNotification } from "../context/useNotification";
@@ -39,6 +40,8 @@ function IssuePage() {
     searchParams.get("status") || "",
   );
   const [selectedIssue, setSelectedIssue] = useState(null);
+  const [issueToDelete, setIssueToDelete] = useState(null);
+  const [commentToDelete, setCommentToDelete] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [loadingProjects, setLoadingProjects] = useState(true);
@@ -252,16 +255,20 @@ function IssuePage() {
     }
   }
 
-  async function handleDeleteComment(issueId, commentId) {
+  async function confirmDeleteComment() {
+    if (!commentToDelete) return;
     setError("");
 
     try {
-      const response = await deleteIssueComment(issueId, commentId);
+      const response = await deleteIssueComment(
+        commentToDelete.issueId,
+        commentToDelete.commentId,
+      );
       const updatedIssue = response.data;
 
       setIssues((currentIssues) =>
         currentIssues.map((issue) =>
-          issue.id === issueId
+          issue.id === commentToDelete.issueId
             ? {
                 ...issue,
                 ...updatedIssue,
@@ -275,29 +282,26 @@ function IssuePage() {
     } catch (error) {
       const message =
         error.response?.data?.message || "Unable to delete comment.";
-      setError(message);
       showNotification(message, "error");
+    } finally {
+      setCommentToDelete(null);
     }
   }
 
-  async function handleDeleteIssue(issueId) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this issue?",
-    );
-
-    if (!confirmed) return;
-
+  async function confirmDeleteIssue() {
+    if (!issueToDelete) return;
     setError("");
 
     try {
-      const response = await deleteIssue(issueId);
+      const response = await deleteIssue(issueToDelete);
       await loadIssues(selectedProjectId, page, statusFilter);
       showNotification(response.message);
     } catch (error) {
       const message =
         error.response?.data?.message || "Unable to delete issue.";
-      setError(message);
       showNotification(message, "error");
+    } finally {
+      setIssueToDelete(null);
     }
   }
 
@@ -496,9 +500,11 @@ function IssuePage() {
                 setSelectedIssue(issue);
                 setShowForm(true);
               }}
-              onDelete={handleDeleteIssue}
+              onDelete={setIssueToDelete}
               onAddComment={handleAddComment}
-              onDeleteComment={handleDeleteComment}
+              onDeleteComment={(issueId, commentId) => {
+                setCommentToDelete({ issueId, commentId });
+              }}
             />
           ))}
 
@@ -507,6 +513,26 @@ function IssuePage() {
             pagination={pagination}
             disabled={loadingIssues}
             onPageChange={setPage}
+          />
+        )}
+
+        {issueToDelete && (
+          <ConfirmModal
+            title="Delete issue"
+            message="Are you sure you want to delete this issue?"
+            confirmText="Delete"
+            onCancel={() => setIssueToDelete(null)}
+            onConfirm={confirmDeleteIssue}
+          />
+        )}
+
+        {commentToDelete && (
+          <ConfirmModal
+            title="Delete comment"
+            message="Are you sure you want to delete this comment?"
+            confirmText="Delete"
+            onCancel={() => setCommentToDelete(null)}
+            onConfirm={confirmDeleteComment}
           />
         )}
       </div>

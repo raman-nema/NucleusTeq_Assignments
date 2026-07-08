@@ -1,17 +1,7 @@
 import { useState } from "react";
 import Button from "../common/Button";
 import { getRole } from "../../utils/storage";
-
-// Format date for display
-function formatDate(value) {
-  if (!value) return "Not set";
-
-  return new Date(value).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
+import { formatDisplayDate } from "../../utils/date";
 
 // Format sprint status
 function formatStatus(status) {
@@ -64,8 +54,8 @@ function SprintCard({ sprint, projectName, onEdit, onDelete, onViewIssues }) {
         {/* Sprint metadata */}
         <div className="sprint-meta">
           <span>{projectName || "Project"}</span>
-          <span>Start: {formatDate(sprint.start_date)}</span>
-          <span>End: {formatDate(sprint.end_date)}</span>
+          <span>Start: {formatDisplayDate(sprint.start_date)}</span>
+          <span>End: {formatDisplayDate(sprint.end_date)}</span>
         </div>
       </div>
 

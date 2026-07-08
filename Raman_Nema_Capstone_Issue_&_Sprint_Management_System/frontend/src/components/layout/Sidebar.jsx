@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { clearStorage, getRole, getUserName } from "../../utils/storage";
+import { ADMIN_NAV_ITEMS, NAV_ITEMS } from "../../constants/navigation";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -12,12 +13,7 @@ function Sidebar() {
     navigate("/login");
   }
 
-  const navItems = [
-    ...(role === "ADMIN" ? [{ label: "Users", path: "/dashboard" }] : []),
-    { label: "Projects", path: "/projects" },
-    { label: "Sprints", path: "/sprints" },
-    { label: "Issues", path: "/issues" },
-  ];
+  const navItems = role === "ADMIN" ? ADMIN_NAV_ITEMS : NAV_ITEMS;
 
   return (
     <aside className="sidebar">
