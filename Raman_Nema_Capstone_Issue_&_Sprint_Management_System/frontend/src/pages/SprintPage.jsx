@@ -28,8 +28,12 @@ function SprintPage() {
   // Component state
   const [projects, setProjects] = useState([]);
   const [sprints, setSprints] = useState([]);
+  const [sprintOptions, setSprintOptions] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(
     searchParams.get("projectId") || "",
+  );
+  const [selectedSprintId, setSelectedSprintId] = useState(
+    searchParams.get("sprintId") || "",
   );
   const [selectedSprint, setSelectedSprint] = useState(null);
   const [sprintToDelete, setSprintToDelete] = useState(null);
@@ -55,14 +59,27 @@ function SprintPage() {
   useEffect(() => {
     if (selectedProjectId) {
       loadSprints(selectedProjectId, page);
+      loadSprintOptions(selectedProjectId);
+    }
+  }, [selectedProjectId, page]);
+
+  useEffect(() => {
+    if (selectedProjectId) {
       setSearchParams((previous) => {
         const params = new URLSearchParams(previous);
         params.set("projectId", selectedProjectId);
         params.set("page", String(page));
+
+        if (selectedSprintId) {
+          params.set("sprintId", selectedSprintId);
+        } else {
+          params.delete("sprintId");
+        }
+
         return params;
       });
     }
-  }, [selectedProjectId, page]);
+  }, [selectedProjectId, page, selectedSprintId]);
 
   // Fetch all projects
   async function loadProjects() {
@@ -113,6 +130,28 @@ function SprintPage() {
       setError(error.response?.data?.message || "Unable to load sprints.");
     } finally {
       setLoadingSprints(false);
+    }
+  }
+
+  async function loadSprintOptions(projectId) {
+    try {
+      const response = await getProjectSprints(projectId, { limit: 100 });
+      const sprintList = response.data.sprints || [];
+      const requestedSprintId = searchParams.get("sprintId");
+
+      setSprintOptions(sprintList);
+
+      setSelectedSprintId((current) => {
+        const preferredSprintId = current || requestedSprintId;
+        const hasPreferredSprint = sprintList.some(
+          (sprint) => sprint.id === preferredSprintId,
+        );
+
+        return hasPreferredSprint ? preferredSprintId : "";
+      });
+    } catch {
+      setSprintOptions([]);
+      setSelectedSprintId("");
     }
   }
 
@@ -191,10 +230,18 @@ function SprintPage() {
   // Handle project selection
   function handleProjectChange(event) {
     setSelectedProjectId(event.target.value);
+    setSelectedSprintId("");
     setPage(DEFAULT_PAGE);
     setSelectedSprint(null);
     setShowForm(false);
     setSearchTerm("");
+  }
+
+  function handleSprintFilterChange(event) {
+    setSelectedSprintId(event.target.value);
+    setPage(DEFAULT_PAGE);
+    setSelectedSprint(null);
+    setShowForm(false);
   }
 
   // Get selected project
@@ -210,10 +257,18 @@ function SprintPage() {
     }, {});
   }, [projects]);
 
-  // Filter sprints by search text
-  const filteredSprints = sprints.filter((sprint) =>
-    sprint.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  // Filter sprints by selected sprint and search text
+  const sprintList = selectedSprintId ? sprintOptions : sprints;
+  const filteredSprints = sprintList.filter((sprint) => {
+    const matchesSprint = selectedSprintId
+      ? sprint.id === selectedSprintId
+      : true;
+    const matchesSearch = sprint.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    return matchesSprint && matchesSearch;
+  });
 
   return (
     <div className="project-page">
@@ -236,6 +291,21 @@ function SprintPage() {
               {projects.map((project) => (
                 <option key={project.id} value={project.id}>
                   {project.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              className="search-input select-input"
+              value={selectedSprintId}
+              onChange={handleSprintFilterChange}
+              disabled={!selectedProjectId || loadingSprints}
+            >
+              <option value="">All sprints</option>
+
+              {sprintOptions.map((sprint) => (
+                <option key={sprint.id} value={sprint.id}>
+                  {sprint.name}
                 </option>
               ))}
             </select>

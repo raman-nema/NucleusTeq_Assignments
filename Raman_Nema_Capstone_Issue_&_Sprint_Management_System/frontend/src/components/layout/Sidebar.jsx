@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { clearStorage, getRole, getUserName } from "../../utils/storage";
-import { ADMIN_NAV_ITEMS, NAV_ITEMS } from "../../constants/navigation";
+import { ADMIN_NAV_ITEMS, NAV_ITEMS, ROUTES } from "../../constants/navigation";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -11,6 +11,33 @@ function Sidebar() {
   function handleLogout() {
     clearStorage();
     navigate("/login");
+  }
+
+  function getNavigationTarget(path) {
+    const shouldKeepSprintContext =
+      (location.pathname === ROUTES.SPRINTS && path === ROUTES.ISSUES) ||
+      (location.pathname === ROUTES.ISSUES && path === ROUTES.SPRINTS);
+
+    if (!shouldKeepSprintContext) {
+      return path;
+    }
+
+    const currentParams = new URLSearchParams(location.search);
+    const targetParams = new URLSearchParams();
+    const projectId = currentParams.get("projectId");
+    const sprintId = currentParams.get("sprintId");
+
+    if (projectId) {
+      targetParams.set("projectId", projectId);
+    }
+
+    if (sprintId) {
+      targetParams.set("sprintId", sprintId);
+    }
+
+    const queryString = targetParams.toString();
+
+    return queryString ? `${path}?${queryString}` : path;
   }
 
   const navItems = role === "ADMIN" ? ADMIN_NAV_ITEMS : NAV_ITEMS;
@@ -24,7 +51,7 @@ function Sidebar() {
           <button
             key={item.path}
             className={`sidebar-link ${location.pathname === item.path ? "active" : ""}`}
-            onClick={() => navigate(item.path)}
+            onClick={() => navigate(getNavigationTarget(item.path))}
           >
             {item.label}
           </button>
