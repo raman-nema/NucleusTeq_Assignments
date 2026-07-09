@@ -82,6 +82,16 @@ class IssueRepository:
         )
 
     @staticmethod
+    def count_by_parent(parent_id: str):
+        """Count issues linked to a parent issue."""
+
+        return database.issues.count_documents(
+            {
+                "parent_id": ObjectId(parent_id),
+            }
+        )
+
+    @staticmethod
     def count_all():
         """Count all issues."""
 

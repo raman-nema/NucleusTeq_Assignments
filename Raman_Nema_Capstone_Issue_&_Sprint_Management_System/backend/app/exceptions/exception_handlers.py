@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from app.constants.message_constants import (
     INVALID_ISSUE_STATUS_TRANSITION_MESSAGE,
     ISSUE_ALREADY_EXISTS_MESSAGE,
+    ISSUE_HAS_CHILDREN_MESSAGE,
     ISSUE_NOT_FOUND_MESSAGE,
     MEMBER_ALREADY_ASSIGNED_MESSAGE,
     MEMBER_NOT_ASSIGNED_MESSAGE,
@@ -23,6 +24,7 @@ from app.exceptions.custom_exceptions import (
     InvalidCredentialsException,
     InvalidIssueStatusTransitionException,
     IssueAlreadyExistsException,
+    IssueHasChildrenException,
     IssueNotFoundException,
     MemberAlreadyAssignedException,
     MemberNotAssignedException,
@@ -169,6 +171,13 @@ async def issue_not_found_handler(
     exc: IssueNotFoundException,
 ):
     return _error_response(404, ISSUE_NOT_FOUND_MESSAGE)
+
+
+async def issue_has_children_handler(
+    request: Request,
+    exc: IssueHasChildrenException,
+):
+    return _error_response(409, ISSUE_HAS_CHILDREN_MESSAGE)
 
 
 async def invalid_issue_status_transition_handler(

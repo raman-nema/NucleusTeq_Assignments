@@ -9,6 +9,7 @@ class IssueModel:
     def build(
         project_id: str,
         sprint_id: str | None,
+        parent_id: str | None,
         title: str,
         description: str,
         priority: str,
@@ -24,6 +25,7 @@ class IssueModel:
         return {
             "project_id": ObjectId(project_id),
             "sprint_id": (ObjectId(sprint_id) if sprint_id else None),
+            "parent_id": (ObjectId(parent_id) if parent_id else None),
             "title": title,
             "description": description,
             "priority": priority,

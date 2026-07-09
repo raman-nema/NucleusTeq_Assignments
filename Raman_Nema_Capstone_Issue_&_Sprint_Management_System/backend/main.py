@@ -14,6 +14,7 @@ from app.exceptions.custom_exceptions import (
     ForbiddenException,
     InvalidIssueStatusTransitionException,
     IssueAlreadyExistsException,
+    IssueHasChildrenException,
     IssueNotFoundException,
     MemberAlreadyAssignedException,
     MemberNotAssignedException,
@@ -37,6 +38,7 @@ from app.exceptions.exception_handlers import (
     invalid_issue_status_transition_handler,
     invalid_credentials_handler,
     issue_exists_handler,
+    issue_has_children_handler,
     issue_not_found_handler,
     member_already_assigned_handler,
     member_not_assigned_handler,
@@ -84,6 +86,7 @@ app.add_exception_handler(MemberAlreadyAssignedException, member_already_assigne
 app.add_exception_handler(MemberNotAssignedException, member_not_assigned_handler)
 app.add_exception_handler(IssueAlreadyExistsException, issue_exists_handler)
 app.add_exception_handler(IssueNotFoundException, issue_not_found_handler)
+app.add_exception_handler(IssueHasChildrenException, issue_has_children_handler)
 app.add_exception_handler(
     InvalidIssueStatusTransitionException,
     invalid_issue_status_transition_handler,

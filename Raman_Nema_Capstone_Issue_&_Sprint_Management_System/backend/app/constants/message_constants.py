@@ -23,6 +23,9 @@ SPRINT_UPDATED_MESSAGE = "Sprint updated successfully"
 ISSUE_ALREADY_EXISTS_MESSAGE = "Issue already exists"
 ISSUE_CREATED_MESSAGE = "Issue created successfully"
 ISSUE_DELETED_MESSAGE = "Issue deleted successfully"
+ISSUE_HAS_CHILDREN_MESSAGE = (
+    "Issue cannot be deleted because child issues are linked to it"
+)
 ISSUE_LIST_MESSAGE = "Issues retrieved successfully"
 ISSUE_NOT_FOUND_MESSAGE = "Issue not found"
 ISSUE_RETRIEVED_MESSAGE = "Issue retrieved successfully"

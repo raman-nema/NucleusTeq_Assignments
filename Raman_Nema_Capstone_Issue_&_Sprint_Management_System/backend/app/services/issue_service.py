@@ -35,6 +35,7 @@ from app.schemas.responses.issue_response import (
 )
 from app.exceptions.custom_exceptions import (
     ForbiddenException,
+    IssueHasChildrenException,
     IssueNotFoundException,
     ProjectNotFoundException,
     SprintNotFoundException,
@@ -68,6 +69,11 @@ class IssueService:
             id=str(issue["_id"]),
             project_id=str(issue["project_id"]),
             sprint_id=str(issue["sprint_id"]),
+            parent_id=(
+                str(issue["parent_id"])
+                if issue.get("parent_id")
+                else None
+            ),
             title=issue["title"],
             description=issue["description"],
             priority=issue["priority"],
@@ -79,6 +85,30 @@ class IssueService:
             created_at=issue["created_at"],
             updated_at=issue["updated_at"],
         )
+
+    @staticmethod
+    def _validate_parent_issue(
+        parent_id: str | None,
+        project_id: str,
+        issue_id: str | None = None,
+    ):
+        """Return a valid parent issue ObjectId or None."""
+
+        if not parent_id:
+            return None
+
+        if issue_id and parent_id == issue_id:
+            raise ForbiddenException()
+
+        parent_issue = IssueRepository.find_by_id(parent_id)
+
+        if not parent_issue:
+            raise IssueNotFoundException()
+
+        if str(parent_issue["project_id"]) != project_id:
+            raise ForbiddenException()
+
+        return parent_issue["_id"]
 
     @staticmethod
     def _get_comment(issue: dict, comment_id: str):
@@ -172,10 +202,16 @@ class IssueService:
                 detail=ISSUE_ALREADY_EXISTS_MESSAGE,
             )
 
+        parent_id = IssueService._validate_parent_issue(
+            request.parent_id,
+            project_id,
+        )
+
         # Build the issue document.
         issue = IssueModel.build(
             project_id=project_id,
             sprint_id=request.sprint_id,
+            parent_id=str(parent_id) if parent_id else None,
             title=request.title,
             description=request.description,
             priority=request.priority,
@@ -187,22 +223,9 @@ class IssueService:
 
         # Save the issue.
         result = IssueRepository.create_issue(issue)
+        issue["_id"] = result.inserted_id
 
-        return IssueResponse(
-            id=str(result.inserted_id),
-            project_id=str(issue["project_id"]),
-            sprint_id=str(issue["sprint_id"]),
-            title=issue["title"],
-            description=issue["description"],
-            priority=issue["priority"],
-            type=issue["type"],
-            status=issue["status"],
-            assignee=issue["assignee"],
-            reporter=issue["reporter"],
-            comments=IssueService._serialize_comments(issue.get("comments", [])),
-            created_at=issue["created_at"],
-            updated_at=issue["updated_at"],
-        )
+        return IssueService._build_issue_response(issue)
 
     @staticmethod
     def get_all_issues(
@@ -243,21 +266,7 @@ class IssueService:
 
         for issue in issues:
             issue_list.append(
-                IssueResponse(
-                    id=str(issue["_id"]),
-                    project_id=str(issue["project_id"]),
-                    sprint_id=str(issue["sprint_id"]),
-                    title=issue["title"],
-                    description=issue["description"],
-                    priority=issue["priority"],
-                    type=issue.get("type", "TASK"),
-                    status=issue["status"],
-                    assignee=issue["assignee"],
-                    reporter=issue["reporter"],
-                    comments=IssueService._serialize_comments(issue.get("comments", [])),
-                    created_at=issue["created_at"],
-                    updated_at=issue["updated_at"],
-                )
+                IssueService._build_issue_response(issue)
             )
 
         return IssueListResponse(
@@ -292,21 +301,7 @@ class IssueService:
         ):
             raise ForbiddenException()
 
-        return IssueResponse(
-            id=str(issue["_id"]),
-            project_id=str(issue["project_id"]),
-            sprint_id=str(issue["sprint_id"]),
-            title=issue["title"],
-            description=issue["description"],
-            priority=issue["priority"],
-            type=issue.get("type", "TASK"),
-            status=issue["status"],
-            assignee=issue["assignee"],
-            reporter=issue["reporter"],
-            comments=IssueService._serialize_comments(issue.get("comments", [])),
-            created_at=issue["created_at"],
-            updated_at=issue["updated_at"],
-        )
+        return IssueService._build_issue_response(issue)
 
     @staticmethod
     def add_comment(
@@ -475,8 +470,15 @@ class IssueService:
                 detail=INVALID_ISSUE_STATUS_TRANSITION_MESSAGE,
             )
 
+        parent_id = IssueService._validate_parent_issue(
+            request.parent_id,
+            str(issue["project_id"]),
+            issue_id,
+        )
+
         updated_data = {
             "sprint_id": sprint["_id"],
+            "parent_id": parent_id,
             "title": request.title,
             "description": request.description,
             "priority": request.priority,
@@ -493,21 +495,7 @@ class IssueService:
 
         issue.update(updated_data)
 
-        return IssueResponse(
-            id=str(issue["_id"]),
-            project_id=str(issue["project_id"]),
-            sprint_id=str(issue["sprint_id"]),
-            title=issue["title"],
-            description=issue["description"],
-            priority=issue["priority"],
-            type=issue.get("type", "TASK"),
-            status=issue["status"],
-            assignee=issue["assignee"],
-            reporter=issue["reporter"],
-            comments=IssueService._serialize_comments(issue.get("comments", [])),
-            created_at=issue["created_at"],
-            updated_at=issue["updated_at"],
-        )
+        return IssueService._build_issue_response(issue)
 
     @staticmethod
     def delete_issue(
@@ -532,6 +520,9 @@ class IssueService:
             )
         ):
             raise ForbiddenException()
+
+        if IssueRepository.count_by_parent(issue_id) > 0:
+            raise IssueHasChildrenException()
 
         IssueRepository.delete_issue(issue_id)
 

@@ -31,6 +31,7 @@ function IssuePage() {
   const [projects, setProjects] = useState([]);
   const [sprints, setSprints] = useState([]);
   const [issues, setIssues] = useState([]);
+  const [issueOptions, setIssueOptions] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(
     searchParams.get("projectId") || "",
   );
@@ -66,6 +67,7 @@ function IssuePage() {
     if (selectedProjectId) {
       loadSprints(selectedProjectId);
       loadIssues(selectedProjectId, page, statusFilter);
+      loadIssueOptions(selectedProjectId);
       setSearchParams((previous) => {
         const params = new URLSearchParams(previous);
         params.set("projectId", selectedProjectId);
@@ -179,6 +181,15 @@ function IssuePage() {
     }
   }
 
+  async function loadIssueOptions(projectId) {
+    try {
+      const response = await getProjectIssues(projectId, { limit: 100 });
+      setIssueOptions(response.data.issues || []);
+    } catch {
+      setIssueOptions([]);
+    }
+  }
+
   async function handleCreateIssue(issueData) {
     if (!selectedProjectId) {
       const message = "Select a project before creating an issue.";
@@ -194,6 +205,7 @@ function IssuePage() {
       const response = await createIssue(selectedProjectId, issueData);
       setPage(DEFAULT_PAGE);
       await loadIssues(selectedProjectId, DEFAULT_PAGE, statusFilter);
+      await loadIssueOptions(selectedProjectId);
       setSelectedIssue(null);
       setShowForm(false);
       showNotification(response.message);
@@ -214,6 +226,7 @@ function IssuePage() {
     try {
       const response = await updateIssue(selectedIssue.id, issueData);
       await loadIssues(selectedProjectId, page, statusFilter);
+      await loadIssueOptions(selectedProjectId);
       setSelectedIssue(null);
       setShowForm(false);
       showNotification(response.message);
@@ -326,6 +339,7 @@ function IssuePage() {
     try {
       const response = await deleteIssue(issueToDelete);
       await loadIssues(selectedProjectId, page, statusFilter);
+      await loadIssueOptions(selectedProjectId);
       showNotification(response.message);
     } catch (error) {
       const message =
@@ -384,6 +398,13 @@ function IssuePage() {
       return names;
     }, {});
   }, [members]);
+
+  const issueTitleById = useMemo(() => {
+    return issueOptions.reduce((titles, issue) => {
+      titles[issue.id] = issue.title;
+      return titles;
+    }, {});
+  }, [issueOptions]);
 
   const filteredIssues = issues.filter((issue) => {
     const matchesSprint = selectedSprintId
@@ -482,6 +503,7 @@ function IssuePage() {
             initialData={selectedIssue}
             sprints={sprints}
             members={assignableMembers}
+            parentIssues={issueOptions}
             selectedSprintId={selectedIssue?.sprint_id || selectedSprintId}
             onSubmit={selectedIssue ? handleUpdateIssue : handleCreateIssue}
             onCancel={() => {
@@ -527,6 +549,7 @@ function IssuePage() {
               sprintName={sprintNameById[issue.sprint_id]}
               assigneeName={memberNameById[issue.assignee]}
               reporterName={memberNameById[issue.reporter]}
+              parentTitle={issueTitleById[issue.parent_id]}
               onEdit={(issue) => {
                 setSelectedIssue(issue);
                 setShowForm(true);

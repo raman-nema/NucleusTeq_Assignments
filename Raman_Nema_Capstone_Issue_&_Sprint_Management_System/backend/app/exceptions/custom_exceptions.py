@@ -94,5 +94,9 @@ class IssueNotFoundException(Exception):
     pass
 
 
+class IssueHasChildrenException(Exception):
+    pass
+
+
 class InvalidIssueStatusTransitionException(Exception):
     pass
