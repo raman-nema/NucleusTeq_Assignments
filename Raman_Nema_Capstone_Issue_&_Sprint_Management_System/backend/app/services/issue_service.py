@@ -1,6 +1,15 @@
 from datetime import datetime
+
 from bson import ObjectId
+from fastapi import HTTPException
+from fastapi import status
+
 from app.common.enums import Role
+from app.common.messages import (
+    INVALID_ISSUE_STATUS_TRANSITION,
+    ISSUE_ALREADY_EXISTS,
+    ISSUE_NOT_FOUND,
+)
 from app.common.pagination import (
     apply_pagination,
     build_pagination_meta,
@@ -13,6 +22,7 @@ from app.repositories.user_repository import UserRepository
 from app.schemas.requests.issue_request import (
     CreateIssueCommentRequest,
     CreateIssueRequest,
+    UpdateIssueCommentRequest,
     UpdateIssueRequest,
 )
 from app.schemas.responses.issue_response import (
@@ -23,13 +33,12 @@ from app.schemas.responses.issue_response import (
 )
 from app.exceptions.custom_exceptions import (
     ForbiddenException,
+    IssueNotFoundException,
     ProjectNotFoundException,
     SprintNotFoundException,
-    IssueAlreadyExistsException,
-    IssueNotFoundException,
     UserNotFoundException,
-    InvalidIssueStatusTransitionException,
 )
+
 
 class IssueService:
     """Handles issue-related business logic."""
@@ -48,6 +57,55 @@ class IssueService:
             )
             for comment in comments or []
         ]
+
+    @staticmethod
+    def _build_issue_response(issue: dict):
+        """Build an issue response from a Mongo document."""
+
+        return IssueResponse(
+            id=str(issue["_id"]),
+            project_id=str(issue["project_id"]),
+            sprint_id=str(issue["sprint_id"]),
+            title=issue["title"],
+            description=issue["description"],
+            priority=issue["priority"],
+            type=issue.get("type", "TASK"),
+            status=issue["status"],
+            assignee=issue["assignee"],
+            reporter=issue["reporter"],
+            comments=IssueService._serialize_comments(issue.get("comments", [])),
+            created_at=issue["created_at"],
+            updated_at=issue["updated_at"],
+        )
+
+    @staticmethod
+    def _get_comment(issue: dict, comment_id: str):
+        """Find a comment embedded in an issue."""
+
+        for comment in issue.get("comments", []):
+            if str(comment.get("_id")) == comment_id:
+                return comment
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Comment not found",
+        )
+
+    @staticmethod
+    def _ensure_comment_modifier(issue: dict, comment: dict, current_user: dict):
+        """Allow admins or the original comment author to modify a comment."""
+
+        if current_user["role"] == Role.ADMIN.value:
+            return
+
+        if not ProjectRepository.is_member(
+            str(issue["project_id"]),
+            str(current_user["_id"]),
+        ):
+            raise ForbiddenException()
+
+        if str(comment["user_id"]) != str(current_user["_id"]):
+            raise ForbiddenException()
 
     @staticmethod
     def create_issue(
@@ -107,7 +165,10 @@ class IssueService:
         )
 
         if existing_issue:
-            raise IssueAlreadyExistsException()
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=ISSUE_ALREADY_EXISTS,
+            )
 
         # Build the issue document.
         issue = IssueModel.build(
@@ -215,7 +276,10 @@ class IssueService:
         issue = IssueRepository.find_by_id(issue_id)
 
         if not issue:
-            raise IssueNotFoundException()
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=ISSUE_NOT_FOUND,
+            )
 
         if (
             current_user["role"] == Role.MEMBER.value
@@ -276,21 +340,37 @@ class IssueService:
 
         updated_issue = IssueRepository.find_by_id(issue_id)
 
-        return IssueResponse(
-            id=str(updated_issue["_id"]),
-            project_id=str(updated_issue["project_id"]),
-            sprint_id=str(updated_issue["sprint_id"]),
-            title=updated_issue["title"],
-            description=updated_issue["description"],
-            priority=updated_issue["priority"],
-            type=updated_issue.get("type", "TASK"),
-            status=updated_issue["status"],
-            assignee=updated_issue["assignee"],
-            reporter=updated_issue["reporter"],
-            comments=IssueService._serialize_comments(updated_issue.get("comments", [])),
-            created_at=updated_issue["created_at"],
-            updated_at=updated_issue["updated_at"],
+        return IssueService._build_issue_response(updated_issue)
+
+    @staticmethod
+    def update_comment(
+        issue_id: str,
+        comment_id: str,
+        request: UpdateIssueCommentRequest,
+        current_user,
+    ):
+        """Update a comment on an issue."""
+
+        issue = IssueRepository.find_by_id(issue_id)
+
+        if not issue:
+            raise IssueNotFoundException()
+
+        comment = IssueService._get_comment(issue, comment_id)
+        IssueService._ensure_comment_modifier(issue, comment, current_user)
+
+        IssueRepository.update_comment(
+            issue_id,
+            comment_id,
+            {
+                "text": request.text,
+                "updated_at": datetime.utcnow(),
+            },
         )
+
+        updated_issue = IssueRepository.find_by_id(issue_id)
+
+        return IssueService._build_issue_response(updated_issue)
 
     @staticmethod
     def delete_comment(
@@ -305,34 +385,14 @@ class IssueService:
         if not issue:
             raise IssueNotFoundException()
 
-        if (
-            current_user["role"] != Role.ADMIN.value
-            and not ProjectRepository.is_member(
-                str(issue["project_id"]),
-                str(current_user["_id"]),
-            )
-        ):
-            raise ForbiddenException()
+        comment = IssueService._get_comment(issue, comment_id)
+        IssueService._ensure_comment_modifier(issue, comment, current_user)
 
         IssueRepository.delete_comment(issue_id, comment_id)
 
         updated_issue = IssueRepository.find_by_id(issue_id)
 
-        return IssueResponse(
-            id=str(updated_issue["_id"]),
-            project_id=str(updated_issue["project_id"]),
-            sprint_id=str(updated_issue["sprint_id"]),
-            title=updated_issue["title"],
-            description=updated_issue["description"],
-            priority=updated_issue["priority"],
-            type=updated_issue.get("type", "TASK"),
-            status=updated_issue["status"],
-            assignee=updated_issue["assignee"],
-            reporter=updated_issue["reporter"],
-            comments=IssueService._serialize_comments(updated_issue.get("comments", [])),
-            created_at=updated_issue["created_at"],
-            updated_at=updated_issue["updated_at"],
-        )
+        return IssueService._build_issue_response(updated_issue)
 
     @staticmethod
     def update_issue(
@@ -345,7 +405,10 @@ class IssueService:
         issue = IssueRepository.find_by_id(issue_id)
 
         if not issue:
-            raise IssueNotFoundException()
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=ISSUE_NOT_FOUND,
+            )
 
         sprint = SprintRepository.find_by_id(
             request.sprint_id,
@@ -395,14 +458,20 @@ class IssueService:
             existing_issue
             and existing_issue["_id"] != issue["_id"]
         ):
-            raise IssueAlreadyExistsException()
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=ISSUE_ALREADY_EXISTS,
+            )
 
         if (
             current_user["role"] == Role.MEMBER.value
             and issue["status"] == "DONE"
             and request.status != "DONE"
         ):
-            raise InvalidIssueStatusTransitionException()
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=INVALID_ISSUE_STATUS_TRANSITION,
+            )
 
         updated_data = {
             "sprint_id": sprint["_id"],
@@ -448,7 +517,10 @@ class IssueService:
         issue = IssueRepository.find_by_id(issue_id)
 
         if not issue:
-            raise IssueNotFoundException()
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=ISSUE_NOT_FOUND,
+            )
 
         if (
             current_user["role"] != Role.ADMIN.value

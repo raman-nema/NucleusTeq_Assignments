@@ -7,6 +7,7 @@ from pydantic import (
 )
 from app.common.enums import Role
 from app.core.security import decode_password
+from app.exceptions.custom_exceptions import BadRequestException
 
 
 class RegisterRequest(BaseModel):
@@ -30,7 +31,7 @@ class RegisterRequest(BaseModel):
     @classmethod
     def validate_company_email(cls, value: EmailStr):
         if not str(value).endswith("@company.com"):
-            raise ValueError("Only company email addresses are allowed.")
+            raise BadRequestException("Only company email addresses are allowed.")
 
         return value
 
@@ -43,13 +44,13 @@ class RegisterRequest(BaseModel):
     @classmethod
     def validate_password(cls, value: str):
 
-        # Require uppercase, lowercase, number, special character, and 8–20 characters.
+        # Require uppercase, lowercase, number, special character, and 8-20 characters.
         password_pattern = (
             r"^(?=.*[a-z])" r"(?=.*[A-Z])" r"(?=.*\d)" r"(?=.*[@$!%*?&]).{8,20}$"
         )
 
         if not re.match(password_pattern, value):
-            raise ValueError(
+            raise BadRequestException(
                 "Password must be 8-20 characters long and contain an uppercase letter, "
                 "lowercase letter, number and special character."
             )
@@ -74,6 +75,6 @@ class LoginRequest(BaseModel):
     @classmethod
     def validate_company_email(cls, value: EmailStr):
         if not str(value).endswith("@company.com"):
-            raise ValueError("Only company email addresses are allowed.")
+            raise BadRequestException("Only company email addresses are allowed.")
 
         return value

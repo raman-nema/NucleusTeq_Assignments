@@ -1,126 +1,66 @@
-from datetime import datetime
-
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Query
+
+from app.common.api_response import ApiResponse
 from app.dependencies.authorization import require_admin
-from app.exceptions.custom_exceptions import (
-    UserAlreadyExistsException,
-    UserNotFoundException,
-)
-from app.repositories.issue_repository import IssueRepository
-from app.repositories.project_repository import ProjectRepository
-from app.repositories.sprint_repository import SprintRepository
-from app.repositories.user_repository import UserRepository
 from app.schemas.requests.admin_request import UpdateUserRequest
+from app.services.admin_service import AdminService
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
 
-@router.get("/dashboard")
+@router.get("/dashboard", response_model=ApiResponse)
 def admin_dashboard(
     search: str | None = Query(None),
     current_user=Depends(require_admin),
 ):
-    users = []
+    """Retrieve admin dashboard totals and users."""
 
-    for user in UserRepository.find_all(search):
-        users.append(
-            {
-                "id": str(user["_id"]),
-                "name": user["name"],
-                "email": user["email"],
-                "role": user["role"],
-                "created_at": user.get("created_at"),
-                "updated_at": user.get("updated_at"),
-            }
-        )
+    response = AdminService.get_dashboard(search)
 
-    return {
-        "success": True,
-        "message": "Admin dashboard retrieved successfully",
-        "data": {
-            "totals": {
-                "projects": ProjectRepository.count_all(),
-                "sprints": SprintRepository.count_all(),
-                "issues": IssueRepository.count_all(),
-                "users": UserRepository.count_all(),
-            },
-            "users": users,
-        },
-    }
+    return ApiResponse(
+        success=True,
+        message="Admin dashboard retrieved successfully",
+        data=response.model_dump(),
+    )
 
 
-@router.get("/users")
+@router.get("/users", response_model=ApiResponse)
 def get_users(
     search: str | None = Query(None),
     role: str | None = Query(None),
     current_user=Depends(require_admin),
 ):
-    users = []
+    """Retrieve users for the admin dashboard."""
 
-    for user in UserRepository.find_all(
+    response = AdminService.get_users(
         search=search,
         role=role,
-    ):
-        users.append(
-            {
-                "id": str(user["_id"]),
-                "name": user["name"],
-                "email": user["email"],
-                "role": user["role"],
-                "created_at": user.get("created_at"),
-                "updated_at": user.get("updated_at"),
-            }
-        )
+    )
 
-    return {
-        "success": True,
-        "message": "Users retrieved successfully",
-        "data": {
-            "users": users,
-        },
-    }
+    return ApiResponse(
+        success=True,
+        message="Users retrieved successfully",
+        data=response.model_dump(),
+    )
 
 
-@router.put("/users/{user_id}")
+@router.put("/users/{user_id}", response_model=ApiResponse)
 def update_user(
     user_id: str,
     request: UpdateUserRequest,
     current_user=Depends(require_admin),
 ):
-    user = UserRepository.find_by_id(user_id)
+    """Update a user from the admin dashboard."""
 
-    if not user:
-        raise UserNotFoundException()
-
-    existing_user = UserRepository.find_by_email(request.email)
-
-    if existing_user and str(existing_user["_id"]) != user_id:
-        raise UserAlreadyExistsException()
-
-    updated_data = {
-        "name": request.name,
-        "email": str(request.email),
-        "updated_at": datetime.utcnow(),
-    }
-
-    UserRepository.update_user(
+    response = AdminService.update_user(
         user_id,
-        updated_data,
+        request,
     )
 
-    user.update(updated_data)
-
-    return {
-        "success": True,
-        "message": "User updated successfully",
-        "data": {
-            "id": str(user["_id"]),
-            "name": user["name"],
-            "email": user["email"],
-            "role": user["role"],
-            "created_at": user.get("created_at"),
-            "updated_at": user.get("updated_at"),
-        },
-    }
+    return ApiResponse(
+        success=True,
+        message="User updated successfully",
+        data=response.model_dump(),
+    )

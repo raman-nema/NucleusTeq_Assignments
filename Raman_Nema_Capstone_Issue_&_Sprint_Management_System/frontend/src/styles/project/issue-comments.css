@@ -41,6 +41,12 @@
   letter-spacing: 0.04em;
 }
 
+.issue-comment-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .issue-comment-text {
   margin: 0;
   color: #334155;
@@ -49,15 +55,27 @@
   word-break: break-word;
 }
 
+.issue-comment-edit,
 .issue-comment-delete {
   border: 1px solid transparent;
   background: #fff;
-  color: #b91c1c;
   font-size: 0.78rem;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 8px;
   transition: background 0.2s, color 0.2s;
+}
+
+.issue-comment-edit {
+  color: #166534;
+}
+
+.issue-comment-delete {
+  color: #b91c1c;
+}
+
+.issue-comment-edit:hover:not(:disabled) {
+  background: #f0fdf4;
 }
 
 .issue-comment-delete:hover:not(:disabled) {
@@ -85,6 +103,7 @@
 .issue-comment-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 8px;
 }
 
 .issue-comment-submit {
@@ -95,6 +114,16 @@
   cursor: pointer;
   background: #15803d;
   color: #fff;
+}
+
+.issue-comment-cancel {
+  padding: 7px 12px;
+  border: 1px solid #dbe2ea;
+  border-radius: 7px;
+  background: #fff;
+  color: #475569;
+  font-size: 0.82rem;
+  cursor: pointer;
 }
 
 .empty-comments {

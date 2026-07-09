@@ -9,6 +9,7 @@ import {
   deleteIssueComment,
   getProjectIssues,
   updateIssue,
+  updateIssueComment,
 } from "../services/issue-service";
 import IssueForm from "../components/issue/IssueForm";
 import IssueCard from "../components/issue/IssueCard";
@@ -288,8 +289,38 @@ function IssuePage() {
     }
   }
 
+  async function handleUpdateComment(issueId, commentId, text) {
+    setError("");
+
+    try {
+      const response = await updateIssueComment(issueId, commentId, { text });
+      const updatedIssue = response.data;
+
+      setIssues((currentIssues) =>
+        currentIssues.map((issue) =>
+          issue.id === issueId
+            ? {
+                ...issue,
+                ...updatedIssue,
+                comments: updatedIssue.comments || [],
+              }
+            : issue,
+        ),
+      );
+
+      showNotification(response.message);
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Unable to update comment.";
+      setError(message);
+      showNotification(message, "error");
+      throw error;
+    }
+  }
+
   async function confirmDeleteIssue() {
     if (!issueToDelete) return;
+
     setError("");
 
     try {
@@ -502,6 +533,7 @@ function IssuePage() {
               }}
               onDelete={setIssueToDelete}
               onAddComment={handleAddComment}
+              onUpdateComment={handleUpdateComment}
               onDeleteComment={(issueId, commentId) => {
                 setCommentToDelete({ issueId, commentId });
               }}
