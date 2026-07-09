@@ -1,6 +1,13 @@
 from datetime import datetime
-from bson import ObjectId
-from app.common.enums import Role
+
+
+from app.common.pagination import build_pagination_meta
+from app.constants.message_constants import (
+    PROJECT_ALREADY_EXISTS_MESSAGE,
+    PROJECT_DELETED_MESSAGE,
+    PROJECT_NOT_FOUND_MESSAGE,
+)
+>>>>>>> python/dev
 from app.models.project_model import ProjectModel
 from app.repositories.project_repository import ProjectRepository
 from app.repositories.user_repository import UserRepository
@@ -15,12 +22,17 @@ from app.schemas.responses.project_response import (
     ProjectMemberSummary,
 )
 from app.exceptions.custom_exceptions import (
+<<<<<<< HEAD
     ForbiddenException,
     ProjectAlreadyExistsException,
     ProjectNotFoundException,
     UserNotFoundException,
     MemberAlreadyAssignedException,
     MemberNotAssignedException,
+=======
+    ConflictException,
+    NotFoundException,
+>>>>>>> python/dev
 )
 
 class ProjectService:
@@ -61,7 +73,7 @@ class ProjectService:
         existing_project = ProjectRepository.find_by_name(request.name)
 
         if existing_project:
-            raise ProjectAlreadyExistsException()
+            raise ConflictException(PROJECT_ALREADY_EXISTS_MESSAGE)
 
         # Build the project document.
         project = ProjectModel.build(
@@ -84,6 +96,7 @@ class ProjectService:
         )
     
     @staticmethod
+<<<<<<< HEAD
     def get_all_projects(current_user):
         """Retrieve projects based on user role."""
 
@@ -93,6 +106,15 @@ class ProjectService:
             projects = ProjectRepository.find_by_member(
                 str(current_user["_id"])
             )
+=======
+    def get_all_projects(pagination):
+
+        total_projects = ProjectRepository.count_all()
+        projects = ProjectRepository.find_all(
+            skip=pagination.skip,
+            limit=pagination.limit,
+        )
+>>>>>>> python/dev
 
         project_list = []
 
@@ -114,7 +136,13 @@ class ProjectService:
 
         return ProjectListResponse(
             projects=project_list,
+<<<<<<< HEAD
         )
+=======
+            pagination=build_pagination_meta(total_projects, pagination),
+        )
+
+>>>>>>> python/dev
     @staticmethod
     def get_project_by_id(
         project_id: str,
@@ -125,7 +153,7 @@ class ProjectService:
         project = ProjectRepository.find_by_id(project_id)
 
         if not project:
-            raise ProjectNotFoundException()
+            raise NotFoundException(PROJECT_NOT_FOUND_MESSAGE)
 
         if (
             current_user["role"] == Role.MEMBER.value
@@ -158,7 +186,7 @@ class ProjectService:
         project = ProjectRepository.find_by_id(project_id)
 
         if not project:
-            raise ProjectNotFoundException()
+            raise NotFoundException(PROJECT_NOT_FOUND_MESSAGE)
 
         if (
             current_user["role"] != Role.ADMIN.value
@@ -200,11 +228,12 @@ class ProjectService:
         project = ProjectRepository.find_by_id(project_id)
 
         if not project:
-            raise ProjectNotFoundException()
+            raise NotFoundException(PROJECT_NOT_FOUND_MESSAGE)
 
         ProjectRepository.delete_project(project_id)
 
-        return DeleteProjectResponse(message="Project deleted successfully")
+
+        return DeleteProjectResponse(message=PROJECT_DELETED_MESSAGE)
 
     @staticmethod
     def assign_member(
