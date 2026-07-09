@@ -1,0 +1,108 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import InputField from "../components/common/InputField";
+import Button from "../components/common/Button";
+
+import { registerUser } from "../services/auth-service";
+
+import "../styles/RegisterPage.css";
+
+function RegisterPage() {
+  const navigate = useNavigate();
+
+  // Keep all registration form fields in one state object.
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "MEMBER",
+  });
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    // Update the field that changed while preserving the other form values.
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      // Send the completed form data to the backend registration endpoint.
+      const response = await registerUser(formData);
+      alert(response.message);
+      // Reset the form after successful registration.
+      setFormData({ name: "", email: "", password: "", role: "MEMBER" });
+    } catch (error) {
+      // Show the backend error message when available.
+      const message = error.response?.data?.message || "Registration Failed";
+      alert(message);
+      console.error(error);
+    }
+  };
+
+  return (
+    <div className="register-page">
+      <div className="register-card">
+        <h1 className="app-title">SprintFlow</h1>
+        <p className="page-subtitle">Create your account to get started</p>
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <InputField
+              label="Name"
+              name="name"
+              type="text"
+              value={formData.name}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <InputField
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <InputField
+              label="Password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Role</label>
+            <div className="select-wrapper">
+              <select name="role" value={formData.role} onChange={handleChange}>
+                <option value="MEMBER">Select a role</option>
+                <option value="MEMBER">Member</option>
+                <option value="VIEWER">Viewer</option>
+              </select>
+            </div>
+          </div>
+
+          <Button text="Register" type="submit" />
+        </form>
+
+        <p className="auth-switch">
+          Already have an account?{" "}
+          <span className="auth-link" onClick={() => navigate("/login")}>
+            {/* Navigate existing users to the login page. */}
+            Login
+          </span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default RegisterPage;
