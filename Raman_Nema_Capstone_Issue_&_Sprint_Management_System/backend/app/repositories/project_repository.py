@@ -1,6 +1,7 @@
 from bson import ObjectId
 from app.core.database import database
 
+
 class ProjectRepository:
     """Handles project database operations."""
 
@@ -23,10 +24,16 @@ class ProjectRepository:
         return database.projects.find_one({"name": name})
 
     @staticmethod
-    def find_all():
-        """Retrieve all projects."""
+    def find_all(skip: int = 0, limit: int = 10):
+        """Retrieve a paginated list of projects."""
 
-        return database.projects.find().sort("created_at", -1)
+        return database.projects.find().sort("created_at", -1).skip(skip).limit(limit)
+
+    @staticmethod
+    def count_all():
+        """Count all project documents."""
+
+        return database.projects.count_documents({})
 
     @staticmethod
     def update_project(

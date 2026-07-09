@@ -1,6 +1,13 @@
 from fastapi import APIRouter
 from fastapi import Depends
 from app.common.api_response import ApiResponse
+from app.common.pagination import PaginationParams, get_pagination_params
+from app.constants.message_constants import (
+    PROJECT_CREATED_MESSAGE,
+    PROJECT_LIST_MESSAGE,
+    PROJECT_RETRIEVED_MESSAGE,
+    PROJECT_UPDATED_MESSAGE,
+)
 from app.services.project_service import ProjectService
 from app.schemas.requests.project_request import (
     CreateProjectRequest,
@@ -32,22 +39,23 @@ def create_project(
 
     return ApiResponse(
         success=True,
-        message="Project created successfully",
+        message=PROJECT_CREATED_MESSAGE,
         data=response.model_dump(),
     )
 
 
 @router.get("", response_model=ApiResponse)
 def get_all_projects(
+    pagination: PaginationParams = Depends(get_pagination_params),
     current_user=Depends(get_current_user),
 ):
     """Retrieve all projects."""
 
-    response = ProjectService.get_all_projects()
+    response = ProjectService.get_all_projects(pagination)
 
     return ApiResponse(
         success=True,
-        message="Projects retrieved successfully",
+        message=PROJECT_LIST_MESSAGE,
         data=response.model_dump(),
     )
 
@@ -65,7 +73,7 @@ def get_project_by_id(
 
     return ApiResponse(
         success=True,
-        message="Project retrieved successfully",
+        message=PROJECT_RETRIEVED_MESSAGE,
         data=response.model_dump(),
     )
 
@@ -85,7 +93,7 @@ def update_project(
 
     return ApiResponse(
         success=True,
-        message="Project updated successfully",
+        message=PROJECT_UPDATED_MESSAGE,
         data=response.model_dump(),
     )
 

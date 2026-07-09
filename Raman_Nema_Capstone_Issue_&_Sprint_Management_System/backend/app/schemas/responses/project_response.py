@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel
+from app.common.pagination import PaginationMeta
 
 
 class ProjectResponse(BaseModel):
@@ -18,6 +19,8 @@ class ProjectListResponse(BaseModel):
     """Project list response schema."""
 
     projects: list[ProjectResponse]
+    pagination: PaginationMeta
+
 
 class DeleteProjectResponse(BaseModel):
     """Project deletion response schema."""
