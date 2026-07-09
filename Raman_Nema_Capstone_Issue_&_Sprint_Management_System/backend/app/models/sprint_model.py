@@ -3,8 +3,6 @@ from bson import ObjectId
 
 
 class SprintModel:
-    """Sprint document model."""
-
     @staticmethod
     def build(
         project_id: str,
@@ -15,29 +13,22 @@ class SprintModel:
         status: str,
         created_by: str,
     ):
-        """Create a sprint document."""
-
-        # Capture current UTC timestamp.
         current_time = datetime.utcnow()
 
         return {
-            # Convert project ID to MongoDB ObjectId.
             "project_id": ObjectId(project_id),
             "name": name,
             "goal": goal,
-            # Store start date at the beginning of the day.
             "start_date": datetime.combine(
                 start_date,
                 time.min,
             ),
-            # Store end date at the beginning of the day.
             "end_date": datetime.combine(
                 end_date,
                 time.min,
             ),
             "status": status,
             "created_by": created_by,
-            # Audit fields.
             "created_at": current_time,
             "updated_at": current_time,
         }

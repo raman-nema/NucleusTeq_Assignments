@@ -39,3 +39,27 @@ export async function deleteIssue(issueId) {
 
   return response.data;
 }
+
+// Add a comment to an issue.
+export async function addIssueComment(issueId, commentData) {
+  const response = await apiClient.post(`/issues/${issueId}/comments`, commentData);
+
+  return response.data;
+}
+
+// Update a comment on an issue.
+export async function updateIssueComment(issueId, commentId, commentData) {
+  const response = await apiClient.put(
+    `/issues/${issueId}/comments/${commentId}`,
+    commentData,
+  );
+
+  return response.data;
+}
+
+// Delete a comment from an issue.
+export async function deleteIssueComment(issueId, commentId) {
+  const response = await apiClient.delete(`/issues/${issueId}/comments/${commentId}`);
+
+  return response.data;
+}

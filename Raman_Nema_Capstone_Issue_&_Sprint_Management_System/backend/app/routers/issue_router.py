@@ -11,7 +11,9 @@ from app.dependencies.authorization import (
     require_admin_or_member,
 )
 from app.schemas.requests.issue_request import (
+    CreateIssueCommentRequest,
     CreateIssueRequest,
+    UpdateIssueCommentRequest,
     UpdateIssueRequest,
 )
 from app.services.issue_service import IssueService
@@ -83,6 +85,70 @@ def get_issue_by_id(
     return ApiResponse(
         success=True,
         message="Issue retrieved successfully",
+        data=response.model_dump(),
+    )
+
+@router.post("/issues/{issue_id}/comments", response_model=ApiResponse)
+def add_comment_to_issue(
+    issue_id: str,
+    request: CreateIssueCommentRequest,
+    current_user=Depends(require_admin_or_member),
+):
+    """Add a comment to an existing issue."""
+
+    response = IssueService.add_comment(
+        issue_id,
+        request,
+        current_user,
+    )
+
+    return ApiResponse(
+        success=True,
+        message="Comment added successfully",
+        data=response.model_dump(),
+    )
+
+
+@router.put("/issues/{issue_id}/comments/{comment_id}", response_model=ApiResponse)
+def update_comment_on_issue(
+    issue_id: str,
+    comment_id: str,
+    request: UpdateIssueCommentRequest,
+    current_user=Depends(require_admin_or_member),
+):
+    """Update a comment on an issue."""
+
+    response = IssueService.update_comment(
+        issue_id,
+        comment_id,
+        request,
+        current_user,
+    )
+
+    return ApiResponse(
+        success=True,
+        message="Comment updated successfully",
+        data=response.model_dump(),
+    )
+
+
+@router.delete("/issues/{issue_id}/comments/{comment_id}", response_model=ApiResponse)
+def delete_comment_from_issue(
+    issue_id: str,
+    comment_id: str,
+    current_user=Depends(require_admin_or_member),
+):
+    """Delete a comment from an issue."""
+
+    response = IssueService.delete_comment(
+        issue_id,
+        comment_id,
+        current_user,
+    )
+
+    return ApiResponse(
+        success=True,
+        message="Comment deleted successfully",
         data=response.model_dump(),
     )
 

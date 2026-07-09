@@ -22,6 +22,7 @@ class ProjectResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+
 class ProjectListResponse(BaseModel):
     """Project list response schema."""
 

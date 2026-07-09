@@ -6,9 +6,11 @@ class ConflictException(Exception):
         super().__init__(message)
 
 
-class InvalidCredentialsException(Exception):
-    """Raised when login credentials are invalid."""
+class UserAlreadyExistsException(Exception):
+    pass
 
+
+class InvalidCredentialsException(Exception):
     pass
 
 
@@ -29,67 +31,54 @@ class NotFoundException(Exception):
 
 
 class UnauthorizedException(Exception):
-    """Raised when authentication fails."""
-
     pass
 
 
 class ExpiredTokenException(Exception):
-    """Raised when authentication token has expired."""
-
     pass
 
 
 class ForbiddenException(Exception):
-    """Raised when user lacks permission."""
-
     pass
 
 
-class ProjectAlreadyExistsException(ConflictException):
-    """Raised when a project already exists."""
-
-    def __init__(self, message: str = "Project already exists"):
-        super().__init__(message)
+class ProjectAlreadyExistsException(Exception):
+    pass
 
 
-class SprintAlreadyExistsException(ConflictException):
-    """Raised when a sprint already exists."""
-
-    def __init__(self, message: str = "Sprint already exists"):
-        super().__init__(message)
+class ProjectNotFoundException(Exception):
+    pass
 
 
-class ProjectNotFoundException(NotFoundException):
-    """Raised when a project does not exist."""
-
-    def __init__(self, message: str = "Project not found"):
-        super().__init__(message)
+class SprintAlreadyExistsException(Exception):
+    def __init__(self):
+        super().__init__("Sprint with this name already exists.")
 
 
-class SprintNotFoundException(NotFoundException):
-    """Raised when a sprint does not exist."""
-
-    def __init__(self, message: str = "Sprint not found"):
-        super().__init__(message)
+class SprintNotFoundException(Exception):
+    def __init__(self):
+        super().__init__("Sprint not found.")
 
 
-class UserNotFoundException(NotFoundException):
-    """Raised when a user does not exist."""
-
-    def __init__(self, message: str = "User not found"):
-        super().__init__(message)
+class UserNotFoundException(Exception):
+    pass
 
 
-class MemberAlreadyAssignedException(ConflictException):
-    """Raised when assigning an existing project member."""
-
-    def __init__(self, message: str = "Member already assigned"):
-        super().__init__(message)
+class MemberAlreadyAssignedException(Exception):
+    pass
 
 
-class MemberNotAssignedException(NotFoundException):
-    """Raised when removing a user who is not assigned."""
+class MemberNotAssignedException(Exception):
+    pass
 
-    def __init__(self, message: str = "Member not assigned"):
-        super().__init__(message)
+
+class IssueAlreadyExistsException(Exception):
+    pass
+
+
+class IssueNotFoundException(Exception):
+    pass
+
+
+class InvalidIssueStatusTransitionException(Exception):
+    pass

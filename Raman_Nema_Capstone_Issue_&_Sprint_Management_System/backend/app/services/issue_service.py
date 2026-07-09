@@ -1,4 +1,6 @@
 from datetime import datetime
+
+from bson import ObjectId
 from fastapi import HTTPException
 from fastapi import status
 
@@ -18,16 +20,20 @@ from app.repositories.sprint_repository import SprintRepository
 from app.repositories.issue_repository import IssueRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.requests.issue_request import (
+    CreateIssueCommentRequest,
     CreateIssueRequest,
+    UpdateIssueCommentRequest,
     UpdateIssueRequest,
 )
 from app.schemas.responses.issue_response import (
+    IssueCommentResponse,
     IssueResponse,
     IssueListResponse,
     DeleteIssueResponse,
 )
 from app.exceptions.custom_exceptions import (
     ForbiddenException,
+    IssueNotFoundException,
     ProjectNotFoundException,
     SprintNotFoundException,
     UserNotFoundException,
@@ -36,6 +42,70 @@ from app.exceptions.custom_exceptions import (
 
 class IssueService:
     """Handles issue-related business logic."""
+
+    @staticmethod
+    def _serialize_comments(comments: list | None):
+        """Convert stored comment documents into response objects."""
+
+        return [
+            IssueCommentResponse(
+                id=str(comment.get("_id")) if comment.get("_id") else None,
+                user_id=str(comment["user_id"]),
+                user_name=comment.get("user_name", "Unknown"),
+                text=comment["text"],
+                created_at=comment["created_at"],
+            )
+            for comment in comments or []
+        ]
+
+    @staticmethod
+    def _build_issue_response(issue: dict):
+        """Build an issue response from a Mongo document."""
+
+        return IssueResponse(
+            id=str(issue["_id"]),
+            project_id=str(issue["project_id"]),
+            sprint_id=str(issue["sprint_id"]),
+            title=issue["title"],
+            description=issue["description"],
+            priority=issue["priority"],
+            type=issue.get("type", "TASK"),
+            status=issue["status"],
+            assignee=issue["assignee"],
+            reporter=issue["reporter"],
+            comments=IssueService._serialize_comments(issue.get("comments", [])),
+            created_at=issue["created_at"],
+            updated_at=issue["updated_at"],
+        )
+
+    @staticmethod
+    def _get_comment(issue: dict, comment_id: str):
+        """Find a comment embedded in an issue."""
+
+        for comment in issue.get("comments", []):
+            if str(comment.get("_id")) == comment_id:
+                return comment
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Comment not found",
+        )
+
+    @staticmethod
+    def _ensure_comment_modifier(issue: dict, comment: dict, current_user: dict):
+        """Allow admins or the original comment author to modify a comment."""
+
+        if current_user["role"] == Role.ADMIN.value:
+            return
+
+        if not ProjectRepository.is_member(
+            str(issue["project_id"]),
+            str(current_user["_id"]),
+        ):
+            raise ForbiddenException()
+
+        if str(comment["user_id"]) != str(current_user["_id"]):
+            raise ForbiddenException()
 
     @staticmethod
     def create_issue(
@@ -127,6 +197,7 @@ class IssueService:
             status=issue["status"],
             assignee=issue["assignee"],
             reporter=issue["reporter"],
+            comments=IssueService._serialize_comments(issue.get("comments", [])),
             created_at=issue["created_at"],
             updated_at=issue["updated_at"],
         )
@@ -181,6 +252,7 @@ class IssueService:
                     status=issue["status"],
                     assignee=issue["assignee"],
                     reporter=issue["reporter"],
+                    comments=IssueService._serialize_comments(issue.get("comments", [])),
                     created_at=issue["created_at"],
                     updated_at=issue["updated_at"],
                 )
@@ -229,9 +301,98 @@ class IssueService:
             status=issue["status"],
             assignee=issue["assignee"],
             reporter=issue["reporter"],
+            comments=IssueService._serialize_comments(issue.get("comments", [])),
             created_at=issue["created_at"],
             updated_at=issue["updated_at"],
         )
+
+    @staticmethod
+    def add_comment(
+        issue_id: str,
+        request: CreateIssueCommentRequest,
+        current_user,
+    ):
+        """Add a comment to an issue."""
+
+        issue = IssueRepository.find_by_id(issue_id)
+
+        if not issue:
+            raise IssueNotFoundException()
+
+        if (
+            current_user["role"] != Role.ADMIN.value
+            and not ProjectRepository.is_member(
+                str(issue["project_id"]),
+                str(current_user["_id"]),
+            )
+        ):
+            raise ForbiddenException()
+
+        comment = {
+            "_id": ObjectId(),
+            "user_id": str(current_user["_id"]),
+            "user_name": current_user.get("name", "Unknown"),
+            "text": request.text,
+            "created_at": datetime.utcnow(),
+        }
+
+        IssueRepository.add_comment(issue_id, comment)
+
+        updated_issue = IssueRepository.find_by_id(issue_id)
+
+        return IssueService._build_issue_response(updated_issue)
+
+    @staticmethod
+    def update_comment(
+        issue_id: str,
+        comment_id: str,
+        request: UpdateIssueCommentRequest,
+        current_user,
+    ):
+        """Update a comment on an issue."""
+
+        issue = IssueRepository.find_by_id(issue_id)
+
+        if not issue:
+            raise IssueNotFoundException()
+
+        comment = IssueService._get_comment(issue, comment_id)
+        IssueService._ensure_comment_modifier(issue, comment, current_user)
+
+        IssueRepository.update_comment(
+            issue_id,
+            comment_id,
+            {
+                "text": request.text,
+                "updated_at": datetime.utcnow(),
+            },
+        )
+
+        updated_issue = IssueRepository.find_by_id(issue_id)
+
+        return IssueService._build_issue_response(updated_issue)
+
+    @staticmethod
+    def delete_comment(
+        issue_id: str,
+        comment_id: str,
+        current_user,
+    ):
+        """Delete a comment from an issue."""
+
+        issue = IssueRepository.find_by_id(issue_id)
+
+        if not issue:
+            raise IssueNotFoundException()
+
+        comment = IssueService._get_comment(issue, comment_id)
+        IssueService._ensure_comment_modifier(issue, comment, current_user)
+
+        IssueRepository.delete_comment(issue_id, comment_id)
+
+        updated_issue = IssueRepository.find_by_id(issue_id)
+
+        return IssueService._build_issue_response(updated_issue)
 
     @staticmethod
     def update_issue(
@@ -341,6 +502,7 @@ class IssueService:
             status=issue["status"],
             assignee=issue["assignee"],
             reporter=issue["reporter"],
+            comments=IssueService._serialize_comments(issue.get("comments", [])),
             created_at=issue["created_at"],
             updated_at=issue["updated_at"],
         )

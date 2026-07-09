@@ -1,8 +1,10 @@
 from math import ceil
-
 from fastapi import Query
 from pydantic import BaseModel
 
+DEFAULT_PAGE = 1
+DEFAULT_LIMIT = 10
+MAX_LIMIT = 100
 
 class PaginationParams(BaseModel):
     """Validated pagination query parameters."""
@@ -50,4 +52,3 @@ def apply_pagination(query, params: PaginationParams):
     """Apply pagination to a Mongo cursor."""
 
     return query.skip(params.skip).limit(params.limit)
-

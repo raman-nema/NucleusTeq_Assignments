@@ -3,10 +3,13 @@ import { useSearchParams } from "react-router-dom";
 import { getProjects } from "../services/project-service";
 import { getProjectSprints } from "../services/sprint-service";
 import {
+  addIssueComment,
   createIssue,
   deleteIssue,
+  deleteIssueComment,
   getProjectIssues,
   updateIssue,
+  updateIssueComment,
 } from "../services/issue-service";
 import IssueForm from "../components/issue/IssueForm";
 import IssueCard from "../components/issue/IssueCard";
@@ -218,6 +221,92 @@ function IssuePage() {
       showNotification(message, "error");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleAddComment(issueId, text) {
+    setError("");
+
+    try {
+      const response = await addIssueComment(issueId, { text });
+      const updatedIssue = response.data;
+
+      setIssues((currentIssues) =>
+        currentIssues.map((issue) =>
+          issue.id === issueId
+            ? {
+                ...issue,
+                ...updatedIssue,
+                comments: updatedIssue.comments || [],
+              }
+            : issue,
+        ),
+      );
+
+      showNotification(response.message);
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Unable to add comment.";
+      setError(message);
+      showNotification(message, "error");
+      throw error;
+    }
+  }
+
+  async function handleDeleteComment(issueId, commentId) {
+    setError("");
+
+    try {
+      const response = await deleteIssueComment(issueId, commentId);
+      const updatedIssue = response.data;
+
+      setIssues((currentIssues) =>
+        currentIssues.map((issue) =>
+          issue.id === issueId
+            ? {
+                ...issue,
+                ...updatedIssue,
+                comments: updatedIssue.comments || [],
+              }
+            : issue,
+        ),
+      );
+
+      showNotification(response.message);
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Unable to delete comment.";
+      setError(message);
+      showNotification(message, "error");
+    }
+  }
+
+  async function handleUpdateComment(issueId, commentId, text) {
+    setError("");
+
+    try {
+      const response = await updateIssueComment(issueId, commentId, { text });
+      const updatedIssue = response.data;
+
+      setIssues((currentIssues) =>
+        currentIssues.map((issue) =>
+          issue.id === issueId
+            ? {
+                ...issue,
+                ...updatedIssue,
+                comments: updatedIssue.comments || [],
+              }
+            : issue,
+        ),
+      );
+
+      showNotification(response.message);
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Unable to update comment.";
+      setError(message);
+      showNotification(message, "error");
+      throw error;
     }
   }
 
@@ -438,6 +527,9 @@ function IssuePage() {
                 setShowForm(true);
               }}
               onDelete={handleDeleteIssue}
+              onAddComment={handleAddComment}
+              onUpdateComment={handleUpdateComment}
+              onDeleteComment={handleDeleteComment}
             />
           ))}
 

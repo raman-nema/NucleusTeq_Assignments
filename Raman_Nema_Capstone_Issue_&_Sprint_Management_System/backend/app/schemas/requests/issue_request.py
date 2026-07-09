@@ -46,5 +46,18 @@ class CreateIssueRequest(IssueRequest):
     """Issue creation request schema."""
 
 
+class CreateIssueCommentRequest(BaseModel):
+    """Issue comment creation request schema."""
+
+    text: str = Field(
+        min_length=1,
+        max_length=500,
+    )
+
+
+class UpdateIssueCommentRequest(CreateIssueCommentRequest):
+    """Issue comment update request schema."""
+
+
 class UpdateIssueRequest(IssueRequest):
     """Issue update request schema."""

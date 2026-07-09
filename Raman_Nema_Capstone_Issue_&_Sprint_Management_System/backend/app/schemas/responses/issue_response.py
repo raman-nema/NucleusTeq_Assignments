@@ -4,6 +4,16 @@ from pydantic import BaseModel
 from app.common.pagination import PaginationMeta
 
 
+class IssueCommentResponse(BaseModel):
+    """Issue comment response schema."""
+
+    id: str | None = None
+    user_id: str
+    user_name: str
+    text: str
+    created_at: datetime
+
+
 class IssueResponse(BaseModel):
     """Issue response schema."""
 
@@ -17,6 +27,7 @@ class IssueResponse(BaseModel):
     status: str
     assignee: str
     reporter: str
+    comments: list[IssueCommentResponse] = []
     created_at: datetime
     updated_at: datetime
 

@@ -111,7 +111,6 @@ class ProjectRepository:
             }
         )
 
-
     @staticmethod
     def is_member(
         project_id: str,

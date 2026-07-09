@@ -31,6 +31,7 @@ class IssueModel:
             "status": status,
             "assignee": assignee,
             "reporter": reporter,
+            "comments": [],
             "created_at": current_time,
             "updated_at": current_time,
         }

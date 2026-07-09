@@ -12,8 +12,18 @@ from app.exceptions.custom_exceptions import (
     ConflictException,
     ExpiredTokenException,
     ForbiddenException,
+    InvalidIssueStatusTransitionException,
+    IssueAlreadyExistsException,
+    IssueNotFoundException,
+    MemberAlreadyAssignedException,
+    MemberNotAssignedException,
     NotFoundException,
+    ProjectAlreadyExistsException,
+    ProjectNotFoundException,
+    SprintAlreadyExistsException,
+    SprintNotFoundException,
     UnauthorizedException,
+    UserNotFoundException,
     InvalidCredentialsException,
 )
 from app.exceptions.exception_handlers import (
@@ -22,9 +32,19 @@ from app.exceptions.exception_handlers import (
     expired_token_handler,
     forbidden_handler,
     http_exception_handler,
+    invalid_issue_status_transition_handler,
     invalid_credentials_handler,
+    issue_exists_handler,
+    issue_not_found_handler,
+    member_already_assigned_handler,
+    member_not_assigned_handler,
     not_found_handler,
+    project_exists_handler,
+    project_not_found_handler,
+    sprint_exists_handler,
+    sprint_not_found_handler,
     unauthorized_handler,
+    user_not_found_handler,
 )
 
 app = FastAPI(title="Issue & Sprint Management System")
@@ -49,6 +69,19 @@ app.add_exception_handler(NotFoundException, not_found_handler)
 app.add_exception_handler(UnauthorizedException, unauthorized_handler)
 app.add_exception_handler(ExpiredTokenException, expired_token_handler)
 app.add_exception_handler(ForbiddenException, forbidden_handler)
+app.add_exception_handler(ProjectAlreadyExistsException, project_exists_handler)
+app.add_exception_handler(ProjectNotFoundException, project_not_found_handler)
+app.add_exception_handler(SprintAlreadyExistsException, sprint_exists_handler)
+app.add_exception_handler(SprintNotFoundException, sprint_not_found_handler)
+app.add_exception_handler(UserNotFoundException, user_not_found_handler)
+app.add_exception_handler(MemberAlreadyAssignedException, member_already_assigned_handler)
+app.add_exception_handler(MemberNotAssignedException, member_not_assigned_handler)
+app.add_exception_handler(IssueAlreadyExistsException, issue_exists_handler)
+app.add_exception_handler(IssueNotFoundException, issue_not_found_handler)
+app.add_exception_handler(
+    InvalidIssueStatusTransitionException,
+    invalid_issue_status_transition_handler,
+)
 app.add_exception_handler(HTTPException, http_exception_handler)
 
 
