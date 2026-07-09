@@ -1,25 +1,70 @@
 from datetime import datetime
+
+
 from app.common.pagination import build_pagination_meta
 from app.constants.message_constants import (
     PROJECT_ALREADY_EXISTS_MESSAGE,
     PROJECT_DELETED_MESSAGE,
     PROJECT_NOT_FOUND_MESSAGE,
 )
+>>>>>>> python/dev
 from app.models.project_model import ProjectModel
 from app.repositories.project_repository import ProjectRepository
+from app.repositories.user_repository import UserRepository
+from app.schemas.requests.project_member_request import (
+    AssignMemberRequest,
+)
 from app.schemas.responses.project_response import (
     ProjectResponse,
     ProjectListResponse,
     DeleteProjectResponse,
+    ProjectMemberResponse,
+    ProjectMemberSummary,
 )
 from app.exceptions.custom_exceptions import (
+<<<<<<< HEAD
+    ForbiddenException,
+    ProjectAlreadyExistsException,
+    ProjectNotFoundException,
+    UserNotFoundException,
+    MemberAlreadyAssignedException,
+    MemberNotAssignedException,
+=======
     ConflictException,
     NotFoundException,
+>>>>>>> python/dev
 )
-
 
 class ProjectService:
     """Handles project-related business logic."""
+
+    @staticmethod
+    def _build_member_summaries(member_ids):
+        """Build member display details from stored user IDs."""
+
+        members = []
+
+        for member_id in member_ids:
+            user = UserRepository.find_by_id(str(member_id))
+
+            if user:
+                members.append(
+                    ProjectMemberSummary(
+                        id=str(user["_id"]),
+                        name=user["name"],
+                        role=user["role"],
+                    )
+                )
+            else:
+                members.append(
+                    ProjectMemberSummary(
+                        id=str(member_id),
+                        name="Unknown user",
+                        role="UNKNOWN",
+                    )
+                )
+
+        return members
 
     @staticmethod
     def create_project(request, current_user):
@@ -45,11 +90,23 @@ class ProjectService:
             name=project["name"],
             description=project["description"],
             created_by=project["created_by"],
+            members=ProjectService._build_member_summaries(project["members"]),
             created_at=project["created_at"],
             updated_at=project["updated_at"],
         )
-
+    
     @staticmethod
+<<<<<<< HEAD
+    def get_all_projects(current_user):
+        """Retrieve projects based on user role."""
+
+        if current_user["role"] == Role.ADMIN.value or current_user["role"] == Role.VIEWER.value:
+            projects = ProjectRepository.find_all()
+        else:
+            projects = ProjectRepository.find_by_member(
+                str(current_user["_id"])
+            )
+=======
     def get_all_projects(pagination):
 
         total_projects = ProjectRepository.count_all()
@@ -57,17 +114,21 @@ class ProjectService:
             skip=pagination.skip,
             limit=pagination.limit,
         )
+>>>>>>> python/dev
 
         project_list = []
 
         for project in projects:
 
-            project_list.append(
+           project_list.append(
                 ProjectResponse(
                     id=str(project["_id"]),
                     name=project["name"],
                     description=project["description"],
                     created_by=project["created_by"],
+                    members=ProjectService._build_member_summaries(
+                        project.get("members", [])
+                    ),
                     created_at=project["created_at"],
                     updated_at=project["updated_at"],
                 )
@@ -75,33 +136,66 @@ class ProjectService:
 
         return ProjectListResponse(
             projects=project_list,
+<<<<<<< HEAD
+        )
+=======
             pagination=build_pagination_meta(total_projects, pagination),
         )
 
+>>>>>>> python/dev
     @staticmethod
-    def get_project_by_id(project_id: str):
+    def get_project_by_id(
+        project_id: str,
+        current_user,
+    ):
+        """Retrieve a project by its ID."""
 
         project = ProjectRepository.find_by_id(project_id)
 
         if not project:
             raise NotFoundException(PROJECT_NOT_FOUND_MESSAGE)
 
+        if (
+            current_user["role"] == Role.MEMBER.value
+            and not ProjectRepository.is_member(
+                project_id,
+                str(current_user["_id"]),
+            )
+        ):
+            raise ForbiddenException()
+        
         return ProjectResponse(
             id=str(project["_id"]),
             name=project["name"],
             description=project["description"],
             created_by=project["created_by"],
+            members=ProjectService._build_member_summaries(
+                project.get("members", [])
+            ),
             created_at=project["created_at"],
             updated_at=project["updated_at"],
         )
-
+    
     @staticmethod
-    def update_project(project_id: str, request):
+    def update_project(
+        project_id: str,
+        request,
+        current_user,
+    ):
 
         project = ProjectRepository.find_by_id(project_id)
 
         if not project:
             raise NotFoundException(PROJECT_NOT_FOUND_MESSAGE)
+
+        if (
+            current_user["role"] != Role.ADMIN.value
+            and not ProjectRepository.is_member(
+                project_id,
+                str(current_user["_id"]),
+            )
+        ):
+            raise ForbiddenException()      
 
         updated_data = {
             "name": request.name,
@@ -121,9 +215,12 @@ class ProjectService:
             name=project["name"],
             description=project["description"],
             created_by=project["created_by"],
+            members=ProjectService._build_member_summaries(
+                project.get("members", [])
+            ),
             created_at=project["created_at"],
             updated_at=project["updated_at"],
-        )
+        )   
 
     @staticmethod
     def delete_project(project_id: str):
@@ -135,4 +232,72 @@ class ProjectService:
 
         ProjectRepository.delete_project(project_id)
 
+
         return DeleteProjectResponse(message=PROJECT_DELETED_MESSAGE)
+
+    @staticmethod
+    def assign_member(
+        project_id: str,
+        request: AssignMemberRequest,
+        current_user,
+    ):
+        """Assign a member to a project."""
+
+        project = ProjectRepository.find_by_id(project_id)
+
+        if not project:
+            raise ProjectNotFoundException()
+
+        user = UserRepository.find_by_id(request.user_id)
+
+        if not user:    
+            raise UserNotFoundException()
+
+        if user["role"] != "MEMBER":
+            raise ForbiddenException()
+
+        members = project.get("members", [])
+
+        if ObjectId(request.user_id) in members:
+            raise MemberAlreadyAssignedException()
+
+        ProjectRepository.add_member(
+            project_id,
+            request.user_id,
+        )
+
+        return ProjectMemberResponse(
+            message="Member assigned successfully",
+        )
+
+    @staticmethod
+    def remove_member(
+        project_id: str,
+        user_id: str,
+        current_user,
+    ):
+        """Remove a member from a project."""
+
+        project = ProjectRepository.find_by_id(project_id)
+
+        if not project:
+            raise ProjectNotFoundException()
+
+        user = UserRepository.find_by_id(user_id)
+
+        if not user:
+            raise UserNotFoundException()
+
+        members = project.get("members", [])
+
+        if ObjectId(user_id) not in members:
+            raise MemberNotAssignedException()
+
+        ProjectRepository.remove_member(
+            project_id,
+            user_id,
+        )
+
+        return ProjectMemberResponse(
+            message="Member removed successfully",
+        )

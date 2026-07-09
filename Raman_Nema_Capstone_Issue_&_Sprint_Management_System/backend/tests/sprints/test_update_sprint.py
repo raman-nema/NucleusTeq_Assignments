@@ -1,7 +1,5 @@
 import uuid
-
 from bson import ObjectId
-
 from app.common.enums import Role
 from app.repositories.user_repository import UserRepository
 
@@ -28,7 +26,6 @@ def login_user(client, email, password):
             "password": password,
         },
     )
-
     return response.json()["data"]["access_token"]
 
 
@@ -36,7 +33,6 @@ def login_user(client, email, password):
 def create_project(client, token):
 
     project_name = f"Project-{uuid.uuid4()}"
-
     response = client.post(
         "/projects",
         headers={"Authorization": f"Bearer {token}"},
@@ -45,57 +41,69 @@ def create_project(client, token):
             "description": "Project Description",
         },
     )
-
     return response.json()["data"]["id"]
 
 
-# Verify admin can update a project.
-def test_admin_can_update_project(client):
+# Create a sprint and return its ID.
+def create_sprint(client, token, project_id):
+    response = client.post(
+        f"/projects/{project_id}/sprints",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "name": f"Sprint-{uuid.uuid4()}",
+            "goal": "Complete authentication module.",
+            "start_date": "2026-07-01",
+            "end_date": "2026-07-14",
+        },
+    )
+    return response.json()["data"]["id"]
 
+
+# Verify admin can update a sprint.
+def test_admin_can_update_sprint(client):
     register_user(
         client,
         "Admin",
-        "admin4@company.com",
+        "admin@company.com",
         "Admin@123",
         Role.ADMIN.value,
     )
-
     token = login_user(
         client,
-        "admin4@company.com",
+        "admin@company.com",
         "Admin@123",
     )
-
-    project_id = create_project(
+    project_id = create_project(client, token)
+    sprint_id = create_sprint(
         client,
         token,
+        project_id,
     )
-
     response = client.put(
-        f"/projects/{project_id}",
+        f"/sprints/{sprint_id}",
         headers={
             "Authorization": f"Bearer {token}",
         },
         json={
             "name": f"Updated-{uuid.uuid4()}",
-            "description": "Updated Description",
+            "goal": "Updated sprint goal.",
+            "start_date": "2026-07-05",
+            "end_date": "2026-07-20",
         },
     )
-
     assert response.status_code == 200
+    assert response.json()["success"] is True
 
 
-# Verify assigned member can update a project.
-def test_assigned_member_can_update_project(client):
-
+# Verify assigned member can update a sprint.
+def test_assigned_member_can_update_sprint(client):
     register_user(
         client,
         "Admin",
-        "admin5@company.com",
+        "admin2@company.com",
         "Admin@123",
         Role.ADMIN.value,
     )
-
     register_user(
         client,
         "Member",
@@ -103,29 +111,29 @@ def test_assigned_member_can_update_project(client):
         "Admin@123",
         Role.MEMBER.value,
     )
-
     admin_token = login_user(
         client,
-        "admin5@company.com",
+        "admin2@company.com",
         "Admin@123",
     )
-
     member_token = login_user(
         client,
         "member@company.com",
         "Admin@123",
     )
-
     project_id = create_project(
         client,
         admin_token,
     )
-
+    sprint_id = create_sprint(
+        client,
+        admin_token,
+        project_id,
+    )
     member = UserRepository.find_by_email(
         "member@company.com",
     )
-
-    client.post(
+    response = client.post(
         f"/projects/{project_id}/members",
         headers={
             "Authorization": f"Bearer {admin_token}",
@@ -134,97 +142,19 @@ def test_assigned_member_can_update_project(client):
             "user_id": str(member["_id"]),
         },
     )
-
-    response = client.put(
-        f"/projects/{project_id}",
-        headers={
-            "Authorization": f"Bearer {member_token}",
-        },
-        json={
-            "name": f"Updated-{uuid.uuid4()}",
-            "description": "Updated Description",
-        },
-    )
-
     assert response.status_code == 200
 
-
-# Verify unassigned member cannot update a project.
-def test_unassigned_member_cannot_update_project(client):
-
-    register_user(
-        client,
-        "Admin",
-        "admin6@company.com",
-        "Admin@123",
-        Role.ADMIN.value,
-    )
-
-    register_user(
-        client,
-        "Member",
-        "member2@company.com",
-        "Admin@123",
-        Role.MEMBER.value,
-    )
-
-    admin_token = login_user(
-        client,
-        "admin6@company.com",
-        "Admin@123",
-    )
-
-    member_token = login_user(
-        client,
-        "member2@company.com",
-        "Admin@123",
-    )
-
-    project_id = create_project(
-        client,
-        admin_token,
-    )
-
     response = client.put(
-        f"/projects/{project_id}",
+        f"/sprints/{sprint_id}",
         headers={
             "Authorization": f"Bearer {member_token}",
         },
         json={
             "name": f"Updated-{uuid.uuid4()}",
-            "description": "Updated Description",
+            "goal": "Updated sprint goal.",
+            "start_date": "2026-07-05",
+            "end_date": "2026-07-20",
         },
     )
-
-    assert response.status_code == 403
-
-
-# Verify viewer cannot update a project.
-def test_viewer_cannot_update_project(client):
-
-    register_user(
-        client,
-        "Viewer",
-        "viewer@company.com",
-        "Admin@123",
-        Role.VIEWER.value,
-    )
-
-    token = login_user(
-        client,
-        "viewer@company.com",
-        "Admin@123",
-    )
-
-    response = client.put(
-        f"/projects/{ObjectId()}",
-        headers={
-            "Authorization": f"Bearer {token}",
-        },
-        json={
-            "name": "Updated",
-            "description": "Updated",
-        },
-    )
-
-    assert response.status_code == 403
+    assert response.status_code == 200
+    assert response.json()["success"] is True

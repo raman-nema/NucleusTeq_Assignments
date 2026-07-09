@@ -100,3 +100,49 @@ export function validateProject(formData) {
 
   return errors;
 }
+
+/**
+ * Validate the sprint form fields.
+ */
+export function validateSprint(formData) {
+  const errors = {};
+  const allowedStatuses = ["PLANNED", "ACTIVE", "COMPLETED"];
+
+  if (!formData.name.trim()) {
+    errors.name = "Sprint name is required.";
+  } else if (formData.name.trim().length < 3) {
+    errors.name = "Sprint name must be at least 3 characters.";
+  } else if (formData.name.trim().length > 100) {
+    errors.name = "Sprint name cannot exceed 100 characters.";
+  }
+
+  if (!formData.goal.trim()) {
+    errors.goal = "Sprint goal is required.";
+  } else if (formData.goal.trim().length < 10) {
+    errors.goal = "Sprint goal must be at least 10 characters.";
+  } else if (formData.goal.trim().length > 500) {
+    errors.goal = "Sprint goal cannot exceed 500 characters.";
+  }
+
+  if (!formData.start_date) {
+    errors.start_date = "Start date is required.";
+  }
+
+  if (!formData.end_date) {
+    errors.end_date = "End date is required.";
+  }
+
+  if (
+    formData.start_date &&
+    formData.end_date &&
+    formData.end_date < formData.start_date
+  ) {
+    errors.end_date = "End date cannot be before the start date.";
+  }
+
+  if (!allowedStatuses.includes(formData.status)) {
+    errors.status = "Please select a valid sprint status.";
+  }
+
+  return errors;
+}

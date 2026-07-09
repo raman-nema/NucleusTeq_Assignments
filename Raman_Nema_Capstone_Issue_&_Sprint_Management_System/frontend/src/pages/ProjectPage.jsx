@@ -4,6 +4,8 @@ import {
   createProject,
   updateProject,
   deleteProject,
+  assignMember,
+  removeMember,
 } from "../services/project-service";
 import ProjectForm from "../components/project/ProjectForm";
 import ProjectCard from "../components/project/ProjectCard";
@@ -12,39 +14,31 @@ import { getRole } from "../utils/storage";
 import "../styles/ProjectPage.css";
 
 function ProjectPage() {
-  // Store all projects returned by the backend.
+  // Component state
   const [projects, setProjects] = useState([]);
-
-  // Track whether data is currently being loaded.
   const [loading, setLoading] = useState(true);
-
-  // Store API error messages.
   const [error, setError] = useState("");
-
-  // Control the visibility of the project form.
   const [showForm, setShowForm] = useState(false);
-
-  // Track whether a create or update request is in progress.
   const [saving, setSaving] = useState(false);
-
-  // Store the project currently being edited.
   const [selectedProject, setSelectedProject] = useState(null);
-
-  // Store the search text.
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Get current user role
+  const role = getRole();
+  const canEditProject = role === "ADMIN" || role === "MEMBER";
+
+  // Load projects on page load
   useEffect(() => {
     loadProjects();
   }, []);
 
+  // Fetch all projects
   async function loadProjects() {
     setLoading(true);
     setError("");
 
     try {
-      // Fetch all projects.
       const response = await getProjects();
-
       setProjects(response.data.projects);
     } catch (error) {
       setError(error.response?.data?.message || "Unable to load projects.");
@@ -53,17 +47,13 @@ function ProjectPage() {
     }
   }
 
+  // Create a new project
   async function handleCreateProject(projectData) {
     setSaving(true);
 
     try {
-      // Create a project.
       await createProject(projectData);
-
-      // Refresh the project list.
       await loadProjects();
-
-      // Close the form.
       setSelectedProject(null);
       setShowForm(false);
     } catch (error) {
@@ -73,17 +63,13 @@ function ProjectPage() {
     }
   }
 
+  // Update an existing project
   async function handleUpdateProject(projectData) {
     setSaving(true);
 
     try {
-      // Update the selected project.
       await updateProject(selectedProject.id, projectData);
-
-      // Refresh the project list.
       await loadProjects();
-
-      // Exit edit mode.
       setSelectedProject(null);
       setShowForm(false);
     } catch (error) {
@@ -93,27 +79,58 @@ function ProjectPage() {
     }
   }
 
+  // Delete a project
   async function handleDeleteProject(projectId) {
     const confirmed = window.confirm(
       "Are you sure you want to delete this project?",
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
-      // Delete the project.
       await deleteProject(projectId);
-
-      // Refresh the project list.
       await loadProjects();
     } catch (error) {
       setError(error.response?.data?.message || "Unable to delete project.");
     }
   }
 
-  // Filter projects by project name.
+  // Assign a member to a project
+  async function handleAssignMember(projectId, userId) {
+    setError("");
+
+    if (!/^[a-f\d]{24}$/i.test(userId)) {
+      setError("Enter a valid member user ID.");
+      return;
+    }
+
+    try {
+      await assignMember(projectId, userId);
+      await loadProjects();
+    } catch (error) {
+      setError(error.response?.data?.message || "Unable to assign member.");
+    }
+  }
+
+  // Remove a project member
+  async function handleRemoveMember(projectId, userId) {
+    const confirmed = window.confirm(
+      "Are you sure you want to remove this member from the project?",
+    );
+
+    if (!confirmed) return;
+
+    setError("");
+
+    try {
+      await removeMember(projectId, userId);
+      await loadProjects();
+    } catch (error) {
+      setError(error.response?.data?.message || "Unable to remove member.");
+    }
+  }
+
+  // Filter projects by search text
   const filteredProjects = projects.filter((project) =>
     project.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
@@ -123,6 +140,7 @@ function ProjectPage() {
       <div className="project-container">
         <h1>Projects</h1>
 
+        {/* Search and create toolbar */}
         <div className="form-group">
           <label className="toolbar-label">Search Project</label>
 
@@ -135,9 +153,11 @@ function ProjectPage() {
               onChange={(event) => setSearchTerm(event.target.value)}
             />
 
-            {getRole() !== "VIEWER" && (
+            {/* Only ADMIN can create projects */}
+            {role === "ADMIN" && (
               <Button
                 text="Create Project"
+                className="btn-success"
                 onClick={() => {
                   setSelectedProject(null);
                   setShowForm(true);
@@ -147,8 +167,10 @@ function ProjectPage() {
           </div>
         </div>
 
-        {getRole() !== "VIEWER" && showForm && (
+        {/* Project form */}
+        {canEditProject && showForm && (
           <ProjectForm
+            key={selectedProject?.id || "new-project"}
             initialData={selectedProject}
             onSubmit={
               selectedProject ? handleUpdateProject : handleCreateProject
@@ -161,13 +183,15 @@ function ProjectPage() {
           />
         )}
 
+        {/* Page states */}
         {loading && <p>Loading projects...</p>}
-
         {error && <p className="error-message">{error}</p>}
 
         {!loading && !error && filteredProjects.length === 0 && (
           <p>No projects found.</p>
         )}
+
+        {/* Project list */}
         {!loading &&
           !error &&
           filteredProjects.map((project) => (
@@ -179,6 +203,8 @@ function ProjectPage() {
                 setShowForm(true);
               }}
               onDelete={handleDeleteProject}
+              onAssignMember={handleAssignMember}
+              onRemoveMember={handleRemoveMember}
             />
           ))}
       </div>

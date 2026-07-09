@@ -51,3 +51,67 @@ class ProjectRepository:
         """Delete a project."""
 
         return database.projects.delete_one({"_id": ObjectId(project_id)})
+        
+    @staticmethod
+    def add_member(
+        project_id: str,
+        user_id: str,
+    ):
+        """Assign a member to a project."""
+
+        return database.projects.update_one(
+            {
+                "_id": ObjectId(project_id),
+            },
+            {
+                "$addToSet": {
+                    "members": ObjectId(user_id),
+                }
+            },
+        )
+
+    @staticmethod
+    def remove_member(
+        project_id: str,
+        user_id: str,
+    ):
+        """Remove a member from a project."""
+
+        return database.projects.update_one(
+            {
+                "_id": ObjectId(project_id),
+            },
+            {
+                "$pull": {
+                    "members": ObjectId(user_id),
+                }
+            },
+        )
+
+    @staticmethod
+    def find_by_member(user_id: str):
+        """Retrieve all projects assigned to a member."""
+
+        return database.projects.find(
+            {
+                "members": ObjectId(user_id),
+            }
+        ).sort(
+            "created_at",
+            -1,
+        )
+
+
+    @staticmethod
+    def is_member(
+        project_id: str,
+        user_id: str,
+    ):
+        """Check whether a user is assigned to a project."""
+
+        return database.projects.find_one(
+            {
+                "_id": ObjectId(project_id),
+                "members": ObjectId(user_id),
+            }
+        )

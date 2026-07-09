@@ -1,4 +1,8 @@
-import { TOKEN_KEY, ROLE_KEY } from "../constants/auth-constants";
+import {
+  TOKEN_KEY,
+  ROLE_KEY,
+  USER_NAME_KEY,
+} from "../constants/auth-constants";
 
 export function saveToken(token) {
   // Store the login token so authenticated API calls can reuse it.
@@ -21,6 +25,14 @@ export function saveRole(role) {
 
 export function getRole() {
   return localStorage.getItem(ROLE_KEY);
+}
+
+export function saveUserName(name) {
+  localStorage.setItem(USER_NAME_KEY, name);
+}
+
+export function getUserName() {
+  return localStorage.getItem(USER_NAME_KEY);
 }
 
 export function clearStorage() {

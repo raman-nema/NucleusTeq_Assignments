@@ -21,7 +21,8 @@ function RegisterPage() {
     role: "MEMBER",
   });
 
-
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -87,13 +88,23 @@ function RegisterPage() {
           </div>
 
           <div className="form-group">
-            <InputField
-              label="Password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-            />
+            <div className="password-wrapper">
+              <InputField
+                label="Password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
             {errors.password && (
               <p className="error-message">{errors.password}</p>
             )}

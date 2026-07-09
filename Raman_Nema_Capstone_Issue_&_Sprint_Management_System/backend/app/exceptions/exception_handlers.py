@@ -8,6 +8,16 @@ from app.exceptions.custom_exceptions import (
     UnauthorizedException,
     ExpiredTokenException,
     ForbiddenException,
+<<<<<<< HEAD
+    ProjectAlreadyExistsException,
+    ProjectNotFoundException,
+    SprintAlreadyExistsException,
+    SprintNotFoundException,
+    UserNotFoundException,
+    MemberAlreadyAssignedException,
+    MemberNotAssignedException,
+=======
+>>>>>>> python/dev
 )
 
 
@@ -88,3 +98,94 @@ async def forbidden_handler(request: Request, exc: ForbiddenException):
         status_code=403,
         content={"success": False, "message": "Access denied", "data": None},
     )
+<<<<<<< HEAD
+
+
+async def project_exists_handler(request: Request, exc: ProjectAlreadyExistsException):
+    """Return a conflict response for duplicate project creation."""
+
+    return JSONResponse(
+        status_code=409,
+        content={
+            "success": False,
+            "message": "Project already exists",
+            "data": None,
+        },
+    )
+
+
+async def project_not_found_handler(request: Request, exc: ProjectNotFoundException):
+    """Return a not found response when the project does not exist."""
+
+    return JSONResponse(
+        status_code=404,
+        content={
+            "success": False,
+            "message": "Project not found",
+            "data": None,
+        },
+    )
+
+
+async def sprint_exists_handler(request: Request, exc: SprintAlreadyExistsException):
+    """Return a conflict response for duplicate sprint creation."""
+
+    return JSONResponse(
+        status_code=409,
+        content={
+            "success": False,
+            "message": "Sprint already exists",
+            "data": None,
+        },
+    )
+
+
+async def sprint_not_found_handler(request: Request, exc: SprintNotFoundException):
+    """Return a not found response when the sprint does not exist."""
+
+    return JSONResponse(
+        status_code=404,
+        content={
+            "success": False,
+            "message": "Sprint not found",
+            "data": None,
+        },
+    )
+
+
+async def user_not_found_handler(request: Request, exc: UserNotFoundException):
+
+    return JSONResponse(
+        status_code=404,
+        content={
+            "success": False,
+            "message": "User not found",
+            "data": None,
+        },
+    )
+
+
+async def member_already_assigned_handler(request: Request, exc: MemberAlreadyAssignedException):
+
+    return JSONResponse(
+        status_code=409,
+        content={
+            "success": False,
+            "message": "Member already assigned",
+            "data": None,
+        },
+    )
+
+
+async def member_not_assigned_handler(request: Request, exc: MemberNotAssignedException):
+
+    return JSONResponse(
+        status_code=404,
+        content={
+            "success": False,
+            "message": "Member not assigned",
+            "data": None,
+        },
+    )
+=======
+>>>>>>> python/dev

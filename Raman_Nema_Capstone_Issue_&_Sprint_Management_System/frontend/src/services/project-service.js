@@ -34,3 +34,19 @@ export async function deleteProject(projectId) {
 
   return response.data;
 }
+
+// Assign a member to a project.
+export async function assignMember(projectId, userId) {
+  const response = await apiClient.post(`/projects/${projectId}/members`, {
+    user_id: userId,
+  });
+  return response.data;
+}
+
+// Remove a member from a project.
+export async function removeMember(projectId, userId) {
+  const response = await apiClient.delete(
+    `/projects/${projectId}/members/${userId}`,
+  );
+  return response.data;
+}

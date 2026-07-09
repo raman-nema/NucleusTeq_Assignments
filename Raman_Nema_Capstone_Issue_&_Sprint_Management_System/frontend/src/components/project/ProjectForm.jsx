@@ -1,56 +1,52 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import InputField from "../common/InputField";
 import Button from "../common/Button";
 import { validateProject } from "../../utils/validations";
 
-function ProjectForm({ initialData, onSubmit, onCancel, loading }) {
-  // Store the project form fields.
-  const [formData, setFormData] = useState({
+// Return initial form values.
+function getInitialFormData(initialData) {
+  if (initialData) {
+    return {
+      name: initialData.name,
+      description: initialData.description,
+    };
+  }
+
+  return {
     name: "",
     description: "",
-  });
+  };
+}
 
-  // Store validation errors.
+function ProjectForm({ initialData, onSubmit, onCancel, loading }) {
+  // Form state
+  const [formData, setFormData] = useState(() =>
+    getInitialFormData(initialData),
+  );
+
+  // Validation errors
   const [errors, setErrors] = useState({});
 
-  // Populate the form when editing a project.
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        name: initialData.name,
-        description: initialData.description,
-      });
-    } else {
-      setFormData({
-        name: "",
-        description: "",
-      });
-    }
-
-    // Clear validation errors whenever the form opens.
-    setErrors({});
-  }, [initialData]);
-
+  // Handle input changes
   const handleChange = (event) => {
     const { name, value } = event.target;
 
-    // Update the modified field.
     setFormData((previous) => ({
       ...previous,
       [name]: value,
     }));
 
-    // Remove the validation error while typing.
+    // Clear field error on input
     setErrors((previous) => ({
       ...previous,
       [name]: "",
     }));
   };
 
+  // Validate and submit form
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // Validate the form.
     const validationErrors = validateProject(formData);
 
     if (Object.keys(validationErrors).length > 0) {
@@ -59,12 +55,12 @@ function ProjectForm({ initialData, onSubmit, onCancel, loading }) {
     }
 
     setErrors({});
-
     onSubmit(formData);
   };
 
   return (
     <form onSubmit={handleSubmit}>
+      {/* Project name */}
       <div className="form-group">
         <InputField
           label="Project Name"
@@ -77,10 +73,12 @@ function ProjectForm({ initialData, onSubmit, onCancel, loading }) {
         {errors.name && <p className="error-message">{errors.name}</p>}
       </div>
 
+      {/* Project description */}
       <div className="form-group">
         <label>Description</label>
 
         <textarea
+          className="description-input"
           name="description"
           value={formData.description}
           onChange={handleChange}
@@ -92,9 +90,11 @@ function ProjectForm({ initialData, onSubmit, onCancel, loading }) {
         )}
       </div>
 
+      {/* Form actions */}
       <div className="button-group">
         <Button
           type="submit"
+          className="btn-success"
           disabled={loading}
           text={loading ? "Saving..." : "Save"}
         />
