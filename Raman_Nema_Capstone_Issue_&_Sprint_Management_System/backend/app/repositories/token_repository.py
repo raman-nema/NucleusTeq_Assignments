@@ -7,24 +7,26 @@ class TokenRepository:
 
     @staticmethod
     def create_token(token: dict):
+        """Insert a new authentication token document."""
 
-        # Persist a newly issued authentication token document.
         return database.auth_tokens.insert_one(token)
 
     @staticmethod
     def find_by_token(token: str):
+        """Find an authentication token document by token value."""
 
         return database.auth_tokens.find_one({"token": token})
 
     @staticmethod
     def delete_token(token: str):
+        """Delete a single authentication token by token value."""
 
         return database.auth_tokens.delete_one({"token": token})
 
     @staticmethod
     def delete_user_tokens(user_id: str):
+        """Delete all authentication tokens for a user."""
 
-        # Remove all active tokens for a user, such as during logout from all sessions.
         return database.auth_tokens.delete_many({"user_id": user_id})
 
     @staticmethod

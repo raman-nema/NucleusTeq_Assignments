@@ -37,6 +37,6 @@ class DeleteProjectResponse(BaseModel):
 
 
 class ProjectMemberResponse(BaseModel):
-    """Project member operation response."""
+    """Project member action response schema."""
 
     message: str

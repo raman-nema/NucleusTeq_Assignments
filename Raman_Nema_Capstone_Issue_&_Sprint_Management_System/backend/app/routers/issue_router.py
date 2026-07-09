@@ -1,7 +1,11 @@
+from typing import Literal
+
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import Query
 
 from app.common.api_response import ApiResponse
+from app.common.pagination import get_pagination_params
 from app.dependencies.authentication import get_current_user
 from app.dependencies.authorization import (
     require_admin_or_member,
@@ -9,16 +13,64 @@ from app.dependencies.authorization import (
 from app.schemas.requests.issue_request import (
     CreateIssueCommentRequest,
     CreateIssueRequest,
+    UpdateIssueCommentRequest,
     UpdateIssueRequest,
 )
 from app.services.issue_service import IssueService
 
 router = APIRouter(
-    prefix="/issues",
     tags=["Issues"],
 )
 
-@router.get("/{issue_id}", response_model=ApiResponse)
+
+@router.post("/projects/{project_id}/issues", response_model=ApiResponse)
+def create_issue(
+    project_id: str,
+    request: CreateIssueRequest,
+    current_user=Depends(require_admin_or_member),
+):
+    """Create an issue for a project."""
+
+    response = IssueService.create_issue(
+        project_id,
+        request,
+        current_user,
+    )
+
+    return ApiResponse(
+        success=True,
+        message="Issue created successfully",
+        data=response.model_dump(),
+    )
+
+
+@router.get("/projects/{project_id}/issues", response_model=ApiResponse)
+def get_all_issues(
+    project_id: str,
+    issue_status: Literal["TODO", "IN_PROGRESS", "DONE"] | None = Query(
+        None,
+        alias="status",
+    ),
+    pagination=Depends(get_pagination_params),
+    current_user=Depends(get_current_user),
+):
+    """Retrieve all issues for a project."""
+
+    response = IssueService.get_all_issues(
+        project_id,
+        current_user,
+        pagination,
+        issue_status,
+    )
+
+    return ApiResponse(
+        success=True,
+        message="Issues retrieved successfully",
+        data=response.model_dump(),
+    )
+
+
+@router.get("/issues/{issue_id}", response_model=ApiResponse)
 def get_issue_by_id(
     issue_id: str,
     current_user=Depends(get_current_user),
@@ -36,7 +88,7 @@ def get_issue_by_id(
         data=response.model_dump(),
     )
 
-@router.post("/{issue_id}/comments", response_model=ApiResponse)
+@router.post("/issues/{issue_id}/comments", response_model=ApiResponse)
 def add_comment_to_issue(
     issue_id: str,
     request: CreateIssueCommentRequest,
@@ -57,7 +109,30 @@ def add_comment_to_issue(
     )
 
 
-@router.delete("/{issue_id}/comments/{comment_id}", response_model=ApiResponse)
+@router.put("/issues/{issue_id}/comments/{comment_id}", response_model=ApiResponse)
+def update_comment_on_issue(
+    issue_id: str,
+    comment_id: str,
+    request: UpdateIssueCommentRequest,
+    current_user=Depends(require_admin_or_member),
+):
+    """Update a comment on an issue."""
+
+    response = IssueService.update_comment(
+        issue_id,
+        comment_id,
+        request,
+        current_user,
+    )
+
+    return ApiResponse(
+        success=True,
+        message="Comment updated successfully",
+        data=response.model_dump(),
+    )
+
+
+@router.delete("/issues/{issue_id}/comments/{comment_id}", response_model=ApiResponse)
 def delete_comment_from_issue(
     issue_id: str,
     comment_id: str,
@@ -78,7 +153,7 @@ def delete_comment_from_issue(
     )
 
 
-@router.put("/{issue_id}", response_model=ApiResponse)
+@router.put("/issues/{issue_id}", response_model=ApiResponse)
 def update_issue(
     issue_id: str,
     request: UpdateIssueRequest,
@@ -98,7 +173,8 @@ def update_issue(
         data=response.model_dump(),
     )
 
-@router.delete("/{issue_id}", response_model=ApiResponse)
+
+@router.delete("/issues/{issue_id}", response_model=ApiResponse)
 def delete_issue(
     issue_id: str,
     current_user=Depends(require_admin_or_member),

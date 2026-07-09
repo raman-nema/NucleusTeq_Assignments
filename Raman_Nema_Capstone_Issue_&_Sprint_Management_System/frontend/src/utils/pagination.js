@@ -7,8 +7,6 @@ export function getDefaultPagination() {
     limit: DEFAULT_PAGE_SIZE,
     total: 0,
     total_pages: 0,
-    has_next: false,
-    has_previous: false,
   };
 }
 

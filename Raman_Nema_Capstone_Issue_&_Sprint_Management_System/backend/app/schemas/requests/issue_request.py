@@ -55,5 +55,9 @@ class CreateIssueCommentRequest(BaseModel):
     )
 
 
+class UpdateIssueCommentRequest(CreateIssueCommentRequest):
+    """Issue comment update request schema."""
+
+
 class UpdateIssueRequest(IssueRequest):
     """Issue update request schema."""

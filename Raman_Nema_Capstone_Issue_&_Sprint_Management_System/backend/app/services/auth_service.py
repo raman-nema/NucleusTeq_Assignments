@@ -1,7 +1,8 @@
 from app.models.user_model import UserModel
 from app.repositories.user_repository import UserRepository
 from app.core.security import hash_password
-from app.exceptions.custom_exceptions import UserAlreadyExistsException
+from app.constants.message_constants import USER_EMAIL_ALREADY_EXISTS_MESSAGE
+from app.exceptions.custom_exceptions import ConflictException
 from app.schemas.responses.auth_response import RegisterResponse
 from app.common.api_response import ApiResponse
 import uuid
@@ -23,7 +24,7 @@ class AuthService:
 
         # Stop registration if the email is already in use.
         if existing_user:
-            raise UserAlreadyExistsException()
+            raise ConflictException(USER_EMAIL_ALREADY_EXISTS_MESSAGE)
 
         hashed_password = hash_password(request.password)
 
