@@ -1,7 +1,9 @@
-class UserAlreadyExistsException(Exception):
-    """Raised when a user already exists."""
+class ConflictException(Exception):
+    """Raised when a request conflicts with an existing resource."""
 
-    pass
+    def __init__(self, message: str = "Resource already exists"):
+        self.message = message
+        super().__init__(message)
 
 
 class InvalidCredentialsException(Exception):
@@ -14,6 +16,14 @@ class BadRequestException(Exception):
     """Raised when request data is invalid."""
 
     def __init__(self, message: str = "Bad request"):
+        self.message = message
+        super().__init__(message)
+
+
+class NotFoundException(Exception):
+    """Raised when a requested resource does not exist."""
+
+    def __init__(self, message: str = "Resource not found"):
         self.message = message
         super().__init__(message)
 

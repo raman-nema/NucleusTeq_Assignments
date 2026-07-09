@@ -1,23 +1,24 @@
 from fastapi.responses import JSONResponse
 from fastapi import Request
 from app.exceptions.custom_exceptions import (
-    UserAlreadyExistsException,
+    ConflictException,
     InvalidCredentialsException,
     BadRequestException,
+    NotFoundException,
     UnauthorizedException,
     ExpiredTokenException,
     ForbiddenException,
 )
 
 
-async def user_exists_handler(request: Request, exc: UserAlreadyExistsException):
-    """Return a conflict response for duplicate user registration attempts."""
+async def conflict_handler(request: Request, exc: ConflictException):
+    """Return a conflict response for duplicate or conflicting resources."""
 
     return JSONResponse(
         status_code=409,
         content={
             "success": False,
-            "message": "User_Email already exists",
+            "message": exc.message,
             "data": None,
         },
     )
@@ -44,6 +45,19 @@ async def bad_request_handler(request: Request, exc: BadRequestException):
 
     return JSONResponse(
         status_code=400,
+        content={
+            "success": False,
+            "message": exc.message,
+            "data": None,
+        },
+    )
+
+
+async def not_found_handler(request: Request, exc: NotFoundException):
+    """Return a not found response when a resource does not exist."""
+
+    return JSONResponse(
+        status_code=404,
         content={
             "success": False,
             "message": exc.message,

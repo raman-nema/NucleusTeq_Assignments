@@ -75,3 +75,28 @@ export function validateLogin(formData) {
 
   return errors;
 }
+
+/**
+ * Validate the project form fields.
+ */
+export function validateProject(formData) {
+  const errors = {};
+
+  if (!formData.name.trim()) {
+    errors.name = "Project name is required.";
+  } else if (formData.name.trim().length < 3) {
+    errors.name = "Project name must be at least 3 characters.";
+  } else if (formData.name.trim().length > 100) {
+    errors.name = "Project name cannot exceed 100 characters.";
+  }
+
+  if (!formData.description.trim()) {
+    errors.description = "Project description is required.";
+  } else if (formData.description.trim().length < 10) {
+    errors.description = "Project description must be at least 10 characters.";
+  } else if (formData.description.trim().length > 500) {
+    errors.description = "Project description cannot exceed 500 characters.";
+  }
+
+  return errors;
+}

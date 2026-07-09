@@ -26,6 +26,14 @@ class RegisterRequest(BaseModel):
 
     role: Role
 
+    @field_validator("email")
+    @classmethod
+    def validate_company_email(cls, value: EmailStr):
+        if not str(value).endswith("@company.com"):
+            raise BadRequestException("Only company email addresses are allowed.")
+
+        return value
+
     @field_validator("password")
     @classmethod
     def validate_password(cls, value: str):
@@ -51,3 +59,11 @@ class LoginRequest(BaseModel):
     password: str = Field(
         min_length=8,
     )
+
+    @field_validator("email")
+    @classmethod
+    def validate_company_email(cls, value: EmailStr):
+        if not str(value).endswith("@company.com"):
+            raise BadRequestException("Only company email addresses are allowed.")
+
+        return value
