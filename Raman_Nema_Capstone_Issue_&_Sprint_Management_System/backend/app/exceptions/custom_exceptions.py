@@ -71,20 +71,3 @@ class MemberNotAssignedException(Exception):
 
     pass
 
-
-class IssueAlreadyExistsException(Exception):
-    """Raised when an issue with the same title already exists."""
-
-    pass
-
-
-class IssueNotFoundException(Exception):
-    """Raised when the requested issue does not exist."""
-
-    pass
-
-
-class InvalidIssueStatusTransitionException(Exception):
-    """Raised when an issue status transition is not allowed."""
-
-    pass

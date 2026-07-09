@@ -1,5 +1,13 @@
 from datetime import datetime
+from fastapi import HTTPException
+from fastapi import status
+
 from app.common.enums import Role
+from app.common.messages import (
+    INVALID_ISSUE_STATUS_TRANSITION,
+    ISSUE_ALREADY_EXISTS,
+    ISSUE_NOT_FOUND,
+)
 from app.common.pagination import (
     apply_pagination,
     build_pagination_meta,
@@ -22,11 +30,9 @@ from app.exceptions.custom_exceptions import (
     ForbiddenException,
     ProjectNotFoundException,
     SprintNotFoundException,
-    IssueAlreadyExistsException,
-    IssueNotFoundException,
     UserNotFoundException,
-    InvalidIssueStatusTransitionException,
 )
+
 
 class IssueService:
     """Handles issue-related business logic."""
@@ -89,7 +95,10 @@ class IssueService:
         )
 
         if existing_issue:
-            raise IssueAlreadyExistsException()
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=ISSUE_ALREADY_EXISTS,
+            )
 
         # Build the issue document.
         issue = IssueModel.build(
@@ -195,7 +204,10 @@ class IssueService:
         issue = IssueRepository.find_by_id(issue_id)
 
         if not issue:
-            raise IssueNotFoundException()
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=ISSUE_NOT_FOUND,
+            )
 
         if (
             current_user["role"] == Role.MEMBER.value
@@ -232,7 +244,10 @@ class IssueService:
         issue = IssueRepository.find_by_id(issue_id)
 
         if not issue:
-            raise IssueNotFoundException()
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=ISSUE_NOT_FOUND,
+            )
 
         sprint = SprintRepository.find_by_id(
             request.sprint_id,
@@ -282,14 +297,20 @@ class IssueService:
             existing_issue
             and existing_issue["_id"] != issue["_id"]
         ):
-            raise IssueAlreadyExistsException()
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=ISSUE_ALREADY_EXISTS,
+            )
 
         if (
             current_user["role"] == Role.MEMBER.value
             and issue["status"] == "DONE"
             and request.status != "DONE"
         ):
-            raise InvalidIssueStatusTransitionException()
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=INVALID_ISSUE_STATUS_TRANSITION,
+            )
 
         updated_data = {
             "sprint_id": sprint["_id"],
@@ -334,7 +355,10 @@ class IssueService:
         issue = IssueRepository.find_by_id(issue_id)
 
         if not issue:
-            raise IssueNotFoundException()
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=ISSUE_NOT_FOUND,
+            )
 
         if (
             current_user["role"] != Role.ADMIN.value

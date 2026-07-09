@@ -1,5 +1,6 @@
 from fastapi.responses import JSONResponse
 from fastapi import Request
+from fastapi import HTTPException
 from app.exceptions.custom_exceptions import (
     UserAlreadyExistsException,
     InvalidCredentialsException,
@@ -13,9 +14,6 @@ from app.exceptions.custom_exceptions import (
     UserNotFoundException,
     MemberAlreadyAssignedException,
     MemberNotAssignedException,
-    IssueAlreadyExistsException,
-    IssueNotFoundException,
-    InvalidIssueStatusTransitionException,
 )
 
 
@@ -164,43 +162,15 @@ async def member_not_assigned_handler(
     )
 
 
-async def issue_exists_handler(
+async def http_exception_handler(
     request: Request,
-    exc: IssueAlreadyExistsException,
+    exc: HTTPException,
 ):
     return JSONResponse(
-        status_code=409,
+        status_code=exc.status_code,
         content={
             "success": False,
-            "message": "Issue already exists",
-            "data": None,
-        },
-    )
-
-
-async def issue_not_found_handler(
-    request: Request,
-    exc: IssueNotFoundException,
-):
-    return JSONResponse(
-        status_code=404,
-        content={
-            "success": False,
-            "message": "Issue not found",
-            "data": None,
-        },
-    )
-
-
-async def invalid_issue_status_transition_handler(
-    request: Request,
-    exc: InvalidIssueStatusTransitionException,
-):
-    return JSONResponse(
-        status_code=400,
-        content={
-            "success": False,
-            "message": "Issues in DONE state cannot move backward",
+            "message": exc.detail,
             "data": None,
         },
     )

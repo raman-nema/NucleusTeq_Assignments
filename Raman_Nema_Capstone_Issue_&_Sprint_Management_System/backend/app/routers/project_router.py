@@ -1,8 +1,5 @@
-from typing import Literal
-
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import Query
 from app.common.api_response import ApiResponse
 from app.common.pagination import get_pagination_params
 from app.services.project_service import ProjectService
@@ -20,9 +17,6 @@ from app.schemas.requests.sprint_request import CreateSprintRequest
 from app.schemas.requests.project_member_request import (
     AssignMemberRequest,
 )
-
-from app.services.issue_service import IssueService
-from app.schemas.requests.issue_request import CreateIssueRequest
 
 router = APIRouter(
     prefix="/projects",
@@ -207,49 +201,5 @@ def get_all_sprints(
     return ApiResponse(
         success=True,
         message="Sprints retrieved successfully",
-        data=response.model_dump(),
-    )
-
-
-# Issue routes for a specific project.
-@router.post("/{project_id}/issues", response_model=ApiResponse)
-def create_issue(
-    project_id: str,
-    request: CreateIssueRequest,
-    current_user=Depends(require_admin_or_member),
-):
-    """Create an issue for a project."""
-
-    response = IssueService.create_issue(
-        project_id,
-        request,
-        current_user,
-    )
-
-    return ApiResponse(
-        success=True,
-        message="Issue created successfully",
-        data=response.model_dump(),
-    )
-
-@router.get("/{project_id}/issues", response_model=ApiResponse)
-def get_all_issues(
-    project_id: str,
-    status: Literal["TODO", "IN_PROGRESS", "DONE"] | None = Query(None),
-    pagination=Depends(get_pagination_params),
-    current_user=Depends(get_current_user),
-):
-    """Retrieve all issues for a project."""
-
-    response = IssueService.get_all_issues(
-        project_id,
-        current_user,
-        pagination,
-        status,
-    )
-
-    return ApiResponse(
-        success=True,
-        message="Issues retrieved successfully",
         data=response.model_dump(),
     )

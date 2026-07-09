@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi import HTTPException
 from app.routers.auth_router import router as auth_router
 from app.routers import project_router
 from app.routers import admin_router
@@ -19,9 +20,6 @@ from app.exceptions.custom_exceptions import (
     MemberAlreadyAssignedException,
     MemberNotAssignedException,
     UserNotFoundException,
-    IssueAlreadyExistsException,
-    IssueNotFoundException,
-    InvalidIssueStatusTransitionException,
 )
 from app.exceptions.exception_handlers import (
     user_exists_handler,
@@ -36,9 +34,7 @@ from app.exceptions.exception_handlers import (
     member_already_assigned_handler,
     member_not_assigned_handler,
     user_not_found_handler,
-    issue_exists_handler,
-    issue_not_found_handler,
-    invalid_issue_status_transition_handler,
+    http_exception_handler,
 )
 
 app = FastAPI(title="Issue & Sprint Management System")
@@ -61,19 +57,14 @@ app.add_exception_handler(InvalidCredentialsException, invalid_credentials_handl
 app.add_exception_handler(UnauthorizedException, unauthorized_handler)
 app.add_exception_handler(ExpiredTokenException, expired_token_handler)
 app.add_exception_handler(ForbiddenException, forbidden_handler)
-app.add_exception_handler(ProjectAlreadyExistsException,project_exists_handler)
+app.add_exception_handler(ProjectAlreadyExistsException, project_exists_handler)
 app.add_exception_handler(ProjectNotFoundException, project_not_found_handler)
 app.add_exception_handler(SprintNotFoundException, sprint_not_found_handler)
 app.add_exception_handler(SprintAlreadyExistsException, sprint_exists_handler)
 app.add_exception_handler(MemberAlreadyAssignedException, member_already_assigned_handler)
 app.add_exception_handler(MemberNotAssignedException, member_not_assigned_handler)
 app.add_exception_handler(UserNotFoundException, user_not_found_handler)
-app.add_exception_handler(IssueAlreadyExistsException, issue_exists_handler)
-app.add_exception_handler(IssueNotFoundException, issue_not_found_handler)
-app.add_exception_handler(
-    InvalidIssueStatusTransitionException,
-    invalid_issue_status_transition_handler,
-)
+app.add_exception_handler(HTTPException, http_exception_handler)
 
 
 # Allow the local frontend application to call the backend APIs.

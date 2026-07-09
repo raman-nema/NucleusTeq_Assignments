@@ -29,8 +29,6 @@ class PaginationMeta(BaseModel):
     limit: int
     total: int
     total_pages: int
-    has_next: bool
-    has_previous: bool
 
 
 def get_pagination_params(
@@ -55,8 +53,6 @@ def build_pagination_meta(total: int, params: PaginationParams):
         limit=params.limit,
         total=total,
         total_pages=total_pages,
-        has_next=params.page < total_pages,
-        has_previous=params.page > 1 and total_pages > 0,
     )
 
 

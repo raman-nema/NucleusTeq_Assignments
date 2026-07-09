@@ -103,10 +103,12 @@ class IssueRepository:
     def find_all_by_sprint(sprint_id: str):
         """Retrieve all issues for a sprint."""
 
+        query = {
+            "sprint_id": ObjectId(sprint_id),
+        }
+
         return database.issues.find(
-            {
-                "sprint_id": ObjectId(sprint_id),
-            }
+            query
         ).sort(
             "created_at",
             -1,

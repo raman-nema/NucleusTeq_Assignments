@@ -5,12 +5,15 @@ function Pagination({ pagination, onPageChange, disabled = false }) {
     return null;
   }
 
+  const hasPrevious = pagination.page > 1;
+  const hasNext = pagination.page < pagination.total_pages;
+
   return (
     <div className="pagination-bar">
       <Button
         text="Previous"
         className="btn-muted"
-        disabled={disabled || !pagination.has_previous}
+        disabled={disabled || !hasPrevious}
         onClick={() => onPageChange(pagination.page - 1)}
       />
 
@@ -21,7 +24,7 @@ function Pagination({ pagination, onPageChange, disabled = false }) {
       <Button
         text="Next"
         className="btn-muted"
-        disabled={disabled || !pagination.has_next}
+        disabled={disabled || !hasNext}
         onClick={() => onPageChange(pagination.page + 1)}
       />
     </div>
