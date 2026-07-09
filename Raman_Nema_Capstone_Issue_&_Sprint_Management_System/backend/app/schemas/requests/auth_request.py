@@ -6,6 +6,7 @@ from pydantic import (
     field_validator,
 )
 from app.common.enums import Role
+from app.exceptions.custom_exceptions import BadRequestException
 
 
 class RegisterRequest(BaseModel):
@@ -29,13 +30,13 @@ class RegisterRequest(BaseModel):
     @classmethod
     def validate_password(cls, value: str):
 
-         # Require uppercase, lowercase, number, special character, and 8–20 characters.
+        # Require uppercase, lowercase, number, special character, and 8-20 characters.
         password_pattern = (
             r"^(?=.*[a-z])" r"(?=.*[A-Z])" r"(?=.*\d)" r"(?=.*[@$!%*?&]).{8,20}$"
         )
 
         if not re.match(password_pattern, value):
-            raise ValueError(
+            raise BadRequestException(
                 "Password must be 8-20 characters long and contain an uppercase letter, "
                 "lowercase letter, number and special character."
             )

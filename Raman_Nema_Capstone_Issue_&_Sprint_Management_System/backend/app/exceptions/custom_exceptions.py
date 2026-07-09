@@ -10,6 +10,14 @@ class InvalidCredentialsException(Exception):
     pass
 
 
+class BadRequestException(Exception):
+    """Raised when request data is invalid."""
+
+    def __init__(self, message: str = "Bad request"):
+        self.message = message
+        super().__init__(message)
+
+
 class UnauthorizedException(Exception):
     """Raised when authentication fails."""
 

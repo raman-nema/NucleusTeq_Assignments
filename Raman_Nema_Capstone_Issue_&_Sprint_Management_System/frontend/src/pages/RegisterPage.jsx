@@ -21,8 +21,8 @@ function RegisterPage() {
     role: "MEMBER",
   });
 
-  const [errors, setErrors] = useState({});
 
+  const [errors, setErrors] = useState({});
   const handleChange = (event) => {
     const { name, value } = event.target;
     // Update the field that changed while preserving the other form values.
@@ -103,11 +103,10 @@ function RegisterPage() {
             <label>Role</label>
             <div className="select-wrapper">
               <select name="role" value={formData.role} onChange={handleChange}>
-                <option value="#">Select a role</option>
+                <option value="MEMBER">Select a role</option>
                 <option value="MEMBER">Member</option>
                 <option value="VIEWER">Viewer</option>
               </select>
-              {errors.role && <p className="error-message">{errors.role}</p>}
             </div>
           </div>
 

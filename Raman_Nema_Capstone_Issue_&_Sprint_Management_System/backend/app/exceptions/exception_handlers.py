@@ -3,6 +3,7 @@ from fastapi import Request
 from app.exceptions.custom_exceptions import (
     UserAlreadyExistsException,
     InvalidCredentialsException,
+    BadRequestException,
     UnauthorizedException,
     ExpiredTokenException,
     ForbiddenException,
@@ -33,6 +34,19 @@ async def invalid_credentials_handler(
         content={
             "success": False,
             "message": "Invalid email or password",
+            "data": None,
+        },
+    )
+
+
+async def bad_request_handler(request: Request, exc: BadRequestException):
+    """Return a bad request response for invalid request data."""
+
+    return JSONResponse(
+        status_code=400,
+        content={
+            "success": False,
+            "message": exc.message,
             "data": None,
         },
     )
