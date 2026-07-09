@@ -57,7 +57,7 @@ export async function addIssueComment(issueId, commentData) {
 // Update a comment on an issue.
 export async function updateIssueComment(issueId, commentId, commentData) {
   const response = await apiClient.put(
-    `/issues/${issueId}/comments/${commentId}`,
+    API_ENDPOINTS.ISSUES.COMMENT_BY_ID(issueId, commentId),
     commentData,
   );
 

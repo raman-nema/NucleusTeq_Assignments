@@ -3,13 +3,16 @@ import InputField from "../common/InputField";
 import Button from "../common/Button";
 import { validateIssue } from "../../utils/validations";
 
-function getInitialFormData(initialData, selectedSprintId, members) {
+function getInitialFormData(initialData, selectedSprintId, sprints, members) {
+  const defaultSprintId = selectedSprintId || sprints[0]?.id || "";
+  const defaultAssigneeId = members[0]?.id || "";
+
   if (initialData) {
     return {
       title: initialData.title,
       description: initialData.description,
-      assignee: initialData.assignee,
-      sprint_id: initialData.sprint_id || selectedSprintId,
+      assignee: initialData.assignee || defaultAssigneeId,
+      sprint_id: initialData.sprint_id || defaultSprintId,
       priority: initialData.priority || "MEDIUM",
       type: initialData.type || "TASK",
       status: initialData.status || "TODO",
@@ -19,8 +22,8 @@ function getInitialFormData(initialData, selectedSprintId, members) {
   return {
     title: "",
     description: "",
-    assignee: members[0]?.id || "",
-    sprint_id: selectedSprintId,
+    assignee: defaultAssigneeId,
+    sprint_id: defaultSprintId,
     priority: "MEDIUM",
     type: "TASK",
     status: "TODO",
@@ -37,7 +40,7 @@ function IssueForm({
   loading,
 }) {
   const [formData, setFormData] = useState(() =>
-    getInitialFormData(initialData, selectedSprintId, members),
+    getInitialFormData(initialData, selectedSprintId, sprints, members),
   );
   const [errors, setErrors] = useState({});
 
