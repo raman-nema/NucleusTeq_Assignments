@@ -14,8 +14,10 @@ from app.exceptions.custom_exceptions import (
     MemberNotAssignedException,
     NotFoundException,
     ProjectAlreadyExistsException,
+    ProjectHasSprintsException,
     ProjectNotFoundException,
     SprintAlreadyExistsException,
+    SprintHasIssuesException,
     SprintNotFoundException,
     UnauthorizedException,
     UserNotFoundException,
@@ -92,6 +94,16 @@ async def project_not_found_handler(
     return _error_response(404, "Project not found")
 
 
+async def project_has_sprints_handler(
+    request: Request,
+    exc: ProjectHasSprintsException,
+):
+    return _error_response(
+        409,
+        "Project cannot be deleted because a sprint is assigned to it",
+    )
+
+
 async def sprint_exists_handler(
     request: Request,
     exc: SprintAlreadyExistsException,
@@ -104,6 +116,13 @@ async def sprint_not_found_handler(
     exc: SprintNotFoundException,
 ):
     return _error_response(404, "Sprint not found")
+
+
+async def sprint_has_issues_handler(
+    request: Request,
+    exc: SprintHasIssuesException,
+):
+    return _error_response(409, "Sprint cannot be deleted because an issue is present")
 
 
 async def user_not_found_handler(request: Request, exc: UserNotFoundException):

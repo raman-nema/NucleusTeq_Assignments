@@ -6,6 +6,7 @@ from app.common.pagination import (
 )
 from app.models.sprint_model import SprintModel
 from app.repositories.project_repository import ProjectRepository
+from app.repositories.issue_repository import IssueRepository
 from app.repositories.sprint_repository import SprintRepository
 from app.schemas.requests.sprint_request import (
     CreateSprintRequest,
@@ -20,6 +21,7 @@ from app.exceptions.custom_exceptions import (
     ForbiddenException,
     ProjectNotFoundException,
     SprintAlreadyExistsException,
+    SprintHasIssuesException,
     SprintNotFoundException,
 )
 
@@ -232,6 +234,9 @@ class SprintService:
             str(current_user["_id"]),
         ):
             raise ForbiddenException()
+
+        if IssueRepository.count_by_sprint(sprint_id) > 0:
+            raise SprintHasIssuesException()
 
         SprintRepository.delete_sprint(sprint_id)
 

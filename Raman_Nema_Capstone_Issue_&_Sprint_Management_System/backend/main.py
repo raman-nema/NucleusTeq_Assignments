@@ -19,8 +19,10 @@ from app.exceptions.custom_exceptions import (
     MemberNotAssignedException,
     NotFoundException,
     ProjectAlreadyExistsException,
+    ProjectHasSprintsException,
     ProjectNotFoundException,
     SprintAlreadyExistsException,
+    SprintHasIssuesException,
     SprintNotFoundException,
     UnauthorizedException,
     UserNotFoundException,
@@ -40,8 +42,10 @@ from app.exceptions.exception_handlers import (
     member_not_assigned_handler,
     not_found_handler,
     project_exists_handler,
+    project_has_sprints_handler,
     project_not_found_handler,
     sprint_exists_handler,
+    sprint_has_issues_handler,
     sprint_not_found_handler,
     unauthorized_handler,
     user_not_found_handler,
@@ -71,8 +75,10 @@ app.add_exception_handler(ExpiredTokenException, expired_token_handler)
 app.add_exception_handler(ForbiddenException, forbidden_handler)
 app.add_exception_handler(ProjectAlreadyExistsException, project_exists_handler)
 app.add_exception_handler(ProjectNotFoundException, project_not_found_handler)
+app.add_exception_handler(ProjectHasSprintsException, project_has_sprints_handler)
 app.add_exception_handler(SprintAlreadyExistsException, sprint_exists_handler)
 app.add_exception_handler(SprintNotFoundException, sprint_not_found_handler)
+app.add_exception_handler(SprintHasIssuesException, sprint_has_issues_handler)
 app.add_exception_handler(UserNotFoundException, user_not_found_handler)
 app.add_exception_handler(MemberAlreadyAssignedException, member_already_assigned_handler)
 app.add_exception_handler(MemberNotAssignedException, member_not_assigned_handler)

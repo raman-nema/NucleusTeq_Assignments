@@ -15,11 +15,13 @@ from app.exceptions.custom_exceptions import (
     MemberAlreadyAssignedException,
     MemberNotAssignedException,
     NotFoundException,
+    ProjectHasSprintsException,
     ProjectNotFoundException,
     UserNotFoundException,
 )
 from app.models.project_model import ProjectModel
 from app.repositories.project_repository import ProjectRepository
+from app.repositories.sprint_repository import SprintRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.requests.project_member_request import AssignMemberRequest
 from app.schemas.responses.project_response import (
@@ -182,6 +184,9 @@ class ProjectService:
 
         if not project:
             raise NotFoundException(PROJECT_NOT_FOUND_MESSAGE)
+
+        if SprintRepository.count_by_project(project_id) > 0:
+            raise ProjectHasSprintsException()
 
         ProjectRepository.delete_project(project_id)
 

@@ -65,6 +65,12 @@ class SprintRepository:
         )
 
     @staticmethod
+    def count_all():
+        """Count all sprints."""
+
+        return database.sprints.count_documents({})
+
+    @staticmethod
     def update_sprint(
         sprint_id: str,
         updated_data: dict,

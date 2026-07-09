@@ -50,6 +50,10 @@ class ProjectNotFoundException(Exception):
     pass
 
 
+class ProjectHasSprintsException(Exception):
+    pass
+
+
 class SprintAlreadyExistsException(Exception):
     def __init__(self):
         super().__init__("Sprint with this name already exists.")
@@ -58,6 +62,10 @@ class SprintAlreadyExistsException(Exception):
 class SprintNotFoundException(Exception):
     def __init__(self):
         super().__init__("Sprint not found.")
+
+
+class SprintHasIssuesException(Exception):
+    pass
 
 
 class UserNotFoundException(Exception):
