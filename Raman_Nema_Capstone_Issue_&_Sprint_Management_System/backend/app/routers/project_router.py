@@ -8,6 +8,8 @@ from app.constants.message_constants import (
     PROJECT_LIST_MESSAGE,
     PROJECT_RETRIEVED_MESSAGE,
     PROJECT_UPDATED_MESSAGE,
+    SPRINT_CREATED_MESSAGE,
+    SPRINT_LIST_MESSAGE,
 )
 
 from app.services.project_service import ProjectService
@@ -187,7 +189,7 @@ def create_sprint(
 
     return ApiResponse(
         success=True,
-        message="Sprint created successfully",
+        message=SPRINT_CREATED_MESSAGE,
         data=response.model_dump(),
     )
 
@@ -208,6 +210,6 @@ def get_all_sprints(
 
     return ApiResponse(
         success=True,
-        message="Sprints retrieved successfully",
+        message=SPRINT_LIST_MESSAGE,
         data=response.model_dump(),
     )

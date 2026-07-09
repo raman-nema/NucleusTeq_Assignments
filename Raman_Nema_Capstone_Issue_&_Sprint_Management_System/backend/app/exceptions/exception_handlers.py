@@ -1,6 +1,20 @@
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 
+from app.constants.message_constants import (
+    INVALID_ISSUE_STATUS_TRANSITION_MESSAGE,
+    ISSUE_ALREADY_EXISTS_MESSAGE,
+    ISSUE_NOT_FOUND_MESSAGE,
+    MEMBER_ALREADY_ASSIGNED_MESSAGE,
+    MEMBER_NOT_ASSIGNED_MESSAGE,
+    PROJECT_ALREADY_EXISTS_MESSAGE,
+    PROJECT_HAS_SPRINTS_MESSAGE,
+    PROJECT_NOT_FOUND_MESSAGE,
+    SPRINT_ALREADY_EXISTS_MESSAGE,
+    SPRINT_HAS_ISSUES_MESSAGE,
+    SPRINT_NOT_FOUND_MESSAGE,
+    USER_NOT_FOUND_MESSAGE,
+)
 from app.exceptions.custom_exceptions import (
     BadRequestException,
     ConflictException,
@@ -84,14 +98,14 @@ async def project_exists_handler(
     request: Request,
     exc: ProjectAlreadyExistsException,
 ):
-    return _error_response(409, "Project already exists")
+    return _error_response(409, PROJECT_ALREADY_EXISTS_MESSAGE)
 
 
 async def project_not_found_handler(
     request: Request,
     exc: ProjectNotFoundException,
 ):
-    return _error_response(404, "Project not found")
+    return _error_response(404, PROJECT_NOT_FOUND_MESSAGE)
 
 
 async def project_has_sprints_handler(
@@ -100,7 +114,7 @@ async def project_has_sprints_handler(
 ):
     return _error_response(
         409,
-        "Project cannot be deleted because a sprint is assigned to it",
+        PROJECT_HAS_SPRINTS_MESSAGE,
     )
 
 
@@ -108,60 +122,60 @@ async def sprint_exists_handler(
     request: Request,
     exc: SprintAlreadyExistsException,
 ):
-    return _error_response(409, "Sprint already exists")
+    return _error_response(409, SPRINT_ALREADY_EXISTS_MESSAGE)
 
 
 async def sprint_not_found_handler(
     request: Request,
     exc: SprintNotFoundException,
 ):
-    return _error_response(404, "Sprint not found")
+    return _error_response(404, SPRINT_NOT_FOUND_MESSAGE)
 
 
 async def sprint_has_issues_handler(
     request: Request,
     exc: SprintHasIssuesException,
 ):
-    return _error_response(409, "Sprint cannot be deleted because an issue is present")
+    return _error_response(409, SPRINT_HAS_ISSUES_MESSAGE)
 
 
 async def user_not_found_handler(request: Request, exc: UserNotFoundException):
-    return _error_response(404, "User not found")
+    return _error_response(404, USER_NOT_FOUND_MESSAGE)
 
 
 async def member_already_assigned_handler(
     request: Request,
     exc: MemberAlreadyAssignedException,
 ):
-    return _error_response(409, "Member already assigned")
+    return _error_response(409, MEMBER_ALREADY_ASSIGNED_MESSAGE)
 
 
 async def member_not_assigned_handler(
     request: Request,
     exc: MemberNotAssignedException,
 ):
-    return _error_response(404, "Member not assigned")
+    return _error_response(404, MEMBER_NOT_ASSIGNED_MESSAGE)
 
 
 async def issue_exists_handler(
     request: Request,
     exc: IssueAlreadyExistsException,
 ):
-    return _error_response(409, "Issue already exists")
+    return _error_response(409, ISSUE_ALREADY_EXISTS_MESSAGE)
 
 
 async def issue_not_found_handler(
     request: Request,
     exc: IssueNotFoundException,
 ):
-    return _error_response(404, "Issue not found")
+    return _error_response(404, ISSUE_NOT_FOUND_MESSAGE)
 
 
 async def invalid_issue_status_transition_handler(
     request: Request,
     exc: InvalidIssueStatusTransitionException,
 ):
-    return _error_response(400, "Issues in DONE state cannot move backward")
+    return _error_response(400, INVALID_ISSUE_STATUS_TRANSITION_MESSAGE)
 
 
 async def http_exception_handler(request: Request, exc: HTTPException):

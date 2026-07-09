@@ -5,10 +5,12 @@ from fastapi import HTTPException
 from fastapi import status
 
 from app.common.enums import Role
-from app.common.messages import (
-    INVALID_ISSUE_STATUS_TRANSITION,
-    ISSUE_ALREADY_EXISTS,
-    ISSUE_NOT_FOUND,
+from app.constants.message_constants import (
+    COMMENT_NOT_FOUND_MESSAGE,
+    INVALID_ISSUE_STATUS_TRANSITION_MESSAGE,
+    ISSUE_ALREADY_EXISTS_MESSAGE,
+    ISSUE_DELETED_MESSAGE,
+    ISSUE_NOT_FOUND_MESSAGE,
 )
 from app.common.pagination import (
     apply_pagination,
@@ -88,7 +90,7 @@ class IssueService:
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Comment not found",
+            detail=COMMENT_NOT_FOUND_MESSAGE,
         )
 
     @staticmethod
@@ -167,7 +169,7 @@ class IssueService:
         if existing_issue:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=ISSUE_ALREADY_EXISTS,
+                detail=ISSUE_ALREADY_EXISTS_MESSAGE,
             )
 
         # Build the issue document.
@@ -278,7 +280,7 @@ class IssueService:
         if not issue:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=ISSUE_NOT_FOUND,
+                detail=ISSUE_NOT_FOUND_MESSAGE,
             )
 
         if (
@@ -407,7 +409,7 @@ class IssueService:
         if not issue:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=ISSUE_NOT_FOUND,
+                detail=ISSUE_NOT_FOUND_MESSAGE,
             )
 
         sprint = SprintRepository.find_by_id(
@@ -460,7 +462,7 @@ class IssueService:
         ):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=ISSUE_ALREADY_EXISTS,
+                detail=ISSUE_ALREADY_EXISTS_MESSAGE,
             )
 
         if (
@@ -470,7 +472,7 @@ class IssueService:
         ):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=INVALID_ISSUE_STATUS_TRANSITION,
+                detail=INVALID_ISSUE_STATUS_TRANSITION_MESSAGE,
             )
 
         updated_data = {
@@ -519,7 +521,7 @@ class IssueService:
         if not issue:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=ISSUE_NOT_FOUND,
+                detail=ISSUE_NOT_FOUND_MESSAGE,
             )
 
         if (
@@ -534,5 +536,5 @@ class IssueService:
         IssueRepository.delete_issue(issue_id)
 
         return DeleteIssueResponse(
-            message="Issue deleted successfully",
+            message=ISSUE_DELETED_MESSAGE,
         )

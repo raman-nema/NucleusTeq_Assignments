@@ -1,6 +1,10 @@
 from fastapi import APIRouter
 from fastapi import Depends
 from app.common.api_response import ApiResponse
+from app.constants.message_constants import (
+    SPRINT_RETRIEVED_MESSAGE,
+    SPRINT_UPDATED_MESSAGE,
+)
 from app.dependencies.authentication import get_current_user
 from app.dependencies.authorization import (
     require_admin_or_member,
@@ -33,7 +37,7 @@ def get_sprint_by_id(
 
     return ApiResponse(
         success=True,
-        message="Sprint retrieved successfully",
+        message=SPRINT_RETRIEVED_MESSAGE,
         data=response.model_dump(),
     )
 
@@ -54,7 +58,7 @@ def update_sprint(
 
     return ApiResponse(
         success=True,
-        message="Sprint updated successfully",
+        message=SPRINT_UPDATED_MESSAGE,
         data=response.model_dump(),
     )
 

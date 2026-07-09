@@ -6,6 +6,15 @@ from fastapi import Query
 
 from app.common.api_response import ApiResponse
 from app.common.pagination import get_pagination_params
+from app.constants.message_constants import (
+    COMMENT_ADDED_MESSAGE,
+    COMMENT_DELETED_MESSAGE,
+    COMMENT_UPDATED_MESSAGE,
+    ISSUE_CREATED_MESSAGE,
+    ISSUE_LIST_MESSAGE,
+    ISSUE_RETRIEVED_MESSAGE,
+    ISSUE_UPDATED_MESSAGE,
+)
 from app.dependencies.authentication import get_current_user
 from app.dependencies.authorization import (
     require_admin_or_member,
@@ -39,7 +48,7 @@ def create_issue(
 
     return ApiResponse(
         success=True,
-        message="Issue created successfully",
+        message=ISSUE_CREATED_MESSAGE,
         data=response.model_dump(),
     )
 
@@ -65,7 +74,7 @@ def get_all_issues(
 
     return ApiResponse(
         success=True,
-        message="Issues retrieved successfully",
+        message=ISSUE_LIST_MESSAGE,
         data=response.model_dump(),
     )
 
@@ -84,7 +93,7 @@ def get_issue_by_id(
 
     return ApiResponse(
         success=True,
-        message="Issue retrieved successfully",
+        message=ISSUE_RETRIEVED_MESSAGE,
         data=response.model_dump(),
     )
 
@@ -104,7 +113,7 @@ def add_comment_to_issue(
 
     return ApiResponse(
         success=True,
-        message="Comment added successfully",
+        message=COMMENT_ADDED_MESSAGE,
         data=response.model_dump(),
     )
 
@@ -127,7 +136,7 @@ def update_comment_on_issue(
 
     return ApiResponse(
         success=True,
-        message="Comment updated successfully",
+        message=COMMENT_UPDATED_MESSAGE,
         data=response.model_dump(),
     )
 
@@ -148,7 +157,7 @@ def delete_comment_from_issue(
 
     return ApiResponse(
         success=True,
-        message="Comment deleted successfully",
+        message=COMMENT_DELETED_MESSAGE,
         data=response.model_dump(),
     )
 
@@ -169,7 +178,7 @@ def update_issue(
 
     return ApiResponse(
         success=True,
-        message="Issue updated successfully",
+        message=ISSUE_UPDATED_MESSAGE,
         data=response.model_dump(),
     )
 
