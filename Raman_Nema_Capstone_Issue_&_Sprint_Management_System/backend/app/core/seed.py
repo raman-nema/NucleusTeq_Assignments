@@ -15,7 +15,7 @@ def seed_admin():
     database.users.insert_one(
         {
             "name": "Admin",
-            "email": "admin@example.com",
+            "email": "admin@company.com",
             "password": hash_password("Admin@123"),
             "role": Role.ADMIN,
         }

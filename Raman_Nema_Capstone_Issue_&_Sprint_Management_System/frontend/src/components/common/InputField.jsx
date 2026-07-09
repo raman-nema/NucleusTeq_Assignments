@@ -1,5 +1,4 @@
 // Reusable controlled input field with label, value, and change handling.
-
 import "../../styles/InputField.css"
 
 function InputField({ label, name, type, value, onChange, className = "" }) {

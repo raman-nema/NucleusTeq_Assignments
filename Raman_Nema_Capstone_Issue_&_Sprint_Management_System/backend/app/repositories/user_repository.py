@@ -1,3 +1,4 @@
+from bson import ObjectId
 from app.core.database import database
 
 
@@ -15,3 +16,13 @@ class UserRepository:
         """Insert a new user document."""
 
         return database.users.insert_one(user)
+    
+    @staticmethod
+    def find_by_id(user_id: str):
+        """Find a user by MongoDB ObjectId."""
+
+        return database.users.find_one(
+            {
+                "_id": ObjectId(user_id)
+            }
+        )

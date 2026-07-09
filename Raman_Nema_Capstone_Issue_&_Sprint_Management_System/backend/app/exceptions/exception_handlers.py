@@ -1,9 +1,12 @@
 from fastapi.responses import JSONResponse
 from fastapi import Request
-
 from app.exceptions.custom_exceptions import (
     UserAlreadyExistsException,
     InvalidCredentialsException,
+    BadRequestException,
+    UnauthorizedException,
+    ExpiredTokenException,
+    ForbiddenException,
 )
 
 
@@ -33,4 +36,41 @@ async def invalid_credentials_handler(
             "message": "Invalid email or password",
             "data": None,
         },
+    )
+
+
+async def bad_request_handler(request: Request, exc: BadRequestException):
+    """Return a bad request response for invalid request data."""
+
+    return JSONResponse(
+        status_code=400,
+        content={
+            "success": False,
+            "message": exc.message,
+            "data": None,
+        },
+    )
+
+
+async def unauthorized_handler(request: Request, exc: UnauthorizedException):
+
+    return JSONResponse(
+        status_code=401,
+        content={"success": False, "message": "Authentication required", "data": None},
+    )
+
+
+async def expired_token_handler(request: Request, exc: ExpiredTokenException):
+
+    return JSONResponse(
+        status_code=401,
+        content={"success": False, "message": "Token has expired", "data": None},
+    )
+
+
+async def forbidden_handler(request: Request, exc: ForbiddenException):
+
+    return JSONResponse(
+        status_code=403,
+        content={"success": False, "message": "Access denied", "data": None},
     )

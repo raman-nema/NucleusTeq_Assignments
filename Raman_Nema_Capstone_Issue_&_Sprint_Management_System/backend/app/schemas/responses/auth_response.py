@@ -15,3 +15,6 @@ class LoginResponse(BaseModel):
     access_token: str
     role: str
     expires_at: datetime
+
+class LogoutResponse(BaseModel):
+    message: str
