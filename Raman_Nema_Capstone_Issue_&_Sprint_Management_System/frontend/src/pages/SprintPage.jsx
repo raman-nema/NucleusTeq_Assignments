@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getProjects } from "../services/project-service";
 import {
   createSprint,
@@ -9,14 +10,26 @@ import {
 import SprintForm from "../components/sprint/SprintForm";
 import SprintCard from "../components/sprint/SprintCard";
 import Button from "../components/common/Button";
+import Pagination from "../components/common/Pagination";
 import { getRole } from "../utils/storage";
+import { useNotification } from "../context/useNotification";
+import {
+  buildPaginationParams,
+  DEFAULT_PAGE,
+  getDefaultPagination,
+} from "../utils/pagination";
 import "../styles/ProjectPage.css";
 
 function SprintPage() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { showNotification } = useNotification();
   // Component state
   const [projects, setProjects] = useState([]);
   const [sprints, setSprints] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [selectedProjectId, setSelectedProjectId] = useState(
+    searchParams.get("projectId") || "",
+  );
   const [selectedSprint, setSelectedSprint] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -24,6 +37,8 @@ function SprintPage() {
   const [loadingSprints, setLoadingSprints] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [page, setPage] = useState(DEFAULT_PAGE);
+  const [pagination, setPagination] = useState(getDefaultPagination());
 
   // Get current user role
   const role = getRole();
@@ -37,9 +52,15 @@ function SprintPage() {
   // Load sprints when project changes
   useEffect(() => {
     if (selectedProjectId) {
-      loadSprints(selectedProjectId);
+      loadSprints(selectedProjectId, page);
+      setSearchParams((previous) => {
+        const params = new URLSearchParams(previous);
+        params.set("projectId", selectedProjectId);
+        params.set("page", String(page));
+        return params;
+      });
     }
-  }, [selectedProjectId]);
+  }, [selectedProjectId, page]);
 
   // Fetch all projects
   async function loadProjects() {
@@ -47,13 +68,23 @@ function SprintPage() {
     setError("");
 
     try {
-      const response = await getProjects();
+      const response = await getProjects({ limit: 100 });
       const projectList = response.data.projects || [];
+      const requestedProjectId = searchParams.get("projectId");
+      const hasRequestedProject = projectList.some(
+        (project) => project.id === requestedProjectId,
+      );
 
       setProjects(projectList);
 
       if (projectList.length > 0) {
-        setSelectedProjectId((current) => current || projectList[0].id);
+        setSelectedProjectId((current) => {
+          if (current && projectList.some((project) => project.id === current)) {
+            return current;
+          }
+
+          return hasRequestedProject ? requestedProjectId : projectList[0].id;
+        });
       }
     } catch (error) {
       setError(error.response?.data?.message || "Unable to load projects.");
@@ -63,15 +94,20 @@ function SprintPage() {
   }
 
   // Fetch sprints for the selected project
-  async function loadSprints(projectId) {
+  async function loadSprints(projectId, nextPage = page) {
     setLoadingSprints(true);
     setError("");
 
     try {
-      const response = await getProjectSprints(projectId);
+      const response = await getProjectSprints(
+        projectId,
+        buildPaginationParams(nextPage),
+      );
       setSprints(response.data.sprints || []);
+      setPagination(response.data.pagination || getDefaultPagination());
     } catch (error) {
       setSprints([]);
+      setPagination(getDefaultPagination());
       setError(error.response?.data?.message || "Unable to load sprints.");
     } finally {
       setLoadingSprints(false);
@@ -81,7 +117,9 @@ function SprintPage() {
   // Create a new sprint
   async function handleCreateSprint(sprintData) {
     if (!selectedProjectId) {
-      setError("Select a project before creating a sprint.");
+      const message = "Select a project before creating a sprint.";
+      setError(message);
+      showNotification(message, "error");
       return;
     }
 
@@ -89,12 +127,17 @@ function SprintPage() {
     setError("");
 
     try {
-      await createSprint(selectedProjectId, sprintData);
-      await loadSprints(selectedProjectId);
+      const response = await createSprint(selectedProjectId, sprintData);
+      setPage(DEFAULT_PAGE);
+      await loadSprints(selectedProjectId, DEFAULT_PAGE);
       setSelectedSprint(null);
       setShowForm(false);
+      showNotification(response.message);
     } catch (error) {
-      setError(error.response?.data?.message || "Unable to create sprint.");
+      const message =
+        error.response?.data?.message || "Unable to create sprint.";
+      setError(message);
+      showNotification(message, "error");
     } finally {
       setSaving(false);
     }
@@ -106,12 +149,16 @@ function SprintPage() {
     setError("");
 
     try {
-      await updateSprint(selectedSprint.id, sprintData);
+      const response = await updateSprint(selectedSprint.id, sprintData);
       await loadSprints(selectedProjectId);
       setSelectedSprint(null);
       setShowForm(false);
+      showNotification(response.message);
     } catch (error) {
-      setError(error.response?.data?.message || "Unable to update sprint.");
+      const message =
+        error.response?.data?.message || "Unable to update sprint.";
+      setError(message);
+      showNotification(message, "error");
     } finally {
       setSaving(false);
     }
@@ -128,21 +175,25 @@ function SprintPage() {
     setError("");
 
     try {
-      await deleteSprint(sprintId);
+      const response = await deleteSprint(sprintId);
       await loadSprints(selectedProjectId);
+      showNotification(response.message);
     } catch (error) {
-      setError(error.response?.data?.message || "Unable to delete sprint.");
+      const message =
+        error.response?.data?.message || "Unable to delete sprint.";
+      setError(message);
+      showNotification(message, "error");
     }
   }
 
-  // Placeholder for viewing sprint issues
   function handleViewIssues(sprint) {
-    window.alert(`Issues for ${sprint.name} will appear here soon.`);
+    navigate(`/issues?projectId=${sprint.project_id}&sprintId=${sprint.id}`);
   }
 
   // Handle project selection
   function handleProjectChange(event) {
     setSelectedProjectId(event.target.value);
+    setPage(DEFAULT_PAGE);
     setSelectedSprint(null);
     setShowForm(false);
     setSearchTerm("");
@@ -263,6 +314,14 @@ function SprintPage() {
               onViewIssues={handleViewIssues}
             />
           ))}
+
+        {!loadingProjects && !loadingSprints && !error && (
+          <Pagination
+            pagination={pagination}
+            disabled={loadingSprints}
+            onPageChange={setPage}
+          />
+        )}
       </div>
     </div>
   );

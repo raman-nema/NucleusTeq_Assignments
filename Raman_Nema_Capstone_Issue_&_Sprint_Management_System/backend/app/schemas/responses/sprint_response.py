@@ -1,5 +1,6 @@
 from datetime import datetime, date
 from pydantic import BaseModel
+from app.common.pagination import PaginationMeta
 
 
 class SprintResponse(BaseModel):
@@ -21,6 +22,7 @@ class SprintListResponse(BaseModel):
     """Sprint list response schema."""
 
     sprints: list[SprintResponse]
+    pagination: PaginationMeta | None = None
 
 
 class DeleteSprintResponse(BaseModel):

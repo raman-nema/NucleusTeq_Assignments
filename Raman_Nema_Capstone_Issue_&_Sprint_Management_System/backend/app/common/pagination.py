@@ -44,3 +44,10 @@ def build_pagination_meta(total: int, params: PaginationParams) -> PaginationMet
         total=total,
         total_pages=total_pages,
     )
+
+
+def apply_pagination(query, params: PaginationParams):
+    """Apply pagination to a Mongo cursor."""
+
+    return query.skip(params.skip).limit(params.limit)
+

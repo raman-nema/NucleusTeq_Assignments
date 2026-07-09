@@ -173,12 +173,27 @@
   flex-shrink: 0;
   padding: 3px 8px;
   border-radius: 999px;
-  background: #eef2ff;
-  color: #3730a3;
+  background: #f3f4f6;
+  color: #374151;
   font-size: 0.68rem;
   font-weight: 700;
   line-height: 1.3;
   text-transform: capitalize;
+}
+
+.status-planned {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.status-progress {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-done {
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .project-info p {
@@ -211,6 +226,53 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+}
+
+.issue-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.issue-priority {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-transform: capitalize;
+}
+
+.issue-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.issue-type {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-transform: capitalize;
+}
+
+.priority-LOW {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.priority-HIGH {
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
 .project-actions {
@@ -448,6 +510,20 @@
   text-align: center;
 }
 
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.pagination-summary {
+  color: #555;
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
 @media (max-width: 680px) {
   .toolbar,
   .project-card,
@@ -465,9 +541,18 @@
     gap: 0;
   }
 
+  .issue-form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
   .project-actions {
     width: 100%;
     justify-content: flex-end;
+  }
+
+  .pagination-bar {
+    justify-content: space-between;
   }
 
   .project-actions button.project-menu-toggle {

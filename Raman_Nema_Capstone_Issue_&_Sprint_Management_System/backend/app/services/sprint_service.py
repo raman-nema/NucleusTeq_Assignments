@@ -1,5 +1,9 @@
 from datetime import datetime, time
 from app.common.enums import Role
+from app.common.pagination import (
+    apply_pagination,
+    build_pagination_meta,
+)
 from app.models.sprint_model import SprintModel
 from app.repositories.project_repository import ProjectRepository
 from app.repositories.sprint_repository import SprintRepository
@@ -74,7 +78,7 @@ class SprintService:
         )
 
     @staticmethod
-    def get_all_sprints(project_id: str, current_user: dict):
+    def get_all_sprints(project_id: str, current_user: dict, pagination):
         """Retrieve all sprints for a project."""
 
         project = ProjectRepository.find_by_id(project_id)
@@ -89,7 +93,11 @@ class SprintService:
             ):
                 raise ForbiddenException()
 
-        sprints = SprintRepository.find_all_by_project(project_id)
+        total_sprints = SprintRepository.count_by_project(project_id)
+        sprints = apply_pagination(
+            SprintRepository.find_all_by_project(project_id),
+            pagination,
+        )
 
         sprint_list = []
 
@@ -111,6 +119,10 @@ class SprintService:
 
         return SprintListResponse(
             sprints=sprint_list,
+            pagination=build_pagination_meta(
+                total_sprints,
+                pagination,
+            ),
         )
 
     @staticmethod

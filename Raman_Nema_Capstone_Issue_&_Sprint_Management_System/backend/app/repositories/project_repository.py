@@ -31,7 +31,7 @@ class ProjectRepository:
 
     @staticmethod
     def count_all():
-        """Count all project documents."""
+        """Count all projects."""
 
         return database.projects.count_documents({})
 
@@ -51,7 +51,7 @@ class ProjectRepository:
         """Delete a project."""
 
         return database.projects.delete_one({"_id": ObjectId(project_id)})
-        
+
     @staticmethod
     def add_member(
         project_id: str,
@@ -99,6 +99,16 @@ class ProjectRepository:
         ).sort(
             "created_at",
             -1,
+        )
+
+    @staticmethod
+    def count_by_member(user_id: str):
+        """Count projects assigned to a member."""
+
+        return database.projects.count_documents(
+            {
+                "members": ObjectId(user_id),
+            }
         )
 
 

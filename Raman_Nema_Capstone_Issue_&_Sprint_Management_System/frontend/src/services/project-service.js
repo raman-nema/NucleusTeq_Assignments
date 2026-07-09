@@ -8,8 +8,10 @@ export async function createProject(projectData) {
 }
 
 // Fetch all projects.
-export async function getProjects() {
-  const response = await apiClient.get("/projects");
+export async function getProjects(params = {}) {
+  const response = await apiClient.get("/projects", {
+    params,
+  });
 
   return response.data;
 }

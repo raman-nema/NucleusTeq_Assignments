@@ -26,7 +26,7 @@ class ProjectListResponse(BaseModel):
     """Project list response schema."""
 
     projects: list[ProjectResponse]
-    pagination: PaginationMeta
+    pagination: PaginationMeta | None = None
 
 
 class DeleteProjectResponse(BaseModel):
@@ -34,3 +34,8 @@ class DeleteProjectResponse(BaseModel):
 
     message: str
 
+
+class ProjectMemberResponse(BaseModel):
+    """Project member action response schema."""
+
+    message: str

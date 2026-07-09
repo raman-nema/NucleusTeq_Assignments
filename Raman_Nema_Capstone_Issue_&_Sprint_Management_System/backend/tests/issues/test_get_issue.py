@@ -1,0 +1,514 @@
+import uuid
+
+from app.common.enums import Role
+from app.core.database import database
+
+
+def register_user(
+    client,
+    name,
+    email,
+    password,
+    role,
+):
+    """Register a user."""
+
+    client.post(
+        "/auth/register",
+        json={
+            "name": name,
+            "email": email,
+            "password": password,
+            "role": role,
+        },
+    )
+
+
+def login_user(
+    client,
+    email,
+    password,
+):
+    """Login user and return access token."""
+
+    response = client.post(
+        "/auth/login",
+        json={
+            "email": email,
+            "password": password,
+        },
+    )
+
+    return response.json()["data"]["access_token"]
+
+
+def get_user_id(email):
+    """Return user id."""
+
+    user = database.users.find_one(
+        {
+            "email": email,
+        }
+    )
+
+    return str(user["_id"])
+
+
+def create_project(
+    client,
+    token,
+):
+    """Create project."""
+
+    response = client.post(
+        "/projects",
+        headers={
+            "Authorization": f"Bearer {token}",
+        },
+        json={
+            "name": f"Project-{uuid.uuid4()}",
+            "description": "Project Description",
+        },
+    )
+
+    return response.json()["data"]["id"]
+
+
+def create_sprint(
+    client,
+    token,
+    project_id,
+):
+    """Create sprint."""
+
+    response = client.post(
+        f"/projects/{project_id}/sprints",
+        headers={
+            "Authorization": f"Bearer {token}",
+        },
+        json={
+            "name": f"Sprint-{uuid.uuid4()}",
+            "goal": "Sprint Goal",
+            "start_date": "2026-07-01",
+            "end_date": "2026-07-15",
+            "status": "PLANNED",
+        },
+    )
+
+    return response.json()["data"]["id"]
+
+
+def create_issue(
+    client,
+    token,
+    project_id,
+    sprint_id,
+    assignee_id,
+    status="TODO",
+):
+    """Create issue."""
+
+    response = client.post(
+        f"/projects/{project_id}/issues",
+        headers={
+            "Authorization": f"Bearer {token}",
+        },
+        json={
+            "title": f"Issue-{uuid.uuid4()}",
+            "description": "Issue Description",
+            "assignee": assignee_id,
+            "sprint_id": sprint_id,
+            "priority": "HIGH",
+            "status": status,
+        },
+    )
+
+    return response.json()["data"]["id"]
+
+
+def test_admin_can_get_all_issues(client):
+
+    register_user(
+        client,
+        "Admin",
+        "admin@company.com",
+        "Admin@123",
+        Role.ADMIN.value,
+    )
+
+    register_user(
+        client,
+        "Member",
+        "member@company.com",
+        "Member@123",
+        Role.MEMBER.value,
+    )
+
+    admin_token = login_user(
+        client,
+        "admin@company.com",
+        "Admin@123",
+    )
+
+    member_id = get_user_id(
+        "member@company.com",
+    )
+
+    project_id = create_project(
+        client,
+        admin_token,
+    )
+
+    client.post(
+        f"/projects/{project_id}/members",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "user_id": member_id,
+        },
+    )
+
+    sprint_id = create_sprint(
+        client,
+        admin_token,
+        project_id,
+    )
+
+    create_issue(
+        client,
+        admin_token,
+        project_id,
+        sprint_id,
+        member_id,
+    )
+
+    response = client.get(
+        f"/projects/{project_id}/issues",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["success"] is True
+    assert len(response.json()["data"]["issues"]) == 1
+
+
+def test_admin_can_filter_issues_by_status(client):
+
+    register_user(
+        client,
+        "Admin",
+        "admin@company.com",
+        "Admin@123",
+        Role.ADMIN.value,
+    )
+
+    register_user(
+        client,
+        "Member",
+        "member@company.com",
+        "Member@123",
+        Role.MEMBER.value,
+    )
+
+    admin_token = login_user(
+        client,
+        "admin@company.com",
+        "Admin@123",
+    )
+
+    member_id = get_user_id(
+        "member@company.com",
+    )
+
+    project_id = create_project(
+        client,
+        admin_token,
+    )
+
+    client.post(
+        f"/projects/{project_id}/members",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "user_id": member_id,
+        },
+    )
+
+    sprint_id = create_sprint(
+        client,
+        admin_token,
+        project_id,
+    )
+
+    create_issue(
+        client,
+        admin_token,
+        project_id,
+        sprint_id,
+        member_id,
+        "TODO",
+    )
+
+    create_issue(
+        client,
+        admin_token,
+        project_id,
+        sprint_id,
+        member_id,
+        "DONE",
+    )
+
+    response = client.get(
+        f"/projects/{project_id}/issues?status=DONE",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+    )
+
+    issues = response.json()["data"]["issues"]
+
+    assert response.status_code == 200
+    assert len(issues) == 1
+    assert issues[0]["status"] == "DONE"
+    assert response.json()["data"]["pagination"]["total"] == 1
+
+
+def test_member_can_get_all_issues(client):
+
+    register_user(
+        client,
+        "Admin",
+        "admin@company.com",
+        "Admin@123",
+        Role.ADMIN.value,
+    )
+
+    register_user(
+        client,
+        "Member",
+        "member@company.com",
+        "Member@123",
+        Role.MEMBER.value,
+    )
+
+    admin_token = login_user(
+        client,
+        "admin@company.com",
+        "Admin@123",
+    )
+
+    member_token = login_user(
+        client,
+        "member@company.com",
+        "Member@123",
+    )
+
+    member_id = get_user_id(
+        "member@company.com",
+    )
+
+    project_id = create_project(
+        client,
+        admin_token,
+    )
+
+    client.post(
+        f"/projects/{project_id}/members",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "user_id": member_id,
+        },
+    )
+
+    sprint_id = create_sprint(
+        client,
+        admin_token,
+        project_id,
+    )
+
+    create_issue(
+        client,
+        admin_token,
+        project_id,
+        sprint_id,
+        member_id,
+    )
+
+    response = client.get(
+        f"/projects/{project_id}/issues",
+        headers={
+            "Authorization": f"Bearer {member_token}",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["success"] is True
+    assert len(response.json()["data"]["issues"]) == 1
+
+def test_viewer_can_get_all_issues(client):
+
+    register_user(
+        client,
+        "Admin",
+        "admin@company.com",
+        "Admin@123",
+        Role.ADMIN.value,
+    )
+
+    register_user(
+        client,
+        "Viewer",
+        "viewer@company.com",
+        "Viewer@123",
+        Role.VIEWER.value,
+    )
+
+    register_user(
+        client,
+        "Member",
+        "member@company.com",
+        "Member@123",
+        Role.MEMBER.value,
+    )
+
+    admin_token = login_user(
+        client,
+        "admin@company.com",
+        "Admin@123",
+    )
+
+    viewer_token = login_user(
+        client,
+        "viewer@company.com",
+        "Viewer@123",
+    )
+
+    member_id = get_user_id(
+        "member@company.com",
+    )
+
+    project_id = create_project(
+        client,
+        admin_token,
+    )
+
+    client.post(
+        f"/projects/{project_id}/members",
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+        },
+        json={
+            "user_id": member_id,
+        },
+    )
+
+    sprint_id = create_sprint(
+        client,
+        admin_token,
+        project_id,
+    )
+
+    create_issue(
+        client,
+        admin_token,
+        project_id,
+        sprint_id,
+        member_id,
+    )
+
+    response = client.get(
+        f"/projects/{project_id}/issues",
+        headers={
+            "Authorization": f"Bearer {viewer_token}",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["success"] is True
+    assert len(response.json()["data"]["issues"]) == 1
+
+def test_member_not_assigned_cannot_get_all_issues(client):
+
+        register_user(
+            client,
+            "Admin",
+            "admin@company.com",
+            "Admin@123",
+            Role.ADMIN.value,
+        )
+
+        register_user(
+            client,
+            "Member1",
+            "member1@company.com",
+            "Member@123",
+            Role.MEMBER.value,
+        )
+
+        register_user(
+            client,
+            "Member2",
+            "member2@company.com",
+            "Member@123",
+            Role.MEMBER.value,
+        )
+
+        admin_token = login_user(
+            client,
+            "admin@company.com",
+            "Admin@123",
+        )
+
+        member2_token = login_user(
+            client,
+            "member2@company.com",
+            "Member@123",
+        )
+
+        member1_id = get_user_id(
+            "member1@company.com",
+        )
+
+        project_id = create_project(
+            client,
+            admin_token,
+        )
+
+        client.post(
+            f"/projects/{project_id}/members",
+            headers={
+                "Authorization": f"Bearer {admin_token}",
+            },
+            json={
+                "user_id": member1_id,
+            },
+        )
+
+        sprint_id = create_sprint(
+            client,
+            admin_token,
+            project_id,
+        )
+
+        create_issue(
+            client,
+            admin_token,
+            project_id,
+            sprint_id,
+            member1_id,
+        )
+
+        response = client.get(
+            f"/projects/{project_id}/issues",
+            headers={
+                "Authorization": f"Bearer {member2_token}",
+            },
+        )
+
+        assert response.status_code == 403

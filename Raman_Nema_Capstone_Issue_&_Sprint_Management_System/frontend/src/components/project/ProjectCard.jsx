@@ -6,6 +6,7 @@ function ProjectCard({
   project,
   onEdit,
   onDelete,
+  onViewSprints,
   onAssignMember,
   onRemoveMember,
 }) {
@@ -143,6 +144,15 @@ function ProjectCard({
                   onClick={() => {
                     setShowActionMenu(false);
                     onEdit(project);
+                  }}
+                />
+
+                <Button
+                  text="View Sprints"
+                  className="project-menu-item"
+                  onClick={() => {
+                    setShowActionMenu(false);
+                    onViewSprints(project.id);
                   }}
                 />
 

@@ -15,7 +15,27 @@ function formatDate(value) {
 
 // Format sprint status
 function formatStatus(status) {
-  return status ? status.replaceAll("_", " ") : "PLANNED";
+  const labels = {
+    PLANNED: "Planned",
+    ACTIVE: "In Progress",
+    IN_PROGRESS: "In Progress",
+    COMPLETED: "Done",
+    DONE: "Done",
+  };
+
+  return labels[status] || "Planned";
+}
+
+function getStatusClass(status) {
+  const statusClass = {
+    PLANNED: "status-planned",
+    ACTIVE: "status-progress",
+    IN_PROGRESS: "status-progress",
+    COMPLETED: "status-done",
+    DONE: "status-done",
+  };
+
+  return statusClass[status] || "status-planned";
 }
 
 function SprintCard({ sprint, projectName, onEdit, onDelete, onViewIssues }) {
@@ -34,7 +54,9 @@ function SprintCard({ sprint, projectName, onEdit, onDelete, onViewIssues }) {
         {/* Sprint details */}
         <div className="sprint-card-heading">
           <h3>{sprint.name}</h3>
-          <span className="sprint-status">{formatStatus(sprint.status)}</span>
+          <span className={`sprint-status ${getStatusClass(sprint.status)}`}>
+            {formatStatus(sprint.status)}
+          </span>
         </div>
 
         <p>{sprint.goal}</p>
