@@ -1,30 +1,25 @@
+from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
-from fastapi import Request
-from fastapi import HTTPException
+
 from app.exceptions.custom_exceptions import (
-    UserAlreadyExistsException,
-    InvalidCredentialsException,
-    UnauthorizedException,
+    BadRequestException,
+    ConflictException,
     ExpiredTokenException,
     ForbiddenException,
-    ProjectAlreadyExistsException,
-    ProjectNotFoundException,
-    SprintAlreadyExistsException,
-    SprintNotFoundException,
-    UserNotFoundException,
-    MemberAlreadyAssignedException,
-    MemberNotAssignedException,
+    InvalidCredentialsException,
+    NotFoundException,
+    UnauthorizedException,
 )
 
 
-async def user_exists_handler(request: Request, exc: UserAlreadyExistsException):
-    """Return a conflict response for duplicate user registration attempts."""
+async def conflict_handler(request: Request, exc: ConflictException):
+    """Return a conflict response for duplicate or conflicting resources."""
 
     return JSONResponse(
         status_code=409,
         content={
             "success": False,
-            "message": "User_Email already exists",
+            "message": exc.message,
             "data": None,
         },
     )
@@ -35,7 +30,6 @@ async def invalid_credentials_handler(
 ):
     """Return an unauthorized response for failed login attempts."""
 
-    # Keep authentication error responses consistent with the API response shape.
     return JSONResponse(
         status_code=401,
         content={
@@ -46,126 +40,74 @@ async def invalid_credentials_handler(
     )
 
 
+async def bad_request_handler(request: Request, exc: BadRequestException):
+    """Return a bad request response for invalid request data."""
+
+    return JSONResponse(
+        status_code=400,
+        content={
+            "success": False,
+            "message": exc.message,
+            "data": None,
+        },
+    )
+
+
+async def not_found_handler(request: Request, exc: NotFoundException):
+    """Return a not found response when a resource does not exist."""
+
+    return JSONResponse(
+        status_code=404,
+        content={
+            "success": False,
+            "message": exc.message,
+            "data": None,
+        },
+    )
+
+
 async def unauthorized_handler(request: Request, exc: UnauthorizedException):
+    """Return an authentication failure response."""
 
     return JSONResponse(
         status_code=401,
-        content={"success": False, "message": "Authentication required", "data": None},
+        content={
+            "success": False,
+            "message": "Authentication required",
+            "data": None,
+        },
     )
 
 
 async def expired_token_handler(request: Request, exc: ExpiredTokenException):
+    """Return an expired-token response."""
 
     return JSONResponse(
         status_code=401,
-        content={"success": False, "message": "Token has expired", "data": None},
+        content={
+            "success": False,
+            "message": "Token has expired",
+            "data": None,
+        },
     )
 
 
 async def forbidden_handler(request: Request, exc: ForbiddenException):
+    """Return an authorization failure response."""
 
     return JSONResponse(
         status_code=403,
-        content={"success": False, "message": "Access denied", "data": None},
-    )
-
-
-async def project_exists_handler(request: Request, exc: ProjectAlreadyExistsException):
-    """Return a conflict response for duplicate project creation."""
-
-    return JSONResponse(
-        status_code=409,
         content={
             "success": False,
-            "message": "Project already exists",
+            "message": "Access denied",
             "data": None,
         },
     )
 
 
-async def project_not_found_handler(request: Request, exc: ProjectNotFoundException):
-    """Return a not found response when the project does not exist."""
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Return FastAPI HTTPException errors in the API response shape."""
 
-    return JSONResponse(
-        status_code=404,
-        content={
-            "success": False,
-            "message": "Project not found",
-            "data": None,
-        },
-    )
-
-
-async def sprint_exists_handler(request: Request, exc: SprintAlreadyExistsException):
-    """Return a conflict response for duplicate sprint creation."""
-
-    return JSONResponse(
-        status_code=409,
-        content={
-            "success": False,
-            "message": "Sprint already exists",
-            "data": None,
-        },
-    )
-
-
-async def sprint_not_found_handler(request: Request, exc: SprintNotFoundException):
-    """Return a not found response when the sprint does not exist."""
-
-    return JSONResponse(
-        status_code=404,
-        content={
-            "success": False,
-            "message": "Sprint not found",
-            "data": None,
-        },
-    )
-
-
-async def user_not_found_handler(request: Request, exc: UserNotFoundException):
-
-    return JSONResponse(
-        status_code=404,
-        content={
-            "success": False,
-            "message": "User not found",
-            "data": None,
-        },
-    )
-
-
-async def member_already_assigned_handler(
-    request: Request, exc: MemberAlreadyAssignedException
-):
-
-    return JSONResponse(
-        status_code=409,
-        content={
-            "success": False,
-            "message": "Member already assigned",
-            "data": None,
-        },
-    )
-
-
-async def member_not_assigned_handler(
-    request: Request, exc: MemberNotAssignedException
-):
-
-    return JSONResponse(
-        status_code=404,
-        content={
-            "success": False,
-            "message": "Member not assigned",
-            "data": None,
-        },
-    )
-
-
-async def http_exception_handler(
-    request: Request,
-    exc: HTTPException,
-):
     return JSONResponse(
         status_code=exc.status_code,
         content={

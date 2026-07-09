@@ -6,10 +6,9 @@ import Button from "../components/common/Button";
 
 import { registerUser } from "../services/auth-service";
 import { useNotification } from "../context/useNotification";
+import { validateRegister } from "../utils/validations";
 
 import "../styles/RegisterPage.css";
-
-import { validateRegister } from "../../src/utils/validations";
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -116,11 +115,10 @@ function RegisterPage() {
             <label>Role</label>
             <div className="select-wrapper">
               <select name="role" value={formData.role} onChange={handleChange}>
-                <option value="#">Select a role</option>
+                <option value="MEMBER">Select a role</option>
                 <option value="MEMBER">Member</option>
                 <option value="VIEWER">Viewer</option>
               </select>
-              {errors.role && <p className="error-message">{errors.role}</p>}
             </div>
           </div>
 

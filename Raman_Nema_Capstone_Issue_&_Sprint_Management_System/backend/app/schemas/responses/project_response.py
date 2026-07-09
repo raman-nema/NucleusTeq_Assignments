@@ -28,12 +28,14 @@ class ProjectListResponse(BaseModel):
     projects: list[ProjectResponse]
     pagination: PaginationMeta | None = None
 
+
 class DeleteProjectResponse(BaseModel):
     """Project deletion response schema."""
 
     message: str
 
+
 class ProjectMemberResponse(BaseModel):
-    """Project member operation response."""
+    """Project member action response schema."""
 
     message: str

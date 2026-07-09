@@ -1,40 +1,30 @@
-from fastapi import FastAPI
-from fastapi import HTTPException
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.routers.auth_router import router as auth_router
 from app.routers import project_router
 from app.routers import admin_router
 from app.routers.sprint_router import router as sprint_router
 from app.routers.issue_router import router as issue_router
-from fastapi.middleware.cors import CORSMiddleware
 from app.core.seed import seed_admin
 from app.exceptions.custom_exceptions import (
-    UserAlreadyExistsException,
-    InvalidCredentialsException,
-    UnauthorizedException,
+    BadRequestException,
+    ConflictException,
     ExpiredTokenException,
     ForbiddenException,
-    ProjectAlreadyExistsException,
-    ProjectNotFoundException,
-    SprintAlreadyExistsException,
-    SprintNotFoundException,
-    MemberAlreadyAssignedException,
-    MemberNotAssignedException,
-    UserNotFoundException,
+    NotFoundException,
+    UnauthorizedException,
+    InvalidCredentialsException,
 )
 from app.exceptions.exception_handlers import (
-    user_exists_handler,
-    invalid_credentials_handler,
-    unauthorized_handler,
+    bad_request_handler,
+    conflict_handler,
     expired_token_handler,
     forbidden_handler,
-    project_exists_handler,
-    project_not_found_handler,
-    sprint_exists_handler,
-    sprint_not_found_handler,
-    member_already_assigned_handler,
-    member_not_assigned_handler,
-    user_not_found_handler,
     http_exception_handler,
+    invalid_credentials_handler,
+    not_found_handler,
+    unauthorized_handler,
 )
 
 app = FastAPI(title="Issue & Sprint Management System")
@@ -52,18 +42,13 @@ app.include_router(issue_router)
 
 
 # Map custom authentication exceptions to consistent JSON responses.
-app.add_exception_handler(UserAlreadyExistsException, user_exists_handler)
+app.add_exception_handler(ConflictException, conflict_handler)
 app.add_exception_handler(InvalidCredentialsException, invalid_credentials_handler)
+app.add_exception_handler(BadRequestException, bad_request_handler)
+app.add_exception_handler(NotFoundException, not_found_handler)
 app.add_exception_handler(UnauthorizedException, unauthorized_handler)
 app.add_exception_handler(ExpiredTokenException, expired_token_handler)
 app.add_exception_handler(ForbiddenException, forbidden_handler)
-app.add_exception_handler(ProjectAlreadyExistsException, project_exists_handler)
-app.add_exception_handler(ProjectNotFoundException, project_not_found_handler)
-app.add_exception_handler(SprintNotFoundException, sprint_not_found_handler)
-app.add_exception_handler(SprintAlreadyExistsException, sprint_exists_handler)
-app.add_exception_handler(MemberAlreadyAssignedException, member_already_assigned_handler)
-app.add_exception_handler(MemberNotAssignedException, member_not_assigned_handler)
-app.add_exception_handler(UserNotFoundException, user_not_found_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)
 
 
@@ -81,4 +66,3 @@ app.add_middleware(
 def startup_event():
     # Ensure the default admin user exists when the application starts.
     seed_admin()
-    
