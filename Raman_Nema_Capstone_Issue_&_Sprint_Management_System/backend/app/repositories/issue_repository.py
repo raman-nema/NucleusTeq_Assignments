@@ -129,6 +129,24 @@ class IssueRepository:
         )
 
     @staticmethod
+    def update_comment(issue_id: str, comment_id: str, updated_data: dict):
+        """Update an embedded issue comment."""
+
+        return database.issues.update_one(
+            {
+                "_id": ObjectId(issue_id),
+                "comments._id": ObjectId(comment_id),
+            },
+            {
+                "$set": {
+                    "comments.$.text": updated_data["text"],
+                    "comments.$.updated_at": updated_data["updated_at"],
+                    "updated_at": updated_data["updated_at"],
+                },
+            },
+        )
+
+    @staticmethod
     def delete_comment(issue_id: str, comment_id: str):
         """Remove a comment from an issue."""
 
@@ -149,10 +167,12 @@ class IssueRepository:
     def find_all_by_sprint(sprint_id: str):
         """Retrieve all issues for a sprint."""
 
+        query = {
+            "sprint_id": ObjectId(sprint_id),
+        }
+
         return database.issues.find(
-            {
-                "sprint_id": ObjectId(sprint_id),
-            }
+            query
         ).sort(
             "created_at",
             -1,

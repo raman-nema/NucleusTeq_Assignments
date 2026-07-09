@@ -5,6 +5,7 @@ from pydantic import (
     Field,
     field_validator,
 )
+from app.exceptions.custom_exceptions import BadRequestException
 
 
 class CreateProjectRequest(BaseModel):
@@ -30,7 +31,7 @@ class CreateProjectRequest(BaseModel):
         project_name_pattern = r"^[A-Za-z0-9][A-Za-z0-9\s_-]*$"
 
         if not re.match(project_name_pattern, value):
-            raise ValueError("Project name contains invalid characters.")
+            raise BadRequestException("Project name contains invalid characters.")
 
         return value
 

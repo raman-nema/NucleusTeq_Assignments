@@ -1,224 +1,170 @@
+from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
-from fastapi import Request
+
 from app.exceptions.custom_exceptions import (
-    UserAlreadyExistsException,
-    InvalidCredentialsException,
-    UnauthorizedException,
+    BadRequestException,
+    ConflictException,
     ExpiredTokenException,
     ForbiddenException,
+    InvalidCredentialsException,
+    InvalidIssueStatusTransitionException,
+    IssueAlreadyExistsException,
+    IssueNotFoundException,
+    MemberAlreadyAssignedException,
+    MemberNotAssignedException,
+    NotFoundException,
     ProjectAlreadyExistsException,
     ProjectHasSprintsException,
     ProjectNotFoundException,
     SprintAlreadyExistsException,
     SprintHasIssuesException,
     SprintNotFoundException,
+    UnauthorizedException,
     UserNotFoundException,
-    MemberAlreadyAssignedException,
-    MemberNotAssignedException,
-    IssueAlreadyExistsException,
-    IssueNotFoundException,
-    InvalidIssueStatusTransitionException,
 )
 
 
-async def user_exists_handler(request: Request, exc: UserAlreadyExistsException):
-    """Return a conflict response for duplicate user registration attempts."""
-
+def _error_response(status_code: int, message: str):
     return JSONResponse(
-        status_code=409,
+        status_code=status_code,
         content={
             "success": False,
-            "message": "User_Email already exists",
+            "message": message,
             "data": None,
         },
     )
+
+
+async def conflict_handler(request: Request, exc: ConflictException):
+    """Return a conflict response for duplicate or conflicting resources."""
+
+    return _error_response(409, exc.message)
 
 
 async def invalid_credentials_handler(
-    request: Request, exc: InvalidCredentialsException
+    request: Request,
+    exc: InvalidCredentialsException,
 ):
-    return JSONResponse(
-        status_code=401,
-        content={
-            "success": False,
-            "message": "Invalid email or password",
-            "data": None,
-        },
-    )
+    """Return an unauthorized response for failed login attempts."""
+
+    return _error_response(401, "Invalid email or password")
+
+
+async def bad_request_handler(request: Request, exc: BadRequestException):
+    """Return a bad request response for invalid request data."""
+
+    return _error_response(400, exc.message)
+
+
+async def not_found_handler(request: Request, exc: NotFoundException):
+    """Return a not found response when a resource does not exist."""
+
+    return _error_response(404, exc.message)
 
 
 async def unauthorized_handler(request: Request, exc: UnauthorizedException):
+    """Return an authentication failure response."""
 
-    return JSONResponse(
-        status_code=401,
-        content={"success": False, "message": "Authentication required", "data": None},
-    )
+    return _error_response(401, "Authentication required")
 
 
 async def expired_token_handler(request: Request, exc: ExpiredTokenException):
+    """Return an expired-token response."""
 
-    return JSONResponse(
-        status_code=401,
-        content={"success": False, "message": "Token has expired", "data": None},
-    )
+    return _error_response(401, "Token has expired")
 
 
 async def forbidden_handler(request: Request, exc: ForbiddenException):
+    """Return an authorization failure response."""
 
-    return JSONResponse(
-        status_code=403,
-        content={"success": False, "message": "Access denied", "data": None},
-    )
+    return _error_response(403, "Access denied")
 
 
-async def project_exists_handler(request: Request, exc: ProjectAlreadyExistsException):
-    return JSONResponse(
-        status_code=409,
-        content={
-            "success": False,
-            "message": "Project already exists",
-            "data": None,
-        },
-    )
+async def project_exists_handler(
+    request: Request,
+    exc: ProjectAlreadyExistsException,
+):
+    return _error_response(409, "Project already exists")
 
 
-async def project_not_found_handler(request: Request, exc: ProjectNotFoundException):
-    return JSONResponse(
-        status_code=404,
-        content={
-            "success": False,
-            "message": "Project not found",
-            "data": None,
-        },
-    )
+async def project_not_found_handler(
+    request: Request,
+    exc: ProjectNotFoundException,
+):
+    return _error_response(404, "Project not found")
 
 
 async def project_has_sprints_handler(
     request: Request,
     exc: ProjectHasSprintsException,
 ):
-    return JSONResponse(
-        status_code=409,
-        content={
-            "success": False,
-            "message": "Project cannot be deleted because a sprint is assigned to it",
-            "data": None,
-        },
+    return _error_response(
+        409,
+        "Project cannot be deleted because a sprint is assigned to it",
     )
 
 
-async def sprint_exists_handler(request: Request, exc: SprintAlreadyExistsException):
-    return JSONResponse(
-        status_code=409,
-        content={
-            "success": False,
-            "message": "Sprint already exists",
-            "data": None,
-        },
-    )
+async def sprint_exists_handler(
+    request: Request,
+    exc: SprintAlreadyExistsException,
+):
+    return _error_response(409, "Sprint already exists")
 
 
-async def sprint_not_found_handler(request: Request, exc: SprintNotFoundException):
-    return JSONResponse(
-        status_code=404,
-        content={
-            "success": False,
-            "message": "Sprint not found",
-            "data": None,
-        },
-    )
+async def sprint_not_found_handler(
+    request: Request,
+    exc: SprintNotFoundException,
+):
+    return _error_response(404, "Sprint not found")
 
 
 async def sprint_has_issues_handler(
     request: Request,
     exc: SprintHasIssuesException,
 ):
-    return JSONResponse(
-        status_code=409,
-        content={
-            "success": False,
-            "message": "Sprint cannot be deleted because an issue is present",
-            "data": None,
-        },
-    )
+    return _error_response(409, "Sprint cannot be deleted because an issue is present")
 
 
 async def user_not_found_handler(request: Request, exc: UserNotFoundException):
-    return JSONResponse(
-        status_code=404,
-        content={
-            "success": False,
-            "message": "User not found",
-            "data": None,
-        },
-    )
+    return _error_response(404, "User not found")
 
 
 async def member_already_assigned_handler(
-    request: Request, exc: MemberAlreadyAssignedException
+    request: Request,
+    exc: MemberAlreadyAssignedException,
 ):
-
-    return JSONResponse(
-        status_code=409,
-        content={
-            "success": False,
-            "message": "Member already assigned",
-            "data": None,
-        },
-    )
+    return _error_response(409, "Member already assigned")
 
 
 async def member_not_assigned_handler(
-    request: Request, exc: MemberNotAssignedException
+    request: Request,
+    exc: MemberNotAssignedException,
 ):
-
-    return JSONResponse(
-        status_code=404,
-        content={
-            "success": False,
-            "message": "Member not assigned",
-            "data": None,
-        },
-    )
+    return _error_response(404, "Member not assigned")
 
 
 async def issue_exists_handler(
     request: Request,
     exc: IssueAlreadyExistsException,
 ):
-    return JSONResponse(
-        status_code=409,
-        content={
-            "success": False,
-            "message": "Issue already exists",
-            "data": None,
-        },
-    )
+    return _error_response(409, "Issue already exists")
 
 
 async def issue_not_found_handler(
     request: Request,
     exc: IssueNotFoundException,
 ):
-    return JSONResponse(
-        status_code=404,
-        content={
-            "success": False,
-            "message": "Issue not found",
-            "data": None,
-        },
-    )
+    return _error_response(404, "Issue not found")
 
 
 async def invalid_issue_status_transition_handler(
     request: Request,
     exc: InvalidIssueStatusTransitionException,
 ):
-    return JSONResponse(
-        status_code=400,
-        content={
-            "success": False,
-            "message": "Issues in DONE state cannot move backward",
-            "data": None,
-        },
-    )
+    return _error_response(400, "Issues in DONE state cannot move backward")
+
+
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Return FastAPI HTTPException errors in the API response shape."""
+
+    return _error_response(exc.status_code, exc.detail)
