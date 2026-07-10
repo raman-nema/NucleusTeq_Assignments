@@ -18,6 +18,32 @@
   gap: 12px;
 }
 
+.sprint-toolbar {
+  flex-wrap: wrap;
+}
+
+.sprint-toolbar .search-input {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.sprint-toolbar button {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.issue-toolbar-member {
+  flex-wrap: nowrap;
+}
+
+.issue-toolbar-member .search-input {
+  flex: 1 1 0;
+}
+
+.issue-toolbar-member button {
+  margin-left: 0;
+}
+
 .search-input {
   flex: 1;
   box-sizing: border-box;

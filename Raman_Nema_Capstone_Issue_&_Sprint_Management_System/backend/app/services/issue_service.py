@@ -233,6 +233,7 @@ class IssueService:
         current_user: dict,
         pagination,
         status: str | None = None,
+        assignee: str | None = None,
     ):
         """Retrieve all issues for a project."""
 
@@ -240,6 +241,9 @@ class IssueService:
 
         if not project:
             raise ProjectNotFoundException()
+
+        if assignee and current_user["role"] != Role.ADMIN.value:
+            raise ForbiddenException()
 
         if (
             current_user["role"] == Role.MEMBER.value
@@ -253,11 +257,13 @@ class IssueService:
         total_issues = IssueRepository.count_by_project(
             project_id,
             status,
+            assignee,
         )
         issues = apply_pagination(
             IssueRepository.find_all_by_project(
                 project_id,
                 status,
+                assignee,
             ),
             pagination,
         )

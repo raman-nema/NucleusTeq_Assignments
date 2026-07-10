@@ -370,6 +370,15 @@
           "response": []
         },
         {
+          "name": "get_issues_by_assignee",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/projects/{{project_id}}/issues?assignee={{assignee_id}}&page={{page}}&limit={{limit}}"
+          },
+          "response": []
+        },
+        {
           "name": "get_issue_by_id",
           "request": {
             "method": "GET",

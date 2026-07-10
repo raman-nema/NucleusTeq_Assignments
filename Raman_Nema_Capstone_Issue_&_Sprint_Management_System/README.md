@@ -88,6 +88,7 @@ Major implemented capabilities include:
 - Create issues under a project and sprint.
 - List issues by project with pagination.
 - Filter issues by status.
+- Filter issues by assignee.
 - Retrieve, update, and delete issues.
 - Issue priorities: `LOW`, `MEDIUM`, `HIGH`.
 - Issue types: `TASK`, `BUG`, `STORY`.
@@ -131,6 +132,7 @@ Major implemented capabilities include:
 - Backend admin user search by name, email, or ObjectId.
 - Backend admin user filtering by role.
 - Backend issue filtering by status.
+- Backend issue filtering by assignee.
 
 ### Role Management
 
@@ -522,7 +524,8 @@ All backend routes return the shared `ApiResponse` shape:
 | Method | Route | Purpose | Auth Required | Roles Allowed |
 | --- | --- | --- | --- | --- |
 | `POST` | `/projects/{project_id}/issues` | Create an issue | Yes | `ADMIN`, assigned `MEMBER` |
-| `GET` | `/projects/{project_id}/issues` | List project issues with optional `status` filter | Yes | `ADMIN`, assigned `MEMBER`, `VIEWER` |
+| `GET` | `/projects/{project_id}/issues?status={{issue_status}}` | List project issues with optional `status` filter | Yes | `ADMIN`, assigned `MEMBER`, `VIEWER` |
+| `GET` | `/projects/{project_id}/issues?assignee={{assignee_id}}` | List project issues with optional `assignee` filter | Yes | `ADMIN`|
 | `GET` | `/issues/{issue_id}` | Get issue by ID | Yes | `ADMIN`, assigned `MEMBER`, `VIEWER` |
 | `PUT` | `/issues/{issue_id}` | Update issue | Yes | `ADMIN`, assigned `MEMBER` |
 | `DELETE` | `/issues/{issue_id}` | Delete issue | Yes | `ADMIN`, assigned `MEMBER` |

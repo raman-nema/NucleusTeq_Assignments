@@ -10,6 +10,15 @@
     max-width: none;
   }
 
+  .sprint-toolbar button {
+    margin-left: 0;
+  }
+
+  .issue-toolbar-member .search-input {
+    flex-basis: auto;
+    width: 100%;
+  }
+
   .sprint-date-grid,
   .issue-form-grid {
     grid-template-columns: 1fr;

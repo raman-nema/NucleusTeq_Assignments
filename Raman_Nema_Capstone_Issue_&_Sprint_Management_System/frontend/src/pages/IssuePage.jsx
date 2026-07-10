@@ -41,6 +41,9 @@ function IssuePage() {
   const [statusFilter, setStatusFilter] = useState(
     searchParams.get("status") || "",
   );
+  const [assigneeFilter, setAssigneeFilter] = useState(
+    searchParams.get("assignee") || "",
+  );
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [issueToDelete, setIssueToDelete] = useState(null);
   const [commentToDelete, setCommentToDelete] = useState(null);
@@ -55,6 +58,7 @@ function IssuePage() {
   const [pagination, setPagination] = useState(getDefaultPagination());
 
   const role = getRole();
+  const isAdmin = role === "ADMIN";
   const canManageIssues = role === "ADMIN" || role === "MEMBER";
   const requestedProjectId = searchParams.get("projectId");
   const requestedSprintId = searchParams.get("sprintId");
@@ -66,7 +70,7 @@ function IssuePage() {
   useEffect(() => {
     if (selectedProjectId) {
       loadSprints(selectedProjectId);
-      loadIssues(selectedProjectId, page, statusFilter);
+      loadIssues(selectedProjectId, page, statusFilter, assigneeFilter);
       loadIssueOptions(selectedProjectId);
       setSearchParams((previous) => {
         const params = new URLSearchParams(previous);
@@ -79,10 +83,16 @@ function IssuePage() {
           params.delete("status");
         }
 
+        if (isAdmin && assigneeFilter) {
+          params.set("assignee", assigneeFilter);
+        } else {
+          params.delete("assignee");
+        }
+
         return params;
       });
     }
-  }, [selectedProjectId, page, statusFilter]);
+  }, [selectedProjectId, page, statusFilter, assigneeFilter, isAdmin]);
 
   useEffect(() => {
     setSearchParams((previous) => {
@@ -158,6 +168,7 @@ function IssuePage() {
     projectId,
     nextPage = page,
     nextStatus = statusFilter,
+    nextAssignee = assigneeFilter,
   ) {
     setLoadingIssues(true);
     setError("");
@@ -168,6 +179,7 @@ function IssuePage() {
         {
           ...buildPaginationParams(nextPage),
           ...(nextStatus ? { status: nextStatus } : {}),
+          ...(isAdmin && nextAssignee ? { assignee: nextAssignee } : {}),
         },
       );
       setIssues(response.data.issues || []);
@@ -204,7 +216,12 @@ function IssuePage() {
     try {
       const response = await createIssue(selectedProjectId, issueData);
       setPage(DEFAULT_PAGE);
-      await loadIssues(selectedProjectId, DEFAULT_PAGE, statusFilter);
+      await loadIssues(
+        selectedProjectId,
+        DEFAULT_PAGE,
+        statusFilter,
+        assigneeFilter,
+      );
       await loadIssueOptions(selectedProjectId);
       setSelectedIssue(null);
       setShowForm(false);
@@ -225,7 +242,7 @@ function IssuePage() {
 
     try {
       const response = await updateIssue(selectedIssue.id, issueData);
-      await loadIssues(selectedProjectId, page, statusFilter);
+      await loadIssues(selectedProjectId, page, statusFilter, assigneeFilter);
       await loadIssueOptions(selectedProjectId);
       setSelectedIssue(null);
       setShowForm(false);
@@ -338,7 +355,7 @@ function IssuePage() {
 
     try {
       const response = await deleteIssue(issueToDelete);
-      await loadIssues(selectedProjectId, page, statusFilter);
+      await loadIssues(selectedProjectId, page, statusFilter, assigneeFilter);
       await loadIssueOptions(selectedProjectId);
       showNotification(response.message);
     } catch (error) {
@@ -357,10 +374,18 @@ function IssuePage() {
     setSelectedIssue(null);
     setShowForm(false);
     setSearchTerm("");
+    setAssigneeFilter("");
   }
 
   function handleStatusFilterChange(event) {
     setStatusFilter(event.target.value);
+    setPage(DEFAULT_PAGE);
+    setSelectedIssue(null);
+    setShowForm(false);
+  }
+
+  function handleAssigneeFilterChange(event) {
+    setAssigneeFilter(event.target.value);
     setPage(DEFAULT_PAGE);
     setSelectedIssue(null);
     setShowForm(false);
@@ -426,7 +451,11 @@ function IssuePage() {
         <div className="form-group">
           <label className="toolbar-label">Project</label>
 
-          <div className="toolbar sprint-toolbar">
+          <div
+            className={`toolbar sprint-toolbar ${
+              isAdmin ? "issue-toolbar-admin" : "issue-toolbar-member"
+            }`}
+          >
             <select
               className="search-input select-input"
               value={selectedProjectId}
@@ -468,6 +497,23 @@ function IssuePage() {
               <option value="IN_PROGRESS">In Progress</option>
               <option value="DONE">Done</option>
             </select>
+
+            {isAdmin && (
+              <select
+                className="search-input select-input"
+                value={assigneeFilter}
+                onChange={handleAssigneeFilterChange}
+                disabled={!selectedProjectId}
+              >
+                <option value="">All assignees</option>
+
+                {assignableMembers.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name} - {member.email}
+                  </option>
+                ))}
+              </select>
+            )}
 
             <input
               className="search-input"

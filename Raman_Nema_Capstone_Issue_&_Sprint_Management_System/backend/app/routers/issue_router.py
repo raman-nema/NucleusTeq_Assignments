@@ -60,6 +60,10 @@ def get_all_issues(
         None,
         alias="status",
     ),
+    assignee: str | None = Query(
+        None,
+        pattern=r"^[0-9a-fA-F]{24}$",
+    ),
     pagination=Depends(get_pagination_params),
     current_user=Depends(get_current_user),
 ):
@@ -70,6 +74,7 @@ def get_all_issues(
         current_user,
         pagination,
         issue_status,
+        assignee,
     )
 
     return ApiResponse(
