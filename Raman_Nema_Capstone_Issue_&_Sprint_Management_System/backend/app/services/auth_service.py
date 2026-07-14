@@ -1,10 +1,8 @@
 from app.models.user_model import UserModel
 from app.repositories.user_repository import UserRepository
-from app.core.security import hash_password
 from app.constants.message_constants import USER_EMAIL_ALREADY_EXISTS_MESSAGE
 from app.exceptions.custom_exceptions import ConflictException
 from app.schemas.responses.auth_response import RegisterResponse
-from app.common.api_response import ApiResponse
 import uuid
 from datetime import datetime
 from datetime import timedelta

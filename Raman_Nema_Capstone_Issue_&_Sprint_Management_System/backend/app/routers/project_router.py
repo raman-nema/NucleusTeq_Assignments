@@ -1,30 +1,32 @@
-from typing import Literal
-
-from fastapi import APIRouter, Depends, Query
-
+from fastapi import APIRouter
+from fastapi import Depends
 from app.common.api_response import ApiResponse
+
 from app.common.pagination import PaginationParams, get_pagination_params
 from app.constants.message_constants import (
     PROJECT_CREATED_MESSAGE,
     PROJECT_LIST_MESSAGE,
     PROJECT_RETRIEVED_MESSAGE,
     PROJECT_UPDATED_MESSAGE,
+    SPRINT_CREATED_MESSAGE,
+    SPRINT_LIST_MESSAGE,
+)
+
+from app.services.project_service import ProjectService
+from app.schemas.requests.project_request import (
+    CreateProjectRequest,
+    UpdateProjectRequest,
 )
 from app.dependencies.authentication import get_current_user
 from app.dependencies.authorization import (
     require_admin,
     require_admin_or_member,
 )
-from app.schemas.requests.issue_request import CreateIssueRequest
-from app.schemas.requests.project_member_request import AssignMemberRequest
-from app.schemas.requests.project_request import (
-    CreateProjectRequest,
-    UpdateProjectRequest,
-)
-from app.schemas.requests.sprint_request import CreateSprintRequest
-from app.services.issue_service import IssueService
-from app.services.project_service import ProjectService
 from app.services.sprint_service import SprintService
+from app.schemas.requests.sprint_request import CreateSprintRequest
+from app.schemas.requests.project_member_request import (
+    AssignMemberRequest,
+)
 
 router = APIRouter(
     prefix="/projects",
@@ -39,7 +41,10 @@ def create_project(
 ):
     """Create a new project."""
 
-    response = ProjectService.create_project(request, current_user)
+    response = ProjectService.create_project(
+        request,
+        current_user,
+    )
 
     return ApiResponse(
         success=True,
@@ -55,7 +60,10 @@ def get_all_projects(
 ):
     """Retrieve all projects."""
 
-    response = ProjectService.get_all_projects(current_user, pagination)
+    response = ProjectService.get_all_projects(
+        current_user,
+        pagination,
+    )
 
     return ApiResponse(
         success=True,
@@ -71,7 +79,10 @@ def get_project_by_id(
 ):
     """Retrieve a project by its ID."""
 
-    response = ProjectService.get_project_by_id(project_id, current_user)
+    response = ProjectService.get_project_by_id(
+        project_id,
+        current_user,
+    )
 
     return ApiResponse(
         success=True,
@@ -88,7 +99,11 @@ def update_project(
 ):
     """Update an existing project."""
 
-    response = ProjectService.update_project(project_id, request, current_user)
+    response = ProjectService.update_project(
+        project_id,
+        request,
+        current_user,
+    )
 
     return ApiResponse(
         success=True,
@@ -104,7 +119,9 @@ def delete_project(
 ):
     """Delete an existing project."""
 
-    response = ProjectService.delete_project(project_id)
+    response = ProjectService.delete_project(
+        project_id,
+    )
 
     return ApiResponse(
         success=True,
@@ -121,7 +138,11 @@ def assign_member(
 ):
     """Assign a member to a project."""
 
-    response = ProjectService.assign_member(project_id, request, current_user)
+    response = ProjectService.assign_member(
+        project_id,
+        request,
+        current_user,
+    )
 
     return ApiResponse(
         success=True,
@@ -138,7 +159,11 @@ def remove_member(
 ):
     """Remove a member from a project."""
 
-    response = ProjectService.remove_member(project_id, user_id, current_user)
+    response = ProjectService.remove_member(
+        project_id,
+        user_id,
+        current_user,
+    )
 
     return ApiResponse(
         success=True,
@@ -147,6 +172,7 @@ def remove_member(
     )
 
 
+# Sprint routes for a specific project.
 @router.post("/{project_id}/sprints", response_model=ApiResponse)
 def create_sprint(
     project_id: str,
@@ -155,11 +181,15 @@ def create_sprint(
 ):
     """Create a sprint for a project."""
 
-    response = SprintService.create_sprint(project_id, request, current_user)
+    response = SprintService.create_sprint(
+        project_id,
+        request,
+        current_user,
+    )
 
     return ApiResponse(
         success=True,
-        message="Sprint created successfully",
+        message=SPRINT_CREATED_MESSAGE,
         data=response.model_dump(),
     )
 
@@ -167,7 +197,7 @@ def create_sprint(
 @router.get("/{project_id}/sprints", response_model=ApiResponse)
 def get_all_sprints(
     project_id: str,
-    pagination: PaginationParams = Depends(get_pagination_params),
+    pagination=Depends(get_pagination_params),
     current_user=Depends(get_current_user),
 ):
     """Retrieve all sprints for a project."""
@@ -180,49 +210,6 @@ def get_all_sprints(
 
     return ApiResponse(
         success=True,
-        message="Sprints retrieved successfully",
-        data=response.model_dump(),
-    )
-
-
-@router.post("/{project_id}/issues", response_model=ApiResponse)
-def create_issue(
-    project_id: str,
-    request: CreateIssueRequest,
-    current_user=Depends(require_admin_or_member),
-):
-    """Create an issue for a project."""
-
-    response = IssueService.create_issue(project_id, request, current_user)
-
-    return ApiResponse(
-        success=True,
-        message="Issue created successfully",
-        data=response.model_dump(),
-    )
-
-
-@router.get("/{project_id}/issues", response_model=ApiResponse)
-def get_all_issues(
-    project_id: str,
-    pagination: PaginationParams = Depends(get_pagination_params),
-    issue_status: Literal["TODO", "IN_PROGRESS", "DONE"] | None = Query(
-        None,
-        alias="status",
-    ),
-    current_user=Depends(get_current_user),
-):
-    """Retrieve all issues for a project."""
-
-    response = IssueService.get_all_issues(
-        project_id,
-        current_user,
-        pagination,
-        issue_status,
-    )
-
-    return ApiResponse(
-        success=True,
-        message="Issues retrieved successfully",
+        message=SPRINT_LIST_MESSAGE,
         data=response.model_dump(),
     )

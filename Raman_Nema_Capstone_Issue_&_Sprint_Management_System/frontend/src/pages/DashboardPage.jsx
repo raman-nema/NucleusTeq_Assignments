@@ -7,7 +7,7 @@ import {
 } from "../services/admin-service";
 import { getRole } from "../utils/storage";
 
-import "../styles/DashboardPage.css";
+import "../styles/dashboard-styles";
 
 function formatDate(value) {
   if (!value) {
@@ -20,6 +20,7 @@ function formatDate(value) {
 function DashboardPage() {
   const navigate = useNavigate();
   const role = getRole();
+  const isAdmin = role === "ADMIN";
   const [dashboard, setDashboard] = useState({
     totals: {
       projects: 0,
@@ -67,14 +68,10 @@ function DashboardPage() {
   );
 
   useEffect(() => {
-    if (role !== "ADMIN") {
-      setLoading(false);
-      setError("Only admin users can access the dashboard.");
-      return;
+    if (isAdmin) {
+      loadDashboard();
     }
-
-    loadDashboard();
-  }, [role]);
+  }, [isAdmin]);
 
   async function loadDashboard(params = {}) {
     setLoading(true);
@@ -192,10 +189,13 @@ function DashboardPage() {
       <div className="dashboard-container">
         <h1>Users</h1>
 
-        {loading && <p>Loading dashboard...</p>}
-        {error && <p className="error-message">{error}</p>}
+        {isAdmin && loading && <p>Loading dashboard...</p>}
+        {!isAdmin && (
+          <p className="error-message">Only admin users can access the dashboard.</p>
+        )}
+        {isAdmin && error && <p className="error-message">{error}</p>}
 
-        {!loading && !error && (
+        {isAdmin && !loading && !error && (
           <>
             <div className="dashboard-stats">
               {totalCards.map((card) => (

@@ -1,0 +1,705 @@
+{
+  "info": {
+    "_postman_id": "bd5952ec-91fb-4722-a874-460d0fc21537",
+    "name": "issue_management_secure",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "31552521"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "projects",
+      "item": [
+        {
+          "name": "remove_member_from_project",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/projects/{{project_id}}/members/{{member_user_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "add_member_to_project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{member_user_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/projects/{{project_id}}/members"
+          },
+          "response": []
+        },
+        {
+          "name": "create_project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{project_name}}\",\n  \"description\": \"{{project_description}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/projects"
+          },
+          "response": []
+        },
+        {
+          "name": "get_all_projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/projects"
+          },
+          "response": []
+        },
+        {
+          "name": "get_project_by_id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/projects/{{project_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "update_project",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{updated_project_name}}\",\n  \"description\": \"{{updated_project_description}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/projects/{{project_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "delete_project",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/projects/{{project_id}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{login_email}}\",\n  \"password\": \"{{login_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/auth/login"
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{base_url}}/auth/logout"
+          },
+          "response": []
+        },
+        {
+          "name": "register_user",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{register_name}}\",\n  \"email\": \"{{register_email}}\",\n  \"password\": \"{{register_password}}\",\n  \"role\": \"{{register_role}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/auth/register"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "sprints",
+      "item": [
+        {
+          "name": "create_sprint",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{sprint_name}}\",\n  \"goal\": \"{{sprint_goal}}\",\n  \"start_date\": \"{{sprint_start_date}}\",\n  \"end_date\": \"{{sprint_end_date}}\",\n  \"status\": \"{{sprint_status}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/projects/{{project_id}}/sprints"
+          },
+          "response": []
+        },
+        {
+          "name": "get_all_sprints_in_project",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/projects/{{project_id}}/sprints"
+          },
+          "response": []
+        },
+        {
+          "name": "get_sprint_by_id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/sprints/{{sprint_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "update_sprint",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{updated_sprint_name}}\",\n  \"goal\": \"{{updated_sprint_goal}}\",\n  \"start_date\": \"{{sprint_start_date}}\",\n  \"end_date\": \"{{updated_sprint_end_date}}\",\n  \"status\": \"{{updated_sprint_status}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/sprints/{{sprint_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "delete_sprint",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/sprints/{{sprint_id}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "admin",
+      "item": [
+        {
+          "name": "get_dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/admin/dashboard"
+          },
+          "response": []
+        },
+        {
+          "name": "get_users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/admin/users"
+          },
+          "response": []
+        },
+        {
+          "name": "update_user",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{updated_user_name}}\",\n  \"email\": \"{{updated_user_email}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/admin/users/{{user_id}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "issues",
+      "item": [
+        {
+          "name": "create_issue",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{issue_title}}\",\n  \"description\": \"{{issue_description}}\",\n  \"assignee\": \"{{assignee_user_id}}\",\n  \"sprint_id\": \"{{sprint_id}}\",\n  \"parent_id\": null,\n  \"priority\": \"{{issue_priority}}\",\n  \"type\": \"{{issue_type}}\",\n  \"status\": \"{{issue_status}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/projects/{{project_id}}/issues"
+          },
+          "response": []
+        },
+        {
+          "name": "get_all_issues",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/projects/{{project_id}}/issues?page={{page}}&limit={{limit}}"
+          },
+          "response": []
+        },
+        {
+          "name": "get_issues_by_status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/projects/{{project_id}}/issues?status={{issue_status}}&page={{page}}&limit={{limit}}"
+          },
+          "response": []
+        },
+        {
+          "name": "get_issues_by_assignee",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/projects/{{project_id}}/issues?assignee={{assignee_id}}&page={{page}}&limit={{limit}}"
+          },
+          "response": []
+        },
+        {
+          "name": "get_issue_by_id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/issues/{{issue_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "update_issue",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{updated_issue_title}}\",\n  \"description\": \"{{updated_issue_description}}\",\n  \"assignee\": \"{{assignee_user_id}}\",\n  \"sprint_id\": \"{{sprint_id}}\",\n  \"parent_id\": null,\n  \"priority\": \"{{updated_issue_priority}}\",\n  \"type\": \"{{issue_type}}\",\n  \"status\": \"{{updated_issue_status}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/issues/{{issue_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "delete_issue",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/issues/{{issue_id}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "comments",
+      "item": [
+        {
+          "name": "add_comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"{{comment_text}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/issues/{{issue_id}}/comments"
+          },
+          "response": []
+        },
+        {
+          "name": "update_comment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"{{updated_comment_text}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/issues/{{issue_id}}/comments/{{comment_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "delete_comment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/issues/{{issue_id}}/comments/{{comment_id}}"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "secret"
+    },
+    {
+      "key": "project_id",
+      "value": "PROJECT_ID",
+      "type": "string"
+    },
+    {
+      "key": "member_user_id",
+      "value": "MEMBER_USER_ID",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "USER_ID",
+      "type": "string"
+    },
+    {
+      "key": "assignee_user_id",
+      "value": "ASSIGNEE_USER_ID",
+      "type": "string"
+    },
+    {
+      "key": "sprint_id",
+      "value": "SPRINT_ID",
+      "type": "string"
+    },
+    {
+      "key": "issue_id",
+      "value": "ISSUE_ID",
+      "type": "string"
+    },
+    {
+      "key": "comment_id",
+      "value": "COMMENT_ID",
+      "type": "string"
+    },
+    {
+      "key": "page",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "limit",
+      "value": "10",
+      "type": "string"
+    },
+    {
+      "key": "login_email",
+      "value": "member@example.com",
+      "type": "string"
+    },
+    {
+      "key": "login_password",
+      "value": "",
+      "type": "secret"
+    },
+    {
+      "key": "register_name",
+      "value": "Test Member",
+      "type": "string"
+    },
+    {
+      "key": "register_email",
+      "value": "newmember@example.com",
+      "type": "string"
+    },
+    {
+      "key": "register_password",
+      "value": "",
+      "type": "secret"
+    },
+    {
+      "key": "register_role",
+      "value": "MEMBER",
+      "type": "string"
+    },
+    {
+      "key": "project_name",
+      "value": "Capstone Project",
+      "type": "string"
+    },
+    {
+      "key": "project_description",
+      "value": "Backend API Testing Project",
+      "type": "string"
+    },
+    {
+      "key": "updated_project_name",
+      "value": "Updated Capstone Project",
+      "type": "string"
+    },
+    {
+      "key": "updated_project_description",
+      "value": "Updated Project Description",
+      "type": "string"
+    },
+    {
+      "key": "sprint_name",
+      "value": "Sprint 1",
+      "type": "string"
+    },
+    {
+      "key": "sprint_goal",
+      "value": "Complete Backend APIs",
+      "type": "string"
+    },
+    {
+      "key": "sprint_start_date",
+      "value": "2026-07-09",
+      "type": "string"
+    },
+    {
+      "key": "sprint_end_date",
+      "value": "2026-07-20",
+      "type": "string"
+    },
+    {
+      "key": "sprint_status",
+      "value": "PLANNED",
+      "type": "string"
+    },
+    {
+      "key": "updated_sprint_name",
+      "value": "Sprint 1 Updated",
+      "type": "string"
+    },
+    {
+      "key": "updated_sprint_goal",
+      "value": "Complete Backend Testing",
+      "type": "string"
+    },
+    {
+      "key": "updated_sprint_end_date",
+      "value": "2026-07-22",
+      "type": "string"
+    },
+    {
+      "key": "updated_sprint_status",
+      "value": "ACTIVE",
+      "type": "string"
+    },
+    {
+      "key": "updated_user_name",
+      "value": "Updated User",
+      "type": "string"
+    },
+    {
+      "key": "updated_user_email",
+      "value": "updated@example.com",
+      "type": "string"
+    },
+    {
+      "key": "issue_title",
+      "value": "Test Login API",
+      "type": "string"
+    },
+    {
+      "key": "issue_description",
+      "value": "Verify login with valid credentials",
+      "type": "string"
+    },
+    {
+      "key": "issue_priority",
+      "value": "HIGH",
+      "type": "string"
+    },
+    {
+      "key": "issue_type",
+      "value": "TASK",
+      "type": "string"
+    },
+    {
+      "key": "issue_status",
+      "value": "TODO",
+      "type": "string"
+    },
+    {
+      "key": "updated_issue_title",
+      "value": "Updated Login API Test",
+      "type": "string"
+    },
+    {
+      "key": "updated_issue_description",
+      "value": "Verify login and logout functionality",
+      "type": "string"
+    },
+    {
+      "key": "updated_issue_priority",
+      "value": "MEDIUM",
+      "type": "string"
+    },
+    {
+      "key": "updated_issue_status",
+      "value": "IN_PROGRESS",
+      "type": "string"
+    },
+    {
+      "key": "comment_text",
+      "value": "Login API tested successfully.",
+      "type": "string"
+    },
+    {
+      "key": "updated_comment_text",
+      "value": "Updated comment after retesting.",
+      "type": "string"
+    }
+  ]
+}

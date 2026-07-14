@@ -40,6 +40,7 @@ class IssueRepository:
     def find_all_by_project(
         project_id: str,
         status: str | None = None,
+        assignee: str | None = None,
     ):
         """Retrieve all issues for a project."""
 
@@ -50,6 +51,9 @@ class IssueRepository:
         if status:
             query["status"] = status
 
+        if assignee:
+            query["assignee"] = ObjectId(assignee)
+
         return database.issues.find(query).sort(
             "created_at",
             -1,
@@ -59,6 +63,7 @@ class IssueRepository:
     def count_by_project(
         project_id: str,
         status: str | None = None,
+        assignee: str | None = None,
     ):
         """Count issues for a project."""
 
@@ -69,6 +74,9 @@ class IssueRepository:
         if status:
             query["status"] = status
 
+        if assignee:
+            query["assignee"] = ObjectId(assignee)
+
         return database.issues.count_documents(query)
 
     @staticmethod
@@ -78,6 +86,16 @@ class IssueRepository:
         return database.issues.count_documents(
             {
                 "sprint_id": ObjectId(sprint_id),
+            }
+        )
+
+    @staticmethod
+    def count_by_parent(parent_id: str):
+        """Count issues linked to a parent issue."""
+
+        return database.issues.count_documents(
+            {
+                "parent_id": ObjectId(parent_id),
             }
         )
 

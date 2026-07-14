@@ -1,3 +1,9 @@
+from app.constants.message_constants import (
+    SPRINT_ALREADY_EXISTS_MESSAGE,
+    SPRINT_NOT_FOUND_MESSAGE,
+)
+
+
 class ConflictException(Exception):
     """Raised when a request conflicts with an existing resource."""
 
@@ -56,12 +62,12 @@ class ProjectHasSprintsException(Exception):
 
 class SprintAlreadyExistsException(Exception):
     def __init__(self):
-        super().__init__("Sprint with this name already exists.")
+        super().__init__(SPRINT_ALREADY_EXISTS_MESSAGE)
 
 
 class SprintNotFoundException(Exception):
     def __init__(self):
-        super().__init__("Sprint not found.")
+        super().__init__(SPRINT_NOT_FOUND_MESSAGE)
 
 
 class SprintHasIssuesException(Exception):
@@ -85,6 +91,10 @@ class IssueAlreadyExistsException(Exception):
 
 
 class IssueNotFoundException(Exception):
+    pass
+
+
+class IssueHasChildrenException(Exception):
     pass
 
 

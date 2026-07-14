@@ -4,6 +4,7 @@ from app.common.pagination import (
     apply_pagination,
     build_pagination_meta,
 )
+from app.constants.message_constants import SPRINT_DELETED_MESSAGE
 from app.models.sprint_model import SprintModel
 from app.repositories.project_repository import ProjectRepository
 from app.repositories.issue_repository import IssueRepository
@@ -241,5 +242,5 @@ class SprintService:
         SprintRepository.delete_sprint(sprint_id)
 
         return DeleteSprintResponse(
-            message="Sprint deleted successfully",
+            message=SPRINT_DELETED_MESSAGE,
         )

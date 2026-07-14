@@ -11,6 +11,7 @@ function IssueCard({
   sprintName,
   assigneeName,
   reporterName,
+  parentTitle,
   onEdit,
   onDelete,
   onAddComment,
@@ -95,6 +96,9 @@ function IssueCard({
         <div className="sprint-meta">
           <span>{formatValue(issue.status, "TODO")}</span>
           <span>{sprintName || "Sprint"}</span>
+          {issue.parent_id && (
+            <span>Parent: {parentTitle || issue.parent_id}</span>
+          )}
           <span>Assignee: {assigneeName || issue.assignee}</span>
           <span>Reporter: {reporterName || issue.reporter}</span>
         </div>

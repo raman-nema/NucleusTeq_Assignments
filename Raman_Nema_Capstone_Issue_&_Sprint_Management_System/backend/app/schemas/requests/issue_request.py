@@ -23,6 +23,8 @@ class IssueRequest(BaseModel):
 
     sprint_id: str
 
+    parent_id: str | None = None
+
     priority: Literal[
         "LOW",
         "MEDIUM",

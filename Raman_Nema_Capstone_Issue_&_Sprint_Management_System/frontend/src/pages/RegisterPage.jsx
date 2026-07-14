@@ -8,7 +8,7 @@ import { registerUser } from "../services/auth-service";
 import { useNotification } from "../context/useNotification";
 import { validateRegister } from "../utils/validations";
 
-import "../styles/RegisterPage.css";
+import "../styles/auth-register-styles";
 
 function RegisterPage() {
   const navigate = useNavigate();

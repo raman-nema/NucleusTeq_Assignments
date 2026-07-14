@@ -20,6 +20,7 @@ class IssueResponse(BaseModel):
     id: str
     project_id: str
     sprint_id: str | None = None
+    parent_id: str | None = None
     title: str
     description: str
     priority: str

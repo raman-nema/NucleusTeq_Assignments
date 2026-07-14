@@ -5,7 +5,7 @@ from app.core.security import hash_password
 
 def seed_admin():
     """Create the default admin user when one is not already present."""
-    existing_admin = database.users.find_one({"role": Role.ADMIN})
+    existing_admin = database.users.find_one({"role": Role.ADMIN.value})
 
     if existing_admin:
         return
@@ -15,6 +15,6 @@ def seed_admin():
             "name": "Admin",
             "email": "admin@company.com",
             "password": hash_password("Admin@123"),
-            "role": Role.ADMIN,
+            "role": Role.ADMIN.value,
         }
     )

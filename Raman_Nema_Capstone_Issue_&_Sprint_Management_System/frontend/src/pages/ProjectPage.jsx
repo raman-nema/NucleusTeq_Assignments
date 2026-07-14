@@ -11,6 +11,7 @@ import {
 import ProjectForm from "../components/project/ProjectForm";
 import ProjectCard from "../components/project/ProjectCard";
 import Button from "../components/common/Button";
+import ConfirmModal from "../components/common/ConfirmModal";
 import Pagination from "../components/common/Pagination";
 import { getRole } from "../utils/storage";
 import {
@@ -19,7 +20,8 @@ import {
   getDefaultPagination,
 } from "../utils/pagination";
 import { useNotification } from "../context/useNotification";
-import "../styles/ProjectPage.css";
+import { ROUTES } from "../constants/navigation";
+import "../styles/project-styles";
 
 function ProjectPage() {
   const navigate = useNavigate();
@@ -31,6 +33,8 @@ function ProjectPage() {
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [projectToDelete, setProjectToDelete] = useState(null);
+  const [memberToRemove, setMemberToRemove] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(DEFAULT_PAGE);
   const [pagination, setPagination] = useState(getDefaultPagination());
@@ -102,22 +106,18 @@ function ProjectPage() {
   }
 
   // Delete a project
-  async function handleDeleteProject(projectId) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this project?",
-    );
-
-    if (!confirmed) return;
-
+  async function confirmDeleteProject() {
+    if (!projectToDelete) return;
     try {
-      const response = await deleteProject(projectId);
+      const response = await deleteProject(projectToDelete);
       await loadProjects();
       showNotification(response.message);
     } catch (error) {
       const message =
         error.response?.data?.message || "Unable to delete project.";
-      setError(message);
       showNotification(message, "error");
+    } finally {
+      setProjectToDelete(null);
     }
   }
 
@@ -145,24 +145,23 @@ function ProjectPage() {
   }
 
   // Remove a project member
-  async function handleRemoveMember(projectId, userId) {
-    const confirmed = window.confirm(
-      "Are you sure you want to remove this member from the project?",
-    );
-
-    if (!confirmed) return;
-
+  async function confirmRemoveMember() {
+    if (!memberToRemove) return;
     setError("");
 
     try {
-      const response = await removeMember(projectId, userId);
+      const response = await removeMember(
+        memberToRemove.projectId,
+        memberToRemove.userId,
+      );
       await loadProjects();
       showNotification(response.message);
     } catch (error) {
       const message =
         error.response?.data?.message || "Unable to remove member.";
-      setError(message);
       showNotification(message, "error");
+    } finally {
+      setMemberToRemove(null);
     }
   }
 
@@ -238,12 +237,14 @@ function ProjectPage() {
                 setSelectedProject(project);
                 setShowForm(true);
               }}
-              onDelete={handleDeleteProject}
+              onDelete={setProjectToDelete}
               onViewSprints={(projectId) => {
-                navigate(`/sprints?projectId=${projectId}`);
+                navigate(`${ROUTES.SPRINTS}?projectId=${projectId}`);
               }}
               onAssignMember={handleAssignMember}
-              onRemoveMember={handleRemoveMember}
+              onRemoveMember={(projectId, userId) => {
+                setMemberToRemove({ projectId, userId });
+              }}
             />
           ))}
 
@@ -252,6 +253,26 @@ function ProjectPage() {
             pagination={pagination}
             disabled={loading}
             onPageChange={setPage}
+          />
+        )}
+
+        {memberToRemove && (
+          <ConfirmModal
+            title="Remove member"
+            message="Are you sure you want to remove this member from the project?"
+            confirmText="Remove"
+            onCancel={() => setMemberToRemove(null)}
+            onConfirm={confirmRemoveMember}
+          />
+        )}
+
+        {projectToDelete && (
+          <ConfirmModal
+            title="Delete project"
+            message="Are you sure you want to delete this project?"
+            confirmText="Delete"
+            onCancel={() => setProjectToDelete(null)}
+            onConfirm={confirmDeleteProject}
           />
         )}
       </div>

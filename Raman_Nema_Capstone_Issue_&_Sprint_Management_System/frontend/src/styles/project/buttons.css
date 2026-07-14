@@ -1,0 +1,84 @@
+.project-container button {
+  padding: 10px 18px;
+  background: #2d2d2d;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.project-container button:hover:not(:disabled) {
+  background: #444;
+}
+
+.project-container button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.button-group button[type="button"] {
+  background: #fff;
+  color: #2d2d2d;
+  border: 1px solid #ddd;
+}
+
+.button-group button[type="button"]:hover {
+  background: #f0f0f0;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+.project-container button.btn-edit {
+  background: #fff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.project-container button.btn-edit:hover:not(:disabled) {
+  background: #eff6ff;
+}
+
+.project-container button.btn-success {
+  background: #fff;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.project-container button.btn-success:hover:not(:disabled) {
+  background: #f0fdf4;
+}
+
+.project-container button.btn-danger {
+  background: #fff;
+  color: #b91c1c;
+  border: 1px solid #fcc;
+}
+
+.project-container button.btn-danger:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.project-container button.btn-muted {
+  background: #fff;
+  color: #555;
+  border: 1px solid #ddd;
+}
+
+.project-container button.btn-muted:hover:not(:disabled) {
+  background: #f5f5f5;
+}

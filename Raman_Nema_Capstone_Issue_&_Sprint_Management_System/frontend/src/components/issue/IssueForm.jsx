@@ -3,13 +3,17 @@ import InputField from "../common/InputField";
 import Button from "../common/Button";
 import { validateIssue } from "../../utils/validations";
 
-function getInitialFormData(initialData, selectedSprintId, members) {
+function getInitialFormData(initialData, selectedSprintId, sprints, members) {
+  const defaultSprintId = selectedSprintId || sprints[0]?.id || "";
+  const defaultAssigneeId = members[0]?.id || "";
+
   if (initialData) {
     return {
       title: initialData.title,
       description: initialData.description,
-      assignee: initialData.assignee,
-      sprint_id: initialData.sprint_id || selectedSprintId,
+      assignee: initialData.assignee || defaultAssigneeId,
+      sprint_id: initialData.sprint_id || defaultSprintId,
+      parent_id: initialData.parent_id || "",
       priority: initialData.priority || "MEDIUM",
       type: initialData.type || "TASK",
       status: initialData.status || "TODO",
@@ -19,8 +23,9 @@ function getInitialFormData(initialData, selectedSprintId, members) {
   return {
     title: "",
     description: "",
-    assignee: members[0]?.id || "",
-    sprint_id: selectedSprintId,
+    assignee: defaultAssigneeId,
+    sprint_id: defaultSprintId,
+    parent_id: "",
     priority: "MEDIUM",
     type: "TASK",
     status: "TODO",
@@ -31,13 +36,14 @@ function IssueForm({
   initialData,
   sprints,
   members,
+  parentIssues,
   selectedSprintId,
   onSubmit,
   onCancel,
   loading,
 }) {
   const [formData, setFormData] = useState(() =>
-    getInitialFormData(initialData, selectedSprintId, members),
+    getInitialFormData(initialData, selectedSprintId, sprints, members),
   );
   const [errors, setErrors] = useState({});
 
@@ -60,6 +66,10 @@ function IssueForm({
 
     const validationErrors = validateIssue(formData);
 
+    if (initialData?.id && formData.parent_id === initialData.id) {
+      validationErrors.parent_id = "Issue cannot be its own parent.";
+    }
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -68,6 +78,10 @@ function IssueForm({
     setErrors({});
     onSubmit(formData);
   }
+
+  const parentIssueOptions = (parentIssues || []).filter(
+    (issue) => issue.id !== initialData?.id,
+  );
 
   return (
     <form onSubmit={handleSubmit}>
@@ -139,6 +153,29 @@ function IssueForm({
 
           {errors.assignee && (
             <p className="error-message">{errors.assignee}</p>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label>Parent Issue</label>
+
+          <select
+            className="search-input"
+            name="parent_id"
+            value={formData.parent_id}
+            onChange={handleChange}
+          >
+            <option value="">No parent issue</option>
+
+            {parentIssueOptions.map((issue) => (
+              <option key={issue.id} value={issue.id}>
+                {issue.title}
+              </option>
+            ))}
+          </select>
+
+          {errors.parent_id && (
+            <p className="error-message">{errors.parent_id}</p>
           )}
         </div>
 

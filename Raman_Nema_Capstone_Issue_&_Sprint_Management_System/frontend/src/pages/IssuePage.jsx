@@ -14,6 +14,7 @@ import {
 import IssueForm from "../components/issue/IssueForm";
 import IssueCard from "../components/issue/IssueCard";
 import Button from "../components/common/Button";
+import ConfirmModal from "../components/common/ConfirmModal";
 import Pagination from "../components/common/Pagination";
 import { getRole } from "../utils/storage";
 import { useNotification } from "../context/useNotification";
@@ -22,7 +23,7 @@ import {
   DEFAULT_PAGE,
   getDefaultPagination,
 } from "../utils/pagination";
-import "../styles/ProjectPage.css";
+import "../styles/project-styles";
 
 function IssuePage() {
   const { showNotification } = useNotification();
@@ -30,6 +31,7 @@ function IssuePage() {
   const [projects, setProjects] = useState([]);
   const [sprints, setSprints] = useState([]);
   const [issues, setIssues] = useState([]);
+  const [issueOptions, setIssueOptions] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(
     searchParams.get("projectId") || "",
   );
@@ -39,7 +41,12 @@ function IssuePage() {
   const [statusFilter, setStatusFilter] = useState(
     searchParams.get("status") || "",
   );
+  const [assigneeFilter, setAssigneeFilter] = useState(
+    searchParams.get("assignee") || "",
+  );
   const [selectedIssue, setSelectedIssue] = useState(null);
+  const [issueToDelete, setIssueToDelete] = useState(null);
+  const [commentToDelete, setCommentToDelete] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [loadingProjects, setLoadingProjects] = useState(true);
@@ -51,6 +58,7 @@ function IssuePage() {
   const [pagination, setPagination] = useState(getDefaultPagination());
 
   const role = getRole();
+  const isAdmin = role === "ADMIN";
   const canManageIssues = role === "ADMIN" || role === "MEMBER";
   const requestedProjectId = searchParams.get("projectId");
   const requestedSprintId = searchParams.get("sprintId");
@@ -62,7 +70,8 @@ function IssuePage() {
   useEffect(() => {
     if (selectedProjectId) {
       loadSprints(selectedProjectId);
-      loadIssues(selectedProjectId, page, statusFilter);
+      loadIssues(selectedProjectId, page, statusFilter, assigneeFilter);
+      loadIssueOptions(selectedProjectId);
       setSearchParams((previous) => {
         const params = new URLSearchParams(previous);
         params.set("projectId", selectedProjectId);
@@ -74,10 +83,16 @@ function IssuePage() {
           params.delete("status");
         }
 
+        if (isAdmin && assigneeFilter) {
+          params.set("assignee", assigneeFilter);
+        } else {
+          params.delete("assignee");
+        }
+
         return params;
       });
     }
-  }, [selectedProjectId, page, statusFilter]);
+  }, [selectedProjectId, page, statusFilter, assigneeFilter, isAdmin]);
 
   useEffect(() => {
     setSearchParams((previous) => {
@@ -153,6 +168,7 @@ function IssuePage() {
     projectId,
     nextPage = page,
     nextStatus = statusFilter,
+    nextAssignee = assigneeFilter,
   ) {
     setLoadingIssues(true);
     setError("");
@@ -163,6 +179,7 @@ function IssuePage() {
         {
           ...buildPaginationParams(nextPage),
           ...(nextStatus ? { status: nextStatus } : {}),
+          ...(isAdmin && nextAssignee ? { assignee: nextAssignee } : {}),
         },
       );
       setIssues(response.data.issues || []);
@@ -173,6 +190,15 @@ function IssuePage() {
       setError(error.response?.data?.message || "Unable to load issues.");
     } finally {
       setLoadingIssues(false);
+    }
+  }
+
+  async function loadIssueOptions(projectId) {
+    try {
+      const response = await getProjectIssues(projectId, { limit: 100 });
+      setIssueOptions(response.data.issues || []);
+    } catch {
+      setIssueOptions([]);
     }
   }
 
@@ -190,7 +216,13 @@ function IssuePage() {
     try {
       const response = await createIssue(selectedProjectId, issueData);
       setPage(DEFAULT_PAGE);
-      await loadIssues(selectedProjectId, DEFAULT_PAGE, statusFilter);
+      await loadIssues(
+        selectedProjectId,
+        DEFAULT_PAGE,
+        statusFilter,
+        assigneeFilter,
+      );
+      await loadIssueOptions(selectedProjectId);
       setSelectedIssue(null);
       setShowForm(false);
       showNotification(response.message);
@@ -210,7 +242,8 @@ function IssuePage() {
 
     try {
       const response = await updateIssue(selectedIssue.id, issueData);
-      await loadIssues(selectedProjectId, page, statusFilter);
+      await loadIssues(selectedProjectId, page, statusFilter, assigneeFilter);
+      await loadIssueOptions(selectedProjectId);
       setSelectedIssue(null);
       setShowForm(false);
       showNotification(response.message);
@@ -253,16 +286,20 @@ function IssuePage() {
     }
   }
 
-  async function handleDeleteComment(issueId, commentId) {
+  async function confirmDeleteComment() {
+    if (!commentToDelete) return;
     setError("");
 
     try {
-      const response = await deleteIssueComment(issueId, commentId);
+      const response = await deleteIssueComment(
+        commentToDelete.issueId,
+        commentToDelete.commentId,
+      );
       const updatedIssue = response.data;
 
       setIssues((currentIssues) =>
         currentIssues.map((issue) =>
-          issue.id === issueId
+          issue.id === commentToDelete.issueId
             ? {
                 ...issue,
                 ...updatedIssue,
@@ -276,8 +313,9 @@ function IssuePage() {
     } catch (error) {
       const message =
         error.response?.data?.message || "Unable to delete comment.";
-      setError(message);
       showNotification(message, "error");
+    } finally {
+      setCommentToDelete(null);
     }
   }
 
@@ -310,24 +348,22 @@ function IssuePage() {
     }
   }
 
-  async function handleDeleteIssue(issueId) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this issue?",
-    );
-
-    if (!confirmed) return;
+  async function confirmDeleteIssue() {
+    if (!issueToDelete) return;
 
     setError("");
 
     try {
-      const response = await deleteIssue(issueId);
-      await loadIssues(selectedProjectId, page, statusFilter);
+      const response = await deleteIssue(issueToDelete);
+      await loadIssues(selectedProjectId, page, statusFilter, assigneeFilter);
+      await loadIssueOptions(selectedProjectId);
       showNotification(response.message);
     } catch (error) {
       const message =
         error.response?.data?.message || "Unable to delete issue.";
-      setError(message);
       showNotification(message, "error");
+    } finally {
+      setIssueToDelete(null);
     }
   }
 
@@ -338,10 +374,18 @@ function IssuePage() {
     setSelectedIssue(null);
     setShowForm(false);
     setSearchTerm("");
+    setAssigneeFilter("");
   }
 
   function handleStatusFilterChange(event) {
     setStatusFilter(event.target.value);
+    setPage(DEFAULT_PAGE);
+    setSelectedIssue(null);
+    setShowForm(false);
+  }
+
+  function handleAssigneeFilterChange(event) {
+    setAssigneeFilter(event.target.value);
     setPage(DEFAULT_PAGE);
     setSelectedIssue(null);
     setShowForm(false);
@@ -380,6 +424,13 @@ function IssuePage() {
     }, {});
   }, [members]);
 
+  const issueTitleById = useMemo(() => {
+    return issueOptions.reduce((titles, issue) => {
+      titles[issue.id] = issue.title;
+      return titles;
+    }, {});
+  }, [issueOptions]);
+
   const filteredIssues = issues.filter((issue) => {
     const matchesSprint = selectedSprintId
       ? issue.sprint_id === selectedSprintId
@@ -400,7 +451,11 @@ function IssuePage() {
         <div className="form-group">
           <label className="toolbar-label">Project</label>
 
-          <div className="toolbar sprint-toolbar">
+          <div
+            className={`toolbar sprint-toolbar ${
+              isAdmin ? "issue-toolbar-admin" : "issue-toolbar-member"
+            }`}
+          >
             <select
               className="search-input select-input"
               value={selectedProjectId}
@@ -443,6 +498,23 @@ function IssuePage() {
               <option value="DONE">Done</option>
             </select>
 
+            {isAdmin && (
+              <select
+                className="search-input select-input"
+                value={assigneeFilter}
+                onChange={handleAssigneeFilterChange}
+                disabled={!selectedProjectId}
+              >
+                <option value="">All assignees</option>
+
+                {assignableMembers.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name} - {member.email}
+                  </option>
+                ))}
+              </select>
+            )}
+
             <input
               className="search-input"
               name="search"
@@ -477,6 +549,7 @@ function IssuePage() {
             initialData={selectedIssue}
             sprints={sprints}
             members={assignableMembers}
+            parentIssues={issueOptions}
             selectedSprintId={selectedIssue?.sprint_id || selectedSprintId}
             onSubmit={selectedIssue ? handleUpdateIssue : handleCreateIssue}
             onCancel={() => {
@@ -522,14 +595,17 @@ function IssuePage() {
               sprintName={sprintNameById[issue.sprint_id]}
               assigneeName={memberNameById[issue.assignee]}
               reporterName={memberNameById[issue.reporter]}
+              parentTitle={issueTitleById[issue.parent_id]}
               onEdit={(issue) => {
                 setSelectedIssue(issue);
                 setShowForm(true);
               }}
-              onDelete={handleDeleteIssue}
+              onDelete={setIssueToDelete}
               onAddComment={handleAddComment}
               onUpdateComment={handleUpdateComment}
-              onDeleteComment={handleDeleteComment}
+              onDeleteComment={(issueId, commentId) => {
+                setCommentToDelete({ issueId, commentId });
+              }}
             />
           ))}
 
@@ -538,6 +614,26 @@ function IssuePage() {
             pagination={pagination}
             disabled={loadingIssues}
             onPageChange={setPage}
+          />
+        )}
+
+        {issueToDelete && (
+          <ConfirmModal
+            title="Delete issue"
+            message="Are you sure you want to delete this issue?"
+            confirmText="Delete"
+            onCancel={() => setIssueToDelete(null)}
+            onConfirm={confirmDeleteIssue}
+          />
+        )}
+
+        {commentToDelete && (
+          <ConfirmModal
+            title="Delete comment"
+            message="Are you sure you want to delete this comment?"
+            confirmText="Delete"
+            onCancel={() => setCommentToDelete(null)}
+            onConfirm={confirmDeleteComment}
           />
         )}
       </div>
